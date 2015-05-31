@@ -16,6 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".addTodo"
+            android:theme="@style/AppTheme.BehindTheme"></activity>
     </application>
 
 </manifest>
