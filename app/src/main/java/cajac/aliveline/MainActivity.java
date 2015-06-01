@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-
+//make a note about sliding tabs
 public class MainActivity extends ActionBarActivity {
 
     @Override
