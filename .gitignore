@@ -5,3 +5,10 @@
 .DS_Store
 /build
 /captures
+
+# Android Studio
+*.iml
+.idea
+.idea/*
+.idea/misc.xml
+app/app.iml
