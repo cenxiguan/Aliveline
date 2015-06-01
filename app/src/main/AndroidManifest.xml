@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cajac.aliveline" >
 
+    <!-- application theme must include action bar for tabs to work -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
