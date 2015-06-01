@@ -10,4 +10,5 @@
 *.iml
 .idea
 .idea/*
+.idea/misc.xml
 app/app.iml
