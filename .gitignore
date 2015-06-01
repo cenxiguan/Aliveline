@@ -9,3 +9,5 @@
 # Android Studio
 *.iml
 .idea
+.idea/*
+app/app.iml
