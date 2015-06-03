@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /* may be helpful to look into sliding tabs in the future
@@ -40,17 +41,6 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /* Button made by Jon for new ToDo
-           commenting for now to make the swipe tabs work
-
-        Button b = (Button) findViewById(R.id.addTodo);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,addTodo.class));
-            }
-        }); */
 
         // Initialization for tabs
         viewPager = (ViewPager) findViewById(R.id.pager);
