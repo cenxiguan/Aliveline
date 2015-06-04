@@ -1,6 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#000000">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/add_todo_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title:" style="@style/text_style1"
+        android:id="@+id/title_prompt"
+        android:layout_marginLeft="38dp"
+        android:layout_marginStart="38dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="43dp" />
+
+    <EditText
+        style="@style/text_style2"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/title_field"
+        android:inputType="text"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_above="@+id/due_date_prompt"
+        android:layout_toRightOf="@+id/title_prompt"
+        android:layout_toEndOf="@+id/title_prompt" />
+
+    <TextView
+        style="@style/text_style1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Due Date:"
+        android:id="@+id/due_date_prompt"
+        android:layout_below="@+id/title_prompt"
+        android:layout_alignLeft="@+id/title_prompt"
+        android:layout_alignStart="@+id/title_prompt"
+        android:layout_marginTop="28dp" />
+
+    <TextView
+        style="@style/text_style1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Estimated Time:"
+        android:id="@+id/estimated_time_prompt"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/due_date_prompt"
+        android:layout_alignLeft="@+id/due_date_prompt"
+        android:layout_alignStart="@+id/due_date_prompt" />
+
+    <TextView
+        style="@style/text_style1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time Usage (Select One):"
+        android:id="@+id/time_usage_prompt"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/estimated_time_prompt"
+        android:layout_alignLeft="@+id/estimated_time_prompt"
+        android:layout_alignStart="@+id/estimated_time_prompt" />
+
+    <EditText
+        style="@style/text_style2"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/estimated_time_field"
+        android:inputType="text"
+        android:layout_alignTop="@+id/estimated_time_prompt"
+        android:layout_toRightOf="@+id/estimated_time_prompt"
+        android:layout_toEndOf="@+id/estimated_time_prompt"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"/>
+
+    <TextView
+        style="@style/text_style2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hours"
+        android:id="@+id/hours"
+        android:layout_above="@+id/time_usage_prompt"
+        android:layout_toRightOf="@+id/estimated_time_field"
+        android:layout_toEndOf="@+id/estimated_time_field"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp" />
+
+    <EditText
+        style="@style/text_style2"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/month_field"
+        android:inputType="text"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_above="@+id/estimated_time_prompt"
+        android:layout_toRightOf="@+id/due_date_prompt"
+        android:layout_toEndOf="@+id/due_date_prompt" />
+
+    <TextView
+        style="@style/text_style2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Month"
+        android:id="@+id/month"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_above="@+id/estimated_time_prompt"
+        android:layout_toRightOf="@+id/month_field"
+        android:layout_toEndOf="@+id/month_field" />
+
+    <EditText
+        style="@style/text_style2"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/day_field"
+        android:inputType="text"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_alignTop="@+id/month"
+        android:layout_toRightOf="@+id/month"
+        android:layout_toEndOf="@+id/month" />
+
+    <TextView
+        style="@style/text_style2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Day"
+        android:id="@+id/day"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_alignTop="@+id/day_field"
+        android:layout_toRightOf="@+id/day_field"
+        android:layout_toEndOf="@+id/day_field" />
+
+    <EditText
+        style="@style/text_style2"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/year_field"
+        android:inputType="text"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_alignTop="@+id/day_field"
+        android:layout_toRightOf="@+id/day"
+        android:layout_toEndOf="@+id/day" />
+
+    <TextView
+        style="@style/text_style2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Year"
+        android:id="@+id/year"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_alignTop="@+id/day"
+        android:layout_toRightOf="@+id/year_field"
+        android:layout_toEndOf="@+id/year_field" />
+
+
+    <Button
+        style="@style/text_style3"
+        android:background="@drawable/add_todo_buttons"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:id="@+id/button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        style="@style/text_style3"
+        android:background="@drawable/add_todo_buttons"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:id="@+id/button2"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
