@@ -1,10 +1,13 @@
 package cajac.aliveline;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 /**
  * Created by Christine on 6/1/2015.
@@ -16,6 +19,16 @@ public class HomeFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        //add new todo button
+        ImageButton b = (ImageButton)rootView.findViewById(R.id.add_todo_button);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), addTodo.class));
+            }
+        });
+
         return rootView;
     }
 }
