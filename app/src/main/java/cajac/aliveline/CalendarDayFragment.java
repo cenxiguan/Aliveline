@@ -1,11 +1,9 @@
 package cajac.aliveline;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -15,11 +13,7 @@ import java.util.Date;
  * Created by Chungyuk Takahashi on 6/1/2015.
  */
 public class CalendarDayFragment extends CalendarDate {
-    static CalendarDate fragmentChangeListener;
-    private FragmentManager fragmentManager;
-
     private Date selectedDate;
-
     private View view;
 
     public CalendarDayFragment() {
@@ -39,14 +33,6 @@ public class CalendarDayFragment extends CalendarDate {
 
 
         return view;
-    }
-
-    public void backPressed() {
-        CalendarMonthFragment dayView = new CalendarMonthFragment(selectedDate);
-        fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.calendar_frame, dayView).commit();
-        Switch dayOrMonth = (Switch) getParentFragment().getView().findViewById(R.id.day_month_switch);
-        dayOrMonth.setChecked(true);
     }
 
     public Date getSelectedDate() {

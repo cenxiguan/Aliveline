@@ -1,18 +1,14 @@
 package cajac.aliveline;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
@@ -25,9 +21,6 @@ import java.util.Date;
  * Created by Chungyuk Takahashi on 5/30/2015.
  */
 public class CalendarMonthFragment extends CalendarDate {
-    static CalendarDate fragmentChangeListener;
-
-    private boolean undo = false;
     private CaldroidFragment caldroidFragment;
     private FragmentManager fragmentManager;
 
@@ -41,15 +34,6 @@ public class CalendarMonthFragment extends CalendarDate {
     public CalendarMonthFragment(Date date) {
         selectedDate = date;
     }
-
-//    public CalendarMonthFragment(CalendarDate listener) {
-//        fragmentChangeListener = listener;
-//    }
-//
-//    public CalendarMonthFragment(CalendarDate listener, Date date) {
-//        fragmentChangeListener = listener;
-//        selectedDate = date;
-//    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,8 +69,6 @@ public class CalendarMonthFragment extends CalendarDate {
 
             // Uncomment this line to use dark theme
 //            args.putInt(CaldroidFragment.THEME_RESOURCE, com.caldroid.R.style.CaldroidDefaultDark);
-            Toast.makeText(getActivity().getApplicationContext(), "TESTING",
-                            Toast.LENGTH_SHORT).show();
             caldroidFragment.setArguments(args);
         }
 
@@ -106,7 +88,6 @@ public class CalendarMonthFragment extends CalendarDate {
                     CalendarDayFragment dayView = new CalendarDayFragment(date);
                     fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.calendar_frame, dayView).commit();
-
                 }
 
                 caldroidFragment.clearBackgroundResourceForDate(selectedDate);
@@ -144,11 +125,6 @@ public class CalendarMonthFragment extends CalendarDate {
 //                Toast.makeText(getActivity().getApplicationContext(),
 //                        "Long click " + formatter.format(date),
 //                        Toast.LENGTH_SHORT).show();
-
-                String formattedDate = formatter.format(date);
-//                Intent intent = new Intent(getActivity().getApplicationContext(), DayView.class);
-//                intent.putExtra(String.valueOf(R.string.day), formattedDate);
-//                startActivity(intent);
             }
 
             @Override
@@ -165,18 +141,16 @@ public class CalendarMonthFragment extends CalendarDate {
         // Setup Caldroid
         caldroidFragment.setCaldroidListener(listener);
 
-
-
         Button save = (Button) view.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText input = (EditText) view.findViewById(R.id.edit);
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-                SharedPreferences.Editor edit = sharedPref.edit();
-
-                edit.putString(formattedSelectDate, input.getText().toString());
-                edit.commit();
+//                EditText input = (EditText) view.findViewById(R.id.edit);
+//                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+//                SharedPreferences.Editor edit = sharedPref.edit();
+//
+//                edit.putString(formattedSelectDate, input.getText().toString());
+//                edit.commit();
             }
         });
 
@@ -193,8 +167,6 @@ public class CalendarMonthFragment extends CalendarDate {
         }
 
     }
-
-    public void onSwitchToNextFragment(Date date){}
 
     public Date getSelectedDate() {
         return selectedDate;
