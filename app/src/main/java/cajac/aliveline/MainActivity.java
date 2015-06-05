@@ -4,11 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.widget.Switch;
-
-import java.util.Date;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
@@ -105,22 +101,6 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
         // empty
-    }
-
-    public void onBackPressed() {
-        if(viewPager.getCurrentItem() == 1) {
-            Switch dayOrMonth = (Switch) findViewById(R.id.day_month_switch);
-            if (dayOrMonth.isChecked()) {
-                dayOrMonth.setChecked(false);
-                Date date = ((CalendarFragment) mAdapter.getItem(1)).getSelectedDate();
-                CalendarMonthFragment fragment = new CalendarMonthFragment(date);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.calendar_frame, fragment).commit();
-            }
-            else if (mAdapter.getItem(1) instanceof CalendarMonthFragment) {
-                finish();
-            }
-        }
     }
 
 }
