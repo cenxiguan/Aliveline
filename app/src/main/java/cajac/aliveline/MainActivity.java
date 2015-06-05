@@ -4,14 +4,11 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.widget.Switch;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import java.util.Date;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
@@ -110,17 +107,20 @@ public class MainActivity extends FragmentActivity implements
         // empty
     }
 
-//    public void replaceFragment(Fragment fragment) {}
-//
-//    public void replaceFragment(Fragment fragment, String date) {
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        Bundle args = new Bundle();
-//        args.putString("DATE", date);
-//        fragment.setArguments(args);
-//        fragmentTransaction.replace(R.id.pager, fragment, fragment.toString());
-//        fragmentTransaction.addToBackStack(fragment.toString());
-//        fragmentTransaction.commit();
-//    }
+    public void onBackPressed() {
+        if(viewPager.getCurrentItem() == 1) {
+            Switch dayOrMonth = (Switch) findViewById(R.id.day_month_switch);
+            if (dayOrMonth.isChecked()) {
+                dayOrMonth.setChecked(false);
+                Date date = ((CalendarFragment) mAdapter.getItem(1)).getSelectedDate();
+                CalendarMonthFragment fragment = new CalendarMonthFragment(date);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.calendar_frame, fragment).commit();
+            }
+            else if (mAdapter.getItem(1) instanceof CalendarMonthFragment) {
+                finish();
+            }
+        }
+    }
 
 }

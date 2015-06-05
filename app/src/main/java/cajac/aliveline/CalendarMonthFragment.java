@@ -3,13 +3,14 @@ package cajac.aliveline;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +24,12 @@ import java.util.Date;
 /**
  * Created by Chungyuk Takahashi on 5/30/2015.
  */
-public class CalendarMonthFragment extends Fragment {
+public class CalendarMonthFragment extends CalendarDate {
+    static CalendarDate fragmentChangeListener;
+
     private boolean undo = false;
     private CaldroidFragment caldroidFragment;
+    private FragmentManager fragmentManager;
 
     private Date selectedDate = Calendar.getInstance().getTime();
     private String formattedSelectDate;
@@ -34,12 +38,25 @@ public class CalendarMonthFragment extends Fragment {
 
     public CalendarMonthFragment() {}
 
-    public View onCreateView(LayoutInflater inflator, ViewGroup container,
+    public CalendarMonthFragment(Date date) {
+        selectedDate = date;
+    }
+
+//    public CalendarMonthFragment(CalendarDate listener) {
+//        fragmentChangeListener = listener;
+//    }
+//
+//    public CalendarMonthFragment(CalendarDate listener, Date date) {
+//        fragmentChangeListener = listener;
+//        selectedDate = date;
+//    }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflator.inflate(R.layout.fragment_calendar_month, container, false);
+        view = inflater.inflate(R.layout.fragment_calendar_month, container, false);
 
         final TextView textView = (TextView) view.findViewById(R.id.textview);
-        final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+        final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
         caldroidFragment = new CaldroidFragment();
 
         // Setup arguments
@@ -62,9 +79,14 @@ public class CalendarMonthFragment extends Fragment {
             formattedSelectDate = formatter.format(date);
             textView.setText(formattedSelectDate);
 
+            caldroidFragment.setBackgroundResourceForDate(R.color.selected, selectedDate);
+            caldroidFragment.setTextColorForDate(R.color.white, selectedDate);
+            caldroidFragment.refreshView();
+
             // Uncomment this line to use dark theme
 //            args.putInt(CaldroidFragment.THEME_RESOURCE, com.caldroid.R.style.CaldroidDefaultDark);
-
+            Toast.makeText(getActivity().getApplicationContext(), "TESTING",
+                            Toast.LENGTH_SHORT).show();
             caldroidFragment.setArguments(args);
         }
 
@@ -73,16 +95,18 @@ public class CalendarMonthFragment extends Fragment {
         t.replace(R.id.calendar1, caldroidFragment);
         t.commit();
 
-
         // Setup listener
         final CaldroidListener listener = new CaldroidListener() {
 
             @Override
             public void onSelectDate(Date date, View view) {
                 if(date.equals(selectedDate)) {
-                    Fragment fragment = new CalendarDayFragment();
-                    FragmentChangeListener activity = (FragmentChangeListener) getActivity();
-                    activity.replaceFragment(fragment, date.toString());
+                    Switch dOM = (Switch) getActivity().findViewById(R.id.day_month_switch);
+                    dOM.setChecked(true);
+                    CalendarDayFragment dayView = new CalendarDayFragment(date);
+                    fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.calendar_frame, dayView).commit();
+
                 }
 
                 caldroidFragment.clearBackgroundResourceForDate(selectedDate);
@@ -94,35 +118,32 @@ public class CalendarMonthFragment extends Fragment {
 
                 formattedSelectDate = formatter.format(selectedDate);
 
-                Toast.makeText(getActivity().getApplicationContext(), formattedSelectDate,
-                        Toast.LENGTH_SHORT).show();
-
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-
-                if(sharedPref.contains(formattedSelectDate)) {
-                    textView.setText(sharedPref.getString(formattedSelectDate, "ERROR!!!"));
-                    Toast.makeText(getActivity().getApplicationContext(), sharedPref.getString(formattedSelectDate, null),
-                            Toast.LENGTH_SHORT).show();
-
-                }else {
-                    textView.setText(formattedSelectDate);
-                    Toast.makeText(getActivity().getApplicationContext(), formattedSelectDate,
-                            Toast.LENGTH_SHORT).show();
-                }
+//                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+//
+//                if(sharedPref.contains(formattedSelectDate)) {
+//                    textView.setText(sharedPref.getString(formattedSelectDate, "ERROR!!!"));
+////                    Toast.makeText(getActivity().getApplicationContext(), sharedPref.getString(formattedSelectDate, null),
+////                            Toast.LENGTH_SHORT).show();
+//
+//                }else {
+//                    textView.setText(formattedSelectDate);
+////                    Toast.makeText(getActivity().getApplicationContext(), formattedSelectDate,
+////                            Toast.LENGTH_SHORT).show();
+//                }
             }
 
             @Override
             public void onChangeMonth(int month, int year) {
                 String text = "month: " + month + " year: " + year;
-                Toast.makeText(getActivity().getApplicationContext(), "onChangeMonth",
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity().getApplicationContext(), "onChangeMonth",
+//                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onLongClickDate(Date date, View view) {
-                Toast.makeText(getActivity().getApplicationContext(),
-                        "Long click " + formatter.format(date),
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity().getApplicationContext(),
+//                        "Long click " + formatter.format(date),
+//                        Toast.LENGTH_SHORT).show();
 
                 String formattedDate = formatter.format(date);
 //                Intent intent = new Intent(getActivity().getApplicationContext(), DayView.class);
@@ -133,9 +154,9 @@ public class CalendarMonthFragment extends Fragment {
             @Override
             public void onCaldroidViewCreated() {
                 if (caldroidFragment.getLeftArrowButton() != null) {
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            "Caldroid view is created", Toast.LENGTH_SHORT)
-                            .show();
+//                    Toast.makeText(getActivity().getApplicationContext(),
+//                            "Caldroid view is created", Toast.LENGTH_SHORT)
+//                            .show();
                 }
             }
 
@@ -173,5 +194,14 @@ public class CalendarMonthFragment extends Fragment {
 
     }
 
+    public void onSwitchToNextFragment(Date date){}
+
+    public Date getSelectedDate() {
+        return selectedDate;
+    }
+
+    public void setSelectedDate(Date date) {
+        selectedDate = date;
+    }
 
 }
