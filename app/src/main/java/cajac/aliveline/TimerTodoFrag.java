@@ -7,14 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by Christine on 6/1/2015.
- * Fragment for the third tab: TIMER
- * layout file in fragment_timer.xml
+ * Created by Christine on 6/4/2015.
+ * The list portion of the Timer fragment
  */
-public class TimerFragment extends Fragment {
+public class TimerTodoFrag extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_timer, container, false);
+        return inflater.inflate(R.layout.frag_timer_todo, container, false);
     }
 }
