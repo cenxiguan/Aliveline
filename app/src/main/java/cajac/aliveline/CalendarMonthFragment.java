@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  * Created by Chungyuk Takahashi on 5/30/2015.
  */
-public class CalendarMonth extends Fragment {
+public class CalendarMonthFragment extends Fragment {
     private boolean undo = false;
     private CaldroidFragment caldroidFragment;
 
@@ -32,11 +32,11 @@ public class CalendarMonth extends Fragment {
 
     private View view;
 
-    public CalendarMonth() {}
+    public CalendarMonthFragment() {}
 
     public View onCreateView(LayoutInflater inflator, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflator.inflate(R.layout.calendar_month, container, false);
+        view = inflator.inflate(R.layout.fragment_calendar_month, container, false);
 
         final TextView textView = (TextView) view.findViewById(R.id.textview);
         final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
@@ -79,6 +79,12 @@ public class CalendarMonth extends Fragment {
 
             @Override
             public void onSelectDate(Date date, View view) {
+                if(date.equals(selectedDate)) {
+                    Fragment fragment = new CalendarDayFragment();
+                    FragmentChangeListener activity = (FragmentChangeListener) getActivity();
+                    activity.replaceFragment(fragment, date.toString());
+                }
+
                 caldroidFragment.clearBackgroundResourceForDate(selectedDate);
                 caldroidFragment.clearTextColorForDate(selectedDate);
                 selectedDate = date;
@@ -153,11 +159,18 @@ public class CalendarMonth extends Fragment {
             }
         });
 
-
-
-
-
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+        super.onSaveInstanceState(outState);
+
+        if (caldroidFragment != null) {
+            caldroidFragment.saveStatesToKey(outState, "CALDROID_SAVED_STATE");
+        }
+
     }
 
 

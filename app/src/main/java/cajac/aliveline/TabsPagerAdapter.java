@@ -23,7 +23,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
                 return new HomeFragment();
             case 1:
                 // Calendar fragment activity
-                return new CalendarFragment();
+                return new CalendarMonthFragment();
             case 2:
                 // Timer fragment activity
                 return new TimerFragment();

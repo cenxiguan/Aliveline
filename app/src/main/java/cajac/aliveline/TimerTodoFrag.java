@@ -7,15 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by Christine on 6/1/2015.
- * Fragment for the second tab: CALENDAR
- * layout file in fragment_calendar.xml
+ * Created by Christine on 6/4/2015.
+ * The list portion of the Timer fragment
  */
-public class CalendarFragment extends Fragment {
+public class TimerTodoFrag extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
-        return rootView;
+        return inflater.inflate(R.layout.frag_timer_todo, container, false);
     }
 }
