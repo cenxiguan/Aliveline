@@ -6,4 +6,7 @@
 
     <string name="edit_text_hint">Add Text</string>
 
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+
 </resources>
