@@ -14,6 +14,9 @@ import java.util.Date;
 import java.util.List;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by alexsuk on 5/30/15.
  */
@@ -234,7 +237,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     //getting all the toDo's that are under a specific day
     //not sure how to accept the day name
+
     public List<Todo> getAllToDosByDay(String givenDay) {
+
         List<Todo> todos = new ArrayList<Todo>();
 
 //        String selectQuery = "SELECT  * FROM " + TABLE_TODO + " to, "
@@ -245,7 +250,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String selectQuery = "SELECT  * FROM " + TABLE_TODO + " to, "
                 + TABLE_DATES + "td , " + TABLE_TODO_DATES  + " tdd WHERE td."
                 + COLUMN_DATES + " = '" + givenDay + "'";
-
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);

@@ -76,7 +76,4 @@ public class Todo {
     public void setId(int id) {
         this.id = id;
     }
-
-
-
 }
