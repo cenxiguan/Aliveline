@@ -65,8 +65,8 @@ public class Todo {
         return timeUsage;
     }
 
-    public void setTimeUsage() {
-
+    public void setTimeUsage(int option) {
+        timeUsage = option;
     }
 
     public long getId() {
