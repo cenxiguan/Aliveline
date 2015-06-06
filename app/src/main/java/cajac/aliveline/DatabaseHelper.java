@@ -275,7 +275,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     public int updateToDo(Todo todo) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, todo.getTitle());
         values.put(COLUMN_DESCRIPTION, todo.getDescription());
