@@ -62,7 +62,7 @@ public class Todo {
 
 
     public int getTimeUsage() {
-
+        return timeUsage;
     }
 
     public void setTimeUsage() {

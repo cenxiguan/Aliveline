@@ -5,6 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +36,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String KEY_ID = "id";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_DESCRIPTION = "desc";
-    public static final String COLUMN_DUEDATE = "due_date";
-    public static final String COLUMN_ESTIMATEDTIME = "est_time";
+    public static final String COLUMN_DUE_DATE = "due_date";
+    public static final String COLUMN_ESTIMATED_TIME = "est_time";
     public static final String COLUMN_TIME_USAGE = "time_usage";
 
     //Column names for Dates table
@@ -39,12 +47,12 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String KEY_TODO_ID = "todo_id";
     public static final String KEY_DATES_ID = "dates_id";
 
-    public static final double HOURS = "hours";
-    public static final boolean LOCK = "lock";
+    public static final String HOURS = "hours";
+    public static final String LOCK = "lock";
 
-    public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_PRODUCTS + "(" +
+    public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " + COLUMN_DESCRIPTION + " TEXT, " +
-            COLUMN_DUEDATE + " DATETIME, " + COLUMN_ESTIMATEDTIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT" + ")";
+            COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT" + ")";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DATES + " DATETIME" + ")";
@@ -54,8 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             KEY_TODO_ID + "INTEGER," + KEY_DATES_ID + "INTEGER," + HOURS + "INTEGER," + LOCK + "INTEGER" +  ")";
 
 
-    public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -84,20 +92,72 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, todo.getTitle());
         values.put(COLUMN_DESCRIPTION, todo.getDescription());
-        values.put(COLUMN_ESTIMATEDTIME, todo.getEsimatedTime());
+        values.put(COLUMN_ESTIMATED_TIME, todo.getEstimatedTime());
         values.put(COLUMN_TIME_USAGE, todo.getTimeUsage());
-        values.put(COLUMN_DUEDATE, todo.getDueDate());
+        values.put(COLUMN_DUE_DATE, createDate(todo.getDueDate()));
         
 
         // insert row
         long todo_id = db.insert(TABLE_TODO, null, values);
 
         // assigning tags to todo
-        for (long days_id : days_ids) {
-            createTodoTag(todo_id, days_id);
-        }
+//        for (long days_id : days_ids) {
+//            createTodoTag(todo_id, days_id);
+//        }
 
         return todo_id;
+    }
+
+    public long createDate(Date date){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        //java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        String dateString = dateToStringFormat(date);
+        contentValues.put(COLUMN_DATES, dateString);
+
+        long date_id = db.insert(TABLE_DATES, null, contentValues);
+
+        return date_id;
+    }
+
+    public Date getDate(long date_id){
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE "
+                + KEY_ID + " = "  + date_id;
+
+        //Log.e(LOG, selectQuerey);
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        String dateString = c.getString(c.getColumnIndex(COLUMN_DATES));
+        Date date = convertStringDate(dateString);
+        return date;
+    }
+
+    public Date getDateID(Date date){
+        SQLiteDatabase db = getReadableDatabase();
+        String dateString = dateToStringFormat(date);
+        String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE "
+                + COLUMN_DATES + " = " + dateString;
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()){
+
+        }
+    }
+
+    public String dateToStringFormat(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+        String dateString = sdf.format(date);
+        return dateString;
+    }
+
+    public void deleteDate(Date date) {
+        String dateString = dateToStringFormat(date);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_DATES, KEY_ID + " = ?",
+                new String[] {String.valueOf(dateString)});
     }
 
     /*
@@ -120,11 +180,28 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         td.setId(c.getInt(c.getColumnIndex("id")));
         td.setTitle(c.getString(c.getColumnIndex("title")));
         td.setDescription(c.getString(c.getColumnIndex("desc")));
-        td.setDueDate(c.getDate(c.getColumnIndex("due_date")));
+        String dateString = c.getString(c.getColumnIndex("due_date"));
+        Date dueDate = convertStringDate(dateString);
+        td.setDueDate(dueDate);
+        //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
         td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
         td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
 
         return td;
+    }
+
+    public Date convertStringDate(String dateString){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(dateString);
+
+        }catch (ParseException e){
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return date;
     }
 
     public List<Todo> getAllToDos() {
@@ -141,7 +218,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 td.setId(c.getInt(c.getColumnIndex("id")));
                 td.setTitle(c.getString(c.getColumnIndex("title")));
                 td.setDescription(c.getString(c.getColumnIndex("desc")));
-                td.setDueDate(c.getDate(c.getColumnIndex("due_date")));
+                //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
+                String dateString = c.getString(c.getColumnIndex("due_date"));
+                Date dueDate = convertStringDate(dateString);
+                td.setDueDate(dueDate);
                 td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
                 td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
 
@@ -155,14 +235,19 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     //getting all the toDo's that are under a specific day
     //not sure how to accept the day name
-    public List<Todo> getAllToDosByDay(Date day_name) {
+
+    public List<Todo> getAllToDosByDay(String givenDay) {
+
         List<Todo> todos = new ArrayList<Todo>();
 
-        String selectQuery = "SELECT  * FROM " + TABLE_TODO + " td, "
-                + TABLE_DATES + " , " + TABLE_TODO_DATES + " tt WHERE tg."
-                + COLUMN_DATES + " = '" + tag_name + "'" + " AND tg." + KEY_ID
-                + " = " + "tt." + KEY_TAG_ID + " AND td." + KEY_ID + " = "
-                + "tt." + KEY_TODO_ID;
+//        String selectQuery = "SELECT  * FROM " + TABLE_TODO + " to, "
+//                + TABLE_DATES + "td , " + TABLE_TODO_DATES + " ttd WHERE td."
+//                + COLUMN_DATES + " = '" + tag_name + "'" + " AND td." + KEY_ID
+//                + " = " + "tt." + KEY_TAG_ID + " AND td." + KEY_ID + " = "
+//                + "tt." + KEY_TODO_ID;
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO + " to, "
+                + TABLE_DATES + "td , " + TABLE_TODO_DATES  + " tdd WHERE td."
+                + COLUMN_DATES + " = '" + givenDay + "'";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -174,7 +259,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 td.setId(c.getInt(c.getColumnIndex("id")));
                 td.setTitle(c.getString(c.getColumnIndex("title")));
                 td.setDescription(c.getString(c.getColumnIndex("desc")));
-                td.setDueDate(c.getDate(c.getColumnIndex("due_date")));
+                //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
+                String dateString = c.getString(c.getColumnIndex("due_date"));
+                Date dueDate = convertStringDate(dateString);
+                td.setDueDate(dueDate);
                 td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
                 td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
 
@@ -193,9 +281,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, todo.getTitle());
         values.put(COLUMN_DESCRIPTION, todo.getDescription());
-        values.put(COLUMN_ESTIMATEDTIME, todo.getEsimatedTime());
+        values.put(COLUMN_ESTIMATED_TIME, todo.getEstimatedTime());
         values.put(COLUMN_TIME_USAGE, todo.getTimeUsage());
-        values.put(COLUMN_DUEDATE, todo.getDueDate());
+        values.put(COLUMN_DUE_DATE, dateToStringFormat(todo.getDueDate()));
         // updating row
         return db.update(TABLE_TODO, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo.getId()) });
@@ -207,4 +295,14 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 new String[] { String.valueOf(todo_id) });
     }
 
+    public long addTodoDate(long todo_id, long date_id, int hours, int lock ){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_TODO_ID, todo_id);
+        values.put(KEY_DATES_ID, date_id);
+        values.put(HOURS, hours);
+        values.put(LOCK, lock);
+        long todo_date_id = db.insert(TABLE_TODO_DATES, null, values);
+        return todo_date_id;
+    }
 }
