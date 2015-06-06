@@ -1,8 +1,13 @@
 package cajac.aliveline;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 /**
  * Created by alexsuk on 5/30/15.
@@ -46,8 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             KEY_TODO_ID + "INTEGER, " + KEY_DATES_ID + "INTEGER" + ")";
 
 
-    public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -61,4 +66,32 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
+
+    public long createDate(Date date){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        String dateString = getDate(date);
+        contentValues.put(COLUMN_DATES, dateString);
+
+        long date_id = db.insert(TABLE_DATES, null, contentValues);
+
+        return date_id;
+    }
+
+    public String getDate(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd:MM:yyyy");
+        String dateString = sdf.format(date);
+        return dateString;
+    }
+
+    public void deleteDate(Date date) {
+        String dateString = getDate(date);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_DATES, KEY_ID + " = ?",
+                new String[] {String.valueOf(dateString)});
+    }
+
+
 }

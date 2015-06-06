@@ -26,6 +26,7 @@ public class MainActivity extends FragmentActivity implements
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
+    private DatabaseHelper db;
     // Tab titles and icons
     private String[] tabs = { "Home", "Calendar", "Timer", "Settings" };
     private int[] icons = {R.drawable.ic_home,
@@ -45,6 +46,8 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db = new DatabaseHelper(this);
+
 
         // Initialization for tabs
         viewPager = (ViewPager) findViewById(R.id.pager);
