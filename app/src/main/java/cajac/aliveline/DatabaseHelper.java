@@ -1,8 +1,13 @@
 package cajac.aliveline;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by alexsuk on 5/30/15.
@@ -150,7 +155,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     //getting all the toDo's that are under a specific day
     //not sure how to accept the day name
-    public List<Todo> getAllToDosByDay(String day_name) {
+    public List<Todo> getAllToDosByDay(Date day_name) {
         List<Todo> todos = new ArrayList<Todo>();
 
         String selectQuery = "SELECT  * FROM " + TABLE_TODO + " td, "
@@ -158,7 +163,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 + COLUMN_DATES + " = '" + tag_name + "'" + " AND tg." + KEY_ID
                 + " = " + "tt." + KEY_TAG_ID + " AND td." + KEY_ID + " = "
                 + "tt." + KEY_TODO_ID;
-
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
