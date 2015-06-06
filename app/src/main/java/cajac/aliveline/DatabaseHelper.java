@@ -133,15 +133,17 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return date;
     }
 
-    public Date getDateID(Date date){
+    public int getDateID(Date date){
         SQLiteDatabase db = getReadableDatabase();
         String dateString = dateToStringFormat(date);
+        int date_id = 0;
         String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE "
                 + COLUMN_DATES + " = " + dateString;
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()){
-
+            date_id = c.getInt(c.getColumnIndex(KEY_ID));
         }
+        return date_id;
     }
 
     public String dateToStringFormat(Date date){
