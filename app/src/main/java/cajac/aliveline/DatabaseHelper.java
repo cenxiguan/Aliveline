@@ -39,27 +39,31 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String COLUMN_DUE_DATE = "due_date";
     public static final String COLUMN_ESTIMATED_TIME = "est_time";
     public static final String COLUMN_TIME_USAGE = "time_usage";
-
+    public static final String COLUMN_START_TIME = "start_time";
+    public static final String COLUMN_REMAINING_TIME = "time_remaining";
     //Column names for Dates table
     public static final String COLUMN_DATES = "dates";
-
     //Column names for todo_dates table
     public static final String KEY_TODO_ID = "todo_id";
     public static final String KEY_DATES_ID = "dates_id";
 
     public static final String HOURS = "hours";
     public static final String LOCK = "lock";
+    public static final String COLUMN_TIME_REQUIRED = "time_required";
+    public static final String COLUMN_TIME_COMPLETED = "time_completed";
 
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " + COLUMN_DESCRIPTION + " TEXT, " +
-            COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT" + ")";
+        COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
+    + "TEXT" + ")";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DATES + " DATETIME" + ")";
 
-    //What columns should be included in relaional?
+    //What columns should be included in relational?
     public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + "(" + KEY_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            KEY_TODO_ID + "INTEGER," + KEY_DATES_ID + "INTEGER," + HOURS + "INTEGER," + LOCK + "INTEGER" +  ")";
+            KEY_TODO_ID + "INTEGER," + KEY_DATES_ID + "INTEGER," + HOURS + "INTEGER," + LOCK + "INTEGER, " + COLUMN_TIME_REQUIRED + "TEXT, " +
+            COLUMN_TIME_COMPLETED + "TEXT" + ")";
 
 
     public DatabaseHelper(Context context) {
@@ -267,12 +271,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 td.setDueDate(dueDate);
                 td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
                 td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
-
                 // adding to todo list
                 todos.add(td);
             } while (c.moveToNext());
         }
-
         return todos;
     }
 

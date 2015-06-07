@@ -12,6 +12,8 @@ public class Todo {
     public int estimatedTime;
     public int timeUsage;
     int id;
+    public String startTime;
+    public String remainingTime;
 
     public Todo(){
 
@@ -49,7 +51,7 @@ public class Todo {
     }
 
 
-    //this part ofthe code and some of the fields editted by Alex.
+    //this part of the code and some of the fields edited by Alex.
     //at the moment, the google doc says that the estimated time is in minutes.
     public int getEstimatedTime() {
         return this.estimatedTime;
@@ -75,5 +77,17 @@ public class Todo {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setStartTime(String startTime){
+        this.startTime = startTime;
+    }
+
+    public String getStartTime(){
+        return startTime;
+    }
+
+    public void setRemainingTime(String remainingTime){
+        this.remainingTime = remainingTime;
     }
 }
