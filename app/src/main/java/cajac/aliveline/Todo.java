@@ -90,4 +90,8 @@ public class Todo {
     public void setRemainingTime(String remainingTime){
         this.remainingTime = remainingTime;
     }
+
+    public String getRemainingTime(){
+        return remainingTime;
+    }
 }
