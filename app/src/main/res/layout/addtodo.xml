@@ -77,18 +77,6 @@
         android:layout_marginStart="15dp"
         android:layout_above="@+id/time_usage_prompt" />
 
-    <TextView
-        style="@style/text_style2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hours"
-        android:id="@+id/hours"
-        android:layout_above="@+id/time_usage_prompt"
-        android:layout_toRightOf="@+id/estimated_time_field"
-        android:layout_toEndOf="@+id/estimated_time_field"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp" />
-
     <EditText
         style="@style/text_style4"
         android:layout_width="50dp"
@@ -107,10 +95,10 @@
         style="@style/text_style2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Month"
+        android:text="/"
         android:id="@+id/month"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_above="@+id/estimated_time_prompt"
         android:layout_toRightOf="@+id/month_field"
         android:layout_toEndOf="@+id/month_field" />
@@ -122,8 +110,8 @@
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/day_field"
         android:inputType="text"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_toRightOf="@+id/month"
         android:layout_toEndOf="@+id/month"
         android:layout_alignTop="@+id/month_field"
@@ -133,10 +121,10 @@
         style="@style/text_style2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Day"
+        android:text="/"
         android:id="@+id/day"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_alignBottom="@+id/month_field"
         android:layout_toRightOf="@+id/day_field"
         android:layout_toEndOf="@+id/day_field" />
@@ -148,8 +136,8 @@
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/year_field"
         android:inputType="text"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_alignTop="@+id/day_field"
         android:layout_toRightOf="@+id/day"
         android:layout_toEndOf="@+id/day"
@@ -159,11 +147,128 @@
         style="@style/text_style2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Year"
+        android:text="(MM/DD/YYYY)"
         android:id="@+id/year"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
         android:layout_alignTop="@+id/day"
         android:layout_toRightOf="@+id/year_field"
         android:layout_toEndOf="@+id/year_field" />
+
+    <ImageButton
+        android:layout_width="155dp"
+        android:layout_height="155dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/up_curve"
+        android:src="@drawable/up2"
+        android:background="@drawable/time_usage_unselected"
+        android:layout_below="@+id/time_usage_prompt" />
+
+    <ImageButton
+        android:layout_width="155dp"
+        android:layout_height="155dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/no_curve"
+        android:src="@drawable/flat2"
+        android:background="@drawable/time_usage_unselected"
+        android:layout_below="@+id/time_usage_prompt"
+        android:layout_toRightOf="@+id/up_curve"/>
+
+    <ImageButton
+        android:layout_width="155dp"
+        android:layout_height="155dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/down_curve"
+        android:src="@drawable/down2"
+        android:background="@drawable/time_usage_unselected"
+        android:layout_below="@+id/time_usage_prompt"
+        android:layout_toRightOf="@+id/no_curve"/>
+
+    <TextView
+        style="@style/text_style1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Days to Work:"
+        android:id="@+id/days_available_prompt"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/up_curve"
+        android:layout_alignLeft="@+id/estimated_time_prompt"
+        android:layout_alignStart="@+id/estimated_time_prompt" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sun"
+        android:id="@+id/button"
+        android:layout_below="@+id/days_available_prompt"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_alignLeft="@+id/days_available_prompt"
+        android:layout_alignStart="@+id/days_available_prompt"
+        android:background="@drawable/time_usage_unselected"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mon"
+        android:id="@+id/button2"
+        android:layout_marginLeft="5dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toRightOf="@+id/button"
+        android:layout_toEndOf="@+id/button"
+        android:background="@drawable/time_usage_unselected"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tue"
+        android:id="@+id/button3"
+        android:layout_marginLeft="5dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toRightOf="@+id/button2"
+        android:background="@drawable/time_usage_unselected"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wed"
+        android:id="@+id/button4"
+        android:layout_marginLeft="5dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toRightOf="@+id/button3"
+        android:background="@drawable/time_usage_unselected"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thu"
+        android:id="@+id/button5"
+        android:layout_marginLeft="5dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toRightOf="@+id/button4"
+        android:background="@drawable/time_usage_unselected"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fri"
+        android:id="@+id/button6"
+        android:layout_marginLeft="5dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toRightOf="@+id/button5"
+        android:background="@drawable/time_usage_unselected"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sat"
+        android:id="@+id/button7"
+        android:layout_marginLeft="5dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toRightOf="@+id/button6"
+        android:background="@drawable/time_usage_unselected"/>
+
 </RelativeLayout>
