@@ -36,6 +36,7 @@ public class addTodo extends DialogFragment {
         });
 
         Dialog dialog = builder.create();
+        dialog.setTitle("Todo Settings");
         return dialog;
     }
 

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/add_todo_background">
+    android:background="#FFFFFF">
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,7 +17,7 @@
         android:layout_marginTop="43dp" />
 
     <EditText
-        style="@style/text_style2"
+        style="@style/text_style4"
         android:layout_width="380dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
@@ -27,7 +27,8 @@
         android:layout_marginStart="15dp"
         android:layout_above="@+id/due_date_prompt"
         android:layout_toRightOf="@+id/title_prompt"
-        android:layout_toEndOf="@+id/title_prompt" />
+        android:layout_toEndOf="@+id/title_prompt"
+        android:layout_alignTop="@+id/title_prompt" />
 
     <TextView
         style="@style/text_style1"
@@ -63,7 +64,7 @@
         android:layout_alignStart="@+id/estimated_time_prompt" />
 
     <EditText
-        style="@style/text_style2"
+        style="@style/text_style4"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
@@ -73,7 +74,8 @@
         android:layout_toRightOf="@+id/estimated_time_prompt"
         android:layout_toEndOf="@+id/estimated_time_prompt"
         android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"/>
+        android:layout_marginStart="15dp"
+        android:layout_above="@+id/time_usage_prompt" />
 
     <TextView
         style="@style/text_style2"
@@ -88,8 +90,8 @@
         android:layout_marginStart="10dp" />
 
     <EditText
-        style="@style/text_style2"
-        android:layout_width="40dp"
+        style="@style/text_style4"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/month_field"
@@ -98,7 +100,8 @@
         android:layout_marginStart="15dp"
         android:layout_above="@+id/estimated_time_prompt"
         android:layout_toRightOf="@+id/due_date_prompt"
-        android:layout_toEndOf="@+id/due_date_prompt" />
+        android:layout_toEndOf="@+id/due_date_prompt"
+        android:layout_alignTop="@+id/due_date_prompt" />
 
     <TextView
         style="@style/text_style2"
@@ -113,17 +116,18 @@
         android:layout_toEndOf="@+id/month_field" />
 
     <EditText
-        style="@style/text_style2"
-        android:layout_width="40dp"
+        style="@style/text_style4"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/day_field"
         android:inputType="text"
         android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
-        android:layout_alignTop="@+id/month"
         android:layout_toRightOf="@+id/month"
-        android:layout_toEndOf="@+id/month" />
+        android:layout_toEndOf="@+id/month"
+        android:layout_alignTop="@+id/month_field"
+        android:layout_above="@+id/estimated_time_prompt" />
 
     <TextView
         style="@style/text_style2"
@@ -131,14 +135,14 @@
         android:layout_height="wrap_content"
         android:text="Day"
         android:id="@+id/day"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_alignTop="@+id/day_field"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_alignBottom="@+id/month_field"
         android:layout_toRightOf="@+id/day_field"
         android:layout_toEndOf="@+id/day_field" />
 
     <EditText
-        style="@style/text_style2"
+        style="@style/text_style4"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
@@ -148,7 +152,8 @@
         android:layout_marginStart="15dp"
         android:layout_alignTop="@+id/day_field"
         android:layout_toRightOf="@+id/day"
-        android:layout_toEndOf="@+id/day" />
+        android:layout_toEndOf="@+id/day"
+        android:layout_above="@+id/estimated_time_prompt" />
 
     <TextView
         style="@style/text_style2"
