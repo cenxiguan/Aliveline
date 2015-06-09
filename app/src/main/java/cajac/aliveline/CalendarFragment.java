@@ -1,24 +1,23 @@
 package cajac.aliveline;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
@@ -30,7 +29,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
 import it.sephiroth.android.library.widget.AbsHListView;
 import it.sephiroth.android.library.widget.AdapterView;
 import it.sephiroth.android.library.widget.HListView;
@@ -41,12 +39,14 @@ import it.sephiroth.android.library.widget.HListView;
 public class CalendarFragment extends Fragment {
     private View view;
     private FragmentManager fragmentManager;
+    protected FragmentActivity mActivity;
 
     private Fragment currentCal;
     private Date selectedDate = Calendar.getInstance().getTime();
     private String formattedSelectDate;
     final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
     private Switch dayOrMonth;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,6 +81,12 @@ public class CalendarFragment extends Fragment {
         currentCal = fragment;
         fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.calendar_frame, currentCal).commit();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = (FragmentActivity) activity;
     }
 
     public Fragment getCurrentCal() {
@@ -135,7 +141,7 @@ public class CalendarFragment extends Fragment {
             }
 
             // Attach to the activity
-            FragmentTransaction t = getActivity().getSupportFragmentManager().beginTransaction();
+            FragmentTransaction t = mActivity.getSupportFragmentManager().beginTransaction();
             t.replace(R.id.calendar1, caldroidFragment);
             t.commit();
 
@@ -238,6 +244,10 @@ public class CalendarFragment extends Fragment {
         InfiniteAdapter mAdapter;
         private static final String LOG_TAG = "CalendarDay";
 
+
+        private final int width = mActivity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
+        private final int day_center = width / 2 - 100;
+
         public CalendarDayFragment() {}
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -246,7 +256,7 @@ public class CalendarFragment extends Fragment {
             listView = (HListView) view.findViewById( R.id.hListView1 );
             Calendar cal = Calendar.getInstance();
             cal.setTime(selectedDate);
-            cal.add(Calendar.DAY_OF_YEAR, -30);
+            cal.add(Calendar.DAY_OF_YEAR, -31);
 
             Log.w(LOG_TAG, "Created View");
 
@@ -254,8 +264,11 @@ public class CalendarFragment extends Fragment {
 
             for(int i = 0; i < 61; i++) {
                 cal.add(Calendar.DAY_OF_YEAR, 1);
-                items.add(formatter.format(cal.getTime().toString()));
+                items.add(formatter.format(cal.getTime()).toString());
             }
+
+//            listView.setSelectionFromLeft(30, day_center); //Zooms and aligns center
+
 //            // Add the most recent past 30 days
 //            for(int i = 30; i > 0; i--) {
 //                other.add(Calendar.DATE, -i);
@@ -269,54 +282,54 @@ public class CalendarFragment extends Fragment {
 //            for( int i = 0; i < 30; i++ ) {
 //                items.add( String.valueOf( i ) );
 //            }
-            mAdapter = new InfiniteAdapter( getActivity(), R.layout.test_item_1, android.R.id.text1, items );
+            mAdapter = new InfiniteAdapter( mActivity, R.layout.test_item_1, android.R.id.text1, items );
             listView.setHeaderDividersEnabled(true);
             listView.setFooterDividersEnabled(true);
 
-            if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE_MODAL ) {
-                listView.setMultiChoiceModeListener( new MultiChoiceModeListener() {
-
-                    @Override
-                    public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
-                        return true;
-                    }
-
-                    @Override
-                    public void onDestroyActionMode( ActionMode mode ) {
-                    }
-
-                    @Override
-                    public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
-                        menu.add( 0, 0, 0, "Delete" );
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
-                        Log.d( LOG_TAG, "onActionItemClicked: " + item.getItemId() );
-
-                        final int itemId = item.getItemId();
-                        if( itemId == 0 ) {
-                            deleteSelectedItems();
-                        }
-
-                        mode.finish();
-                        return false;
-                    }
-
-                    @Override
-                    public void onItemCheckedStateChanged( ActionMode mode, int position, long id, boolean checked ) {
-                        mode.setTitle( "What the fuck!" );
-                        mode.setSubtitle( "Selected items: " + listView.getCheckedItemCount() );
-                    }
-                } );
-            } else if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
+//            if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE_MODAL ) {
+//                listView.setMultiChoiceModeListener( new MultiChoiceModeListener() {
+//
+//                    @Override
+//                    public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
+//                        return true;
+//                    }
+//
+//                    @Override
+//                    public void onDestroyActionMode( ActionMode mode ) {
+//                    }
+//
+//                    @Override
+//                    public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
+//                        menu.add( 0, 0, 0, "Delete" );
+//                        return true;
+//                    }
+//
+//                    @Override
+//                    public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
+//                        Log.d( LOG_TAG, "onActionItemClicked: " + item.getItemId() );
+//
+//                        final int itemId = item.getItemId();
+//                        if( itemId == 0 ) {
+//                            deleteSelectedItems();
+//                        }
+//
+//                        mode.finish();
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public void onItemCheckedStateChanged( ActionMode mode, int position, long id, boolean checked ) {
+//                        mode.setTitle( "What the fuck!" );
+//                        mode.setSubtitle( "Selected items: " + listView.getCheckedItemCount() );
+//                    }
+//                } );
+//            } else if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
                 listView.setOnItemClickListener( this );
-            }
+//            }
 
 
             listView.setAdapter(mAdapter);
-		    listView.setSelection(30);
+            listView.setSelectionFromLeft(30, day_center); //Zooms and aligns center
 
             listView.setOnScrollListener(new EndlessScrollListener() {
                 @Override
@@ -340,7 +353,8 @@ public class CalendarFragment extends Fragment {
 
         public void onClick( View v ) {
             final int id = v.getId();
-
+                Toast.makeText(mActivity.getApplicationContext(), "onChangeMonth",
+                        Toast.LENGTH_SHORT).show();
         }
 
         private void addElements() {
@@ -395,9 +409,18 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
-            Log.i(LOG_TAG, "onItemClick: " + position );
-            Log.d(LOG_TAG, "checked items: " + listView.getCheckedItemCount() );
-            Log.d(LOG_TAG, "checked positions: " + listView.getCheckedItemPositions());
+
+            Log.w(LOG_TAG, "Clicked");
+            if(position%2 == 0){
+                listView.smoothScrollToPositionFromLeft(position, day_center, 1000);
+//                listView.setSelection(position);        //Zooms and aligns left
+//            }else if(position%4 == 1){
+////                listView.setSelectionFromLeft(position, width/2 - 100); //Zooms and aligns center
+//            }else if(position%4 == 2){
+//                listView.smoothScrollToPosition(position);  //scrolls and align left
+            }else
+                listView.smoothScrollToPositionFromLeft(position, day_center); //Scroll and align center
+
         }
 
         class InfiniteAdapter extends ArrayAdapter<String> {
@@ -452,13 +475,14 @@ public class CalendarFragment extends Fragment {
                 int type = getItemViewType( position );
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
-                if( type == 0 ) {
-                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_1 );
-                } else if( type == 1 ) {
-                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_2 );
-                } else {
-                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_3 );
-                }
+                params.width = 200;
+//                if( type == 0 ) {
+//                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_1 );
+//                } else if( type == 1 ) {
+//                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_2 );
+//                } else {
+//                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_3 );
+//                }
 
                 return convertView;
             }

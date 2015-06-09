@@ -11,7 +11,7 @@ import it.sephiroth.android.library.widget.AbsHListView;
 public abstract class EndlessScrollListener implements AbsHListView.OnScrollListener {
     // The minimum amount of items to have below your current scroll position
     // before loading more.
-    private int visibleThreshold = 30;
+    private int visibleThreshold = 5;
     // The current offset index of data you have loaded
     private int currentPage = 0;
     // The total number of items in the dataset after the last load
@@ -40,12 +40,12 @@ public abstract class EndlessScrollListener implements AbsHListView.OnScrollList
     @Override
     public void onScroll(AbsHListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
     {
-        Log.w("Endless", "first " + String.valueOf(firstVisibleItem));
-        Log.w("Endless", "visible " + String.valueOf(visibleItemCount));
-        Log.w("Endless", "total " + String.valueOf(totalItemCount));
-        Log.w("Endless", "loading " + loading);
-        Log.w("Endless", "current "+ currentPage);
-        Log.w("Endless", "previous "+ previousTotalItemCount);
+//        Log.w("Endless", "first " + String.valueOf(firstVisibleItem));
+//        Log.w("Endless", "visible " + String.valueOf(visibleItemCount));
+//        Log.w("Endless", "total " + String.valueOf(totalItemCount));
+//        Log.w("Endless", "loading " + loading);
+//        Log.w("Endless", "current "+ currentPage);
+//        Log.w("Endless", "previous "+ previousTotalItemCount);
         // If the total item count is zero and the previous isn't, assume the
         // list is invalidated and should be reset back to initial state
         if (totalItemCount < previousTotalItemCount) {
