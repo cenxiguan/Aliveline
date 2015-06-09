@@ -10,9 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 
-    public TabsPagerAdapter(FragmentManager fm) {
-        super(fm);
-    }
+    public TabsPagerAdapter(FragmentManager fm) { super(fm); }
 
     // returns the correct fragment for tab selected
     @Override
@@ -39,4 +37,6 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return 4;
     }
+
+
 }
