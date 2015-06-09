@@ -11,27 +11,15 @@
     </style>
 
     <style name="text_style1" >
-<<<<<<< HEAD
-        <item name="android:textColor" >#ffffff</item>
-        <item name="android:gravity" >center</item>
-        <item name="android:textSize" >25dp</item>
-        <item name="android:textStyle" >bold</item>
-=======
         <item name="android:textColor" >#000000</item>
         <item name="android:gravity" >center</item>
         <item name="android:textSize" >30dp</item>
-
->>>>>>> addTodo
     </style>
 
     <style name="text_style2" >
         <item name="android:textColor" >#000</item>
         <item name="android:gravity" >left</item>
-<<<<<<< HEAD
-        <item name="android:textSize" >25dp</item>
-=======
         <item name="android:textSize" >23dp</item>
->>>>>>> addTodo
     </style>
 
     <style name="text_style3" >
@@ -39,13 +27,10 @@
         <item name="android:gravity" >center</item>
         <item name="android:textSize" >30dp</item>
     </style>
-<<<<<<< HEAD
-=======
 
     <style name="text_style4" >
         <item name="android:textColor" >#000</item>
         <item name="android:gravity" >left</item>
         <item name="android:textSize" >28dp</item>
     </style>
->>>>>>> addTodo
 </resources>
