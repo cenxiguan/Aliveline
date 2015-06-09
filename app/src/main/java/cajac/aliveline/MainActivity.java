@@ -2,19 +2,16 @@ package cajac.aliveline;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
+
+   SO link on Deprecated ActionBar --> http://stackoverflow.com/questions/24473213/action-bar-navigation-modes-are-deprecated-in-android-l
+   Google link on Material Design --> http://www.google.com/design/spec/components/tabs.html
+
  */
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener {
@@ -105,4 +102,5 @@ public class MainActivity extends FragmentActivity implements
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
         // empty
     }
+
 }
