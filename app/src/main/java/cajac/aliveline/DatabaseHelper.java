@@ -259,17 +259,21 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 //                + COLUMN_DATE + " = '" + tag_name + "'" + " AND td." + KEY_ID
 //                + " = " + "tt." + KEY_TAG_ID + " AND td." + KEY_ID + " = "
 //                + "tt." + KEY_TODO_ID;
-        String selectQuery = "SELECT  * FROM " + TABLE_TODO + " to, "
-                + TABLE_DATES + "td , " + TABLE_TODO_DATES  + " tdd WHERE td."
-                + COLUMN_DATE + " = '" + givenDay + "'";
+
+        Date date = convertStringDate(givenDay);
+        int date_id = getDateID(date);
+
+
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE "
+                + KEY_DATES_ID + " = '" + date_id + "'";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
-
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
-                Todo td = new Todo();
+                int todo_id = c.getInt(c.getColumnIndex(KEY_TODO_ID));
+                Todo td = getTodo(todo_id);
                 td = setTodoValues(td, c);
 //                td.setId(c.getInt(c.getColumnIndex("id")));
 //                td.setTitle(c.getString(c.getColumnIndex("title")));
