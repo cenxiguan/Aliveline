@@ -6,13 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
 
@@ -49,6 +42,8 @@ public class MainActivity extends FragmentActivity implements
         db = new DatabaseHelper(this);
 
 
+
+
         // Initialization for tabs
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
@@ -78,13 +73,17 @@ public class MainActivity extends FragmentActivity implements
                 // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
             }
+
             @Override
             public void onPageScrolled(int arg0, float arg1, int arg2) {
             }
+
             @Override
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+
+
     }
 
     /* creates custom view tab with image on top, text on bottom
