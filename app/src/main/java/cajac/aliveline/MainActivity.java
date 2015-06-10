@@ -16,6 +16,8 @@ import android.support.v4.view.ViewPager;
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener {
 
+
+
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
@@ -83,6 +85,8 @@ public class MainActivity extends FragmentActivity implements
             }
         });
 
+        
+
 
     }
 
@@ -111,18 +115,5 @@ public class MainActivity extends FragmentActivity implements
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
         // empty
     }
-
-//    public void replaceFragment(Fragment fragment) {}
-//
-//    public void replaceFragment(Fragment fragment, String date) {
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        Bundle args = new Bundle();
-//        args.putString("DATE", date);
-//        fragment.setArguments(args);
-//        fragmentTransaction.replace(R.id.pager, fragment, fragment.toString());
-//        fragmentTransaction.addToBackStack(fragment.toString());
-//        fragmentTransaction.commit();
-//    }
 
 }

@@ -13,8 +13,6 @@
         android:layout_height="match_parent"
         android:layout_weight="0.5"
         android:background="#52F74D">
-
-
     </RelativeLayout>
 
 
@@ -27,9 +25,14 @@
 
 
         <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/cardsListView">
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/cardsListView"
+            android:background="#FFFFFF"
+            android:layout_toStartOf="@+id/add_todo_button"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
 
         </ListView>
 
@@ -50,3 +53,5 @@
 
 
 </LinearLayout>
+
+

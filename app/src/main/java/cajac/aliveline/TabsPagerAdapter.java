@@ -10,9 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 
-    public TabsPagerAdapter(FragmentManager fm) {
-        super(fm);
-    }
+    public TabsPagerAdapter(FragmentManager fm) { super(fm); }
 
     // returns the correct fragment for tab selected
     @Override
@@ -23,7 +21,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
                 return new HomeFragment();
             case 1:
                 // Calendar fragment activity
-                return new CalendarMonthFragment();
+                return new CalendarFragment();
             case 2:
                 // Timer fragment activity
                 return new TimerFragment();
@@ -39,4 +37,6 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return 4;
     }
+
+
 }
