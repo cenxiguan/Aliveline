@@ -274,7 +274,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             do {
                 int todo_id = c.getInt(c.getColumnIndex(KEY_TODO_ID));
                 Todo td = getTodo(todo_id);
-                td = setTodoValues(td, c);
+                //td = setTodoValues(td, c);
 //                td.setId(c.getInt(c.getColumnIndex("id")));
 //                td.setTitle(c.getString(c.getColumnIndex("title")));
 //                td.setDescription(c.getString(c.getColumnIndex("desc")));
@@ -327,6 +327,25 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         values.put(COLUMN_TIME_COMPLETED, timeCompleted);
         long todo_date_id = db.insert(TABLE_TODO_DATES, null, values);
         return todo_date_id;
+    }
+
+    public long updateTodoDate(long id, long todo_id, long date_id, int hours, int lock, String timeRequired, String timeCompleted){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_TODO_ID, todo_id);
+        values.put(KEY_DATES_ID, date_id);
+        values.put(HOURS, hours);
+        values.put(LOCK, lock);
+        values.put(COLUMN_TIME_REQUIRED, timeRequired);
+        values.put(COLUMN_TIME_COMPLETED, timeCompleted);
+        long todo_date_id = db.update(TABLE_TODO_DATES, values, KEY_ID + " = ?" ,
+                new String[] {String.valueOf(id)});
+        return todo_date_id;
+    }
+    public void deleteTodoDateRow(long id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TODO_DATES, KEY_ID + " = ?",
+                new String[] {String.valueOf(id)});
     }
     //setTodo values will be called to be used any time a todos values must be set, to avoid repetition
     public Todo setTodoValues(Todo td, Cursor c){
