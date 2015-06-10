@@ -6,13 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
 
@@ -112,18 +105,5 @@ public class MainActivity extends FragmentActivity implements
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
         // empty
     }
-
-//    public void replaceFragment(Fragment fragment) {}
-//
-//    public void replaceFragment(Fragment fragment, String date) {
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        Bundle args = new Bundle();
-//        args.putString("DATE", date);
-//        fragment.setArguments(args);
-//        fragmentTransaction.replace(R.id.pager, fragment, fragment.toString());
-//        fragmentTransaction.addToBackStack(fragment.toString());
-//        fragmentTransaction.commit();
-//    }
 
 }
