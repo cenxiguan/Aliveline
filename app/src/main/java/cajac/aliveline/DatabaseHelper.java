@@ -55,15 +55,15 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " + COLUMN_DESCRIPTION + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
-    + "TEXT" + ")";
+    + " TEXT" + ")";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DATE + " DATETIME" + ")";
 
     //What columns should be included in relational?
-    public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + "(" + KEY_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            KEY_TODO_ID + "INTEGER," + KEY_DATES_ID + "INTEGER," + HOURS + "INTEGER," + LOCK + "INTEGER, " + COLUMN_TIME_REQUIRED + "TEXT, " +
-            COLUMN_TIME_COMPLETED + "TEXT" + ")";
+    public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + TABLE_TODO_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            KEY_TODO_ID + " INTEGER," + KEY_DATES_ID + " INTEGER," + HOURS + " INTEGER," + LOCK + " INTEGER, " + COLUMN_TIME_REQUIRED + " TEXT, " +
+            COLUMN_TIME_COMPLETED + " TEXT" + ")";
 
 
     public DatabaseHelper(Context context) {
@@ -157,7 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public String dateToStringFormat(Date date){
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD");
         String dateString = sdf.format(date);
         return dateString;
     }
@@ -203,7 +203,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public Date convertStringDate(String dateString){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-DD");
         Date date = null;
         try {
             date = simpleDateFormat.parse(dateString);
@@ -356,7 +356,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String dateString = c.getString(c.getColumnIndex(COLUMN_DUE_DATE));
         Date dueDate = convertStringDate(dateString);
         td.setDueDate(dueDate);
-        td.setEstimatedTime(c.getInt(c.getColumnIndex(COLUMN_ESTIMATED_TIME)));
+        td.setEstimatedTime(c.getString(c.getColumnIndex(COLUMN_ESTIMATED_TIME)));
         td.setTimeUsage(c.getInt(c.getColumnIndex(COLUMN_TIME_USAGE)));
         td.setStartTime(c.getString(c.getColumnIndex(COLUMN_START_TIME)));
         td.setRemainingTime(c.getString(c.getColumnIndex(COLUMN_REMAINING_TIME)));
