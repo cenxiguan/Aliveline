@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
@@ -237,7 +236,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private class CalendarDayFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
+    private class CalendarDayFragment extends Fragment implements AdapterView.OnItemClickListener {
         private View dayView;
         private HListView listView;
         private InfiniteAdapter mAdapter;
@@ -262,8 +261,6 @@ public class CalendarFragment extends Fragment {
             future.setTime(selectedDate);
             future.add(Calendar.DAY_OF_YEAR, 30);
 
-            Log.w(LOG_TAG, "Created View");
-
             List<Date> items = new ArrayList<>();
 
             for(int i = 1; i <= 61; i++) {
@@ -280,11 +277,11 @@ public class CalendarFragment extends Fragment {
             listView.setFooterDividersEnabled(true);
             listView.setOnItemClickListener(this);
             listView.setAdapter(mAdapter);
-            listView.setSelectionFromLeft(Integer.MAX_VALUE/2 + 32, day_center); //Zooms and aligns center
+            listView.setSelectionFromLeft(Integer.MAX_VALUE / 2 + 32, day_center); //Zooms and aligns center
 
-            listView.setOnScrollListener(new EndlessScrollListener() {
+            listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
                 @Override
-                public void onLoadMore(int page, int totalItemsCount, boolean direction) {
+                public void onLoadMore(boolean direction) {
                     // Triggered only when new data needs to be appended to the list
                     // Add whatever code is needed to append new items to your AdapterView
 //                    addElements();
@@ -292,25 +289,27 @@ public class CalendarFragment extends Fragment {
                         addFuture();
                     else
                         addPast();
-                    customLoadMoreDataFromApi(page);
-                    // or customLoadMoreDataFromApi(totalItemsCount);
                 }
 
-                public void onScrollStateChanged(AbsHListView View, int scrollState) {}
+                public void onScrollStateChanged(AbsHListView View, int scrollState) {
+                }
+            });
+
+            listView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View p_v, MotionEvent p_event) {
+                    // this will disallow the touch request for parent scroll on touch of child view
+                    p_v.getParent().requestDisallowInterceptTouchEvent(true);
+                    return false;
+                }
             });
 
             TextView txt = (TextView) dayView.findViewById(R.id.txt);
             txt.setText(selectedDate.toString());
 
-
             return dayView;
         }
 
-        public void onClick( View v ) {
-            final int id = v.getId();
-                Toast.makeText(mActivity.getApplicationContext(), "onChangeMonth",
-                        Toast.LENGTH_SHORT).show();
-        }
 
         private void addPast() {
             for (int i = 0; i < 7; i++) {
@@ -318,12 +317,6 @@ public class CalendarFragment extends Fragment {
                 future.add(Calendar.DAY_OF_YEAR, -1);
                 mAdapter.addPast(past.getTime());
             }
-//            for(int i = 0; i < 7; i++) {
-//                past.add(Calendar.DAY_OF_YEAR, -1);
-//                mAdapter.addToFront(formatter.format(past.getTime()));
-//            }
-//
-////            listView.setSelection();
             mAdapter.notifyDataSetChanged();
         }
 
@@ -333,16 +326,7 @@ public class CalendarFragment extends Fragment {
                 future.add(Calendar.DAY_OF_YEAR, 1);
                 mAdapter.addFuture(future.getTime());
             }
-//            for(int i = 0; i < 7; i++) {
-//                future.add(Calendar.DAY_OF_YEAR, 1);
-//                mAdapter.addToBack(formatter.format(future.getTime()));
-//            }
             mAdapter.notifyDataSetChanged();
-//            for( int i = 0; i < 10; i++ ) {
-////			mAdapter.mItems.add( Math.min( mAdapter.mItems.size(), 2), String.valueOf( mAdapter.mItems.size() ) );
-//                mAdapter.mItems.add(String.valueOf(mAdapter.mItems.size()));
-//            }
-//            mAdapter.notifyDataSetChanged();
         }
 
         // Append more data into the adapter
@@ -358,12 +342,10 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
-            Date date = mAdapter.getMItems().get(position%61);
-//            Toast.makeText(mActivity.getApplicationContext(), mAdapter.getMItems().get(position%61),
-//                    Toast.LENGTH_SHORT).show();
+            Date date = mAdapter.getItem(position);
+            selectedDate = date;
             TextView txt = (TextView) dayView.findViewById(R.id.txt);
             txt.setText(formatter.format(date));
-            Log.w(LOG_TAG, "Clicked");
             listView.post(new ScrollRunnable(position));
         }
 
@@ -404,21 +386,9 @@ public class CalendarFragment extends Fragment {
             }
 
             @Override
-            public int getViewTypeCount() {
-                return 3;
-            }
-
-            @Override
-            public int getItemViewType( int position ) {
-                return position%3;
-            }
-
-            @Override
             public View getView( int position, View convertView, ViewGroup parent ) {
                 this.parent = parent;
                 position%=mItems.size();
-
-                View front= convertView;
 
                 if( null == convertView ) {
                     convertView = mInflater.inflate( mResource, parent, false );
@@ -434,8 +404,7 @@ public class CalendarFragment extends Fragment {
             }
 
             @Override
-            public int getCount()
-            {
+            public int getCount() {
                 return Integer.MAX_VALUE;
             }
 
@@ -444,17 +413,7 @@ public class CalendarFragment extends Fragment {
                 if ( mItems.size()==0 ) {
                     return null;
                 }
-
-                // mod the list index to the actual element count
                 return mItems.get( position%mItems.size() );
-            }
-
-            public void addToFront(Date date) {
-                mItems.add(0, date);
-            }
-
-            public void addToBack(Date date) {
-                mItems.add(date);
             }
 
             public void addFuture(Date date) {
@@ -469,19 +428,6 @@ public class CalendarFragment extends Fragment {
                 int size = mItems.size();
                 first = (first + (size - 1)) % size;
                 last = (last + (size - 1)) % size;
-            }
-
-            public List<Date> getMItems() {
-                return mItems;
-            }
-
-            public boolean onTouchEvent(MotionEvent p_event) {
-                if (p_event.getAction() == MotionEvent.ACTION_MOVE
-                        && parent != null) {
-                    parent.requestDisallowInterceptTouchEvent(true);
-                }
-
-                return parent.onTouchEvent(p_event);
             }
 
         }
