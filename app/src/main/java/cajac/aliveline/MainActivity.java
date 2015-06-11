@@ -16,6 +16,8 @@ import android.support.v4.view.ViewPager;
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener {
 
+
+
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
@@ -40,6 +42,8 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = new DatabaseHelper(this);
+
+
 
 
         // Initialization for tabs
@@ -71,13 +75,19 @@ public class MainActivity extends FragmentActivity implements
                 // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
             }
+
             @Override
             public void onPageScrolled(int arg0, float arg1, int arg2) {
             }
+
             @Override
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+
+        
+
+
     }
 
     /* creates custom view tab with image on top, text on bottom
