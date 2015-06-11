@@ -1,13 +1,18 @@
 package cajac.aliveline;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -17,8 +22,14 @@ import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import it.sephiroth.android.library.widget.AbsHListView;
+import it.sephiroth.android.library.widget.AdapterView;
+import it.sephiroth.android.library.widget.HListView;
 
 /**
  * Created by Chungyuk Takahashi on 6/5/2015.
@@ -26,10 +37,14 @@ import java.util.Date;
 public class CalendarFragment extends Fragment {
     private View view;
     private FragmentManager fragmentManager;
+    protected FragmentActivity mActivity;
 
     private Fragment currentCal;
     private Date selectedDate = Calendar.getInstance().getTime();
+    private String formattedSelectDate;
+    final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
     private Switch dayOrMonth;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,6 +81,12 @@ public class CalendarFragment extends Fragment {
         fragmentManager.beginTransaction().replace(R.id.calendar_frame, currentCal).commit();
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = (FragmentActivity) activity;
+    }
+
     public Fragment getCurrentCal() {
         return currentCal;
     }
@@ -76,9 +97,6 @@ public class CalendarFragment extends Fragment {
 
     private class CalendarMonthFragment extends Fragment {
         private CaldroidFragment caldroidFragment;
-
-        private String formattedSelectDate;
-
         private View view;
 
         public CalendarMonthFragment() {}
@@ -88,7 +106,6 @@ public class CalendarFragment extends Fragment {
             view = inflater.inflate(R.layout.fragment_calendar_month, container, false);
 
             final TextView textView = (TextView) view.findViewById(R.id.textview);
-            final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
             caldroidFragment = new CaldroidFragment();
 
             // Setup arguments
@@ -122,7 +139,7 @@ public class CalendarFragment extends Fragment {
             }
 
             // Attach to the activity
-            FragmentTransaction t = getActivity().getSupportFragmentManager().beginTransaction();
+            FragmentTransaction t = mActivity.getSupportFragmentManager().beginTransaction();
             t.replace(R.id.calendar1, caldroidFragment);
             t.commit();
 
@@ -219,20 +236,200 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private class CalendarDayFragment extends Fragment {
-        private View view;
+    private class CalendarDayFragment extends Fragment implements AdapterView.OnItemClickListener {
+        private View dayView;
+        private HListView listView;
+        private InfiniteAdapter mAdapter;
+
+        private static final String LOG_TAG = "CalendarDay";
+        private final int width = mActivity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
+        private final int day_center = width / 2 - 120;
+
+        private Calendar past = Calendar.getInstance();
+        private Calendar future = Calendar.getInstance();
+        private int first;
+        private int last;
 
         public CalendarDayFragment() {}
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState){
-            view = inflater.inflate(R.layout.fragment_calendar_day, container, false);
+            dayView = inflater.inflate(R.layout.fragment_calendar_day, container, false);
+            listView = (HListView) dayView.findViewById( R.id.hListView1 );
+            past.setTime(selectedDate);
+            past.add(Calendar.DAY_OF_YEAR, -30);
+            future.setTime(selectedDate);
+            future.add(Calendar.DAY_OF_YEAR, 30);
 
-            TextView txt = (TextView) view.findViewById(R.id.txt);
+            List<Date> items = new ArrayList<>();
+
+            for(int i = 1; i <= 61; i++) {
+                items.add(past.getTime());
+                past.add(Calendar.DAY_OF_YEAR, 1);
+            }
+            first = 0;
+            last = items.size() - 1;
+            past.setTime(selectedDate);
+            past.add(Calendar.DAY_OF_YEAR, -30);
+
+            mAdapter = new InfiniteAdapter( mActivity, R.layout.test_item_1, android.R.id.text1, items );
+            listView.setHeaderDividersEnabled(true);
+            listView.setFooterDividersEnabled(true);
+            listView.setOnItemClickListener(this);
+            listView.setAdapter(mAdapter);
+            listView.setSelectionFromLeft(Integer.MAX_VALUE / 2 + 32, day_center); //Zooms and aligns center
+
+            listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
+                @Override
+                public void onLoadMore(boolean direction) {
+                    // Triggered only when new data needs to be appended to the list
+                    // Add whatever code is needed to append new items to your AdapterView
+//                    addElements();
+                    if (direction)
+                        addFuture();
+                    else
+                        addPast();
+                }
+
+                public void onScrollStateChanged(AbsHListView View, int scrollState) {
+                }
+            });
+
+            listView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View p_v, MotionEvent p_event) {
+                    // this will disallow the touch request for parent scroll on touch of child view
+                    p_v.getParent().requestDisallowInterceptTouchEvent(true);
+                    return false;
+                }
+            });
+
+            TextView txt = (TextView) dayView.findViewById(R.id.txt);
             txt.setText(selectedDate.toString());
 
+            return dayView;
+        }
 
-            return view;
+
+        private void addPast() {
+            for (int i = 0; i < 7; i++) {
+                past.add(Calendar.DAY_OF_YEAR, -1);
+                future.add(Calendar.DAY_OF_YEAR, -1);
+                mAdapter.addPast(past.getTime());
+            }
+            mAdapter.notifyDataSetChanged();
+        }
+
+        private void addFuture() {
+            for (int i = 0; i < 7; i++) {
+                past.add(Calendar.DAY_OF_YEAR, 1);
+                future.add(Calendar.DAY_OF_YEAR, 1);
+                mAdapter.addFuture(future.getTime());
+            }
+            mAdapter.notifyDataSetChanged();
+        }
+
+        // Append more data into the adapter
+        public void customLoadMoreDataFromApi(int offset) {
+            // This method probably sends out a network request and appends new data items to your adapter.
+            // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
+            // Deserialize API response and then construct new objects to append to the adapter
+        }
+
+        private void scrollList() {
+            listView.smoothScrollBy(1500, 300);
+        }
+
+        @Override
+        public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
+            Date date = mAdapter.getItem(position);
+            selectedDate = date;
+            TextView txt = (TextView) dayView.findViewById(R.id.txt);
+            txt.setText(formatter.format(date));
+            listView.post(new ScrollRunnable(position));
+        }
+
+        private class ScrollRunnable implements Runnable{
+            private int position;
+
+            public ScrollRunnable(int position) { this.position = position; }
+
+            public void run() {
+                listView.smoothScrollToPositionFromLeft(position, day_center, 1000);
+            }
+        }
+
+        private class InfiniteAdapter extends ArrayAdapter<Date> {
+
+            private List<Date> mItems;
+            private LayoutInflater mInflater;
+            private int mResource;
+            private int mTextResId;
+            ViewGroup parent;
+
+            public InfiniteAdapter( Context context, int resourceId, int textViewResourceId, List<Date> objects ) {
+                super( context, resourceId, textViewResourceId, objects );
+                mInflater = LayoutInflater.from( context );
+                mResource = resourceId;
+                mTextResId = textViewResourceId;
+                mItems = objects;
+            }
+
+            @Override
+            public boolean hasStableIds() {
+                return true;
+            }
+
+            @Override
+            public long getItemId( int position ) {
+                return getItem( position ).hashCode();
+            }
+
+            @Override
+            public View getView( int position, View convertView, ViewGroup parent ) {
+                this.parent = parent;
+                position%=mItems.size();
+
+                if( null == convertView ) {
+                    convertView = mInflater.inflate( mResource, parent, false );
+                }
+
+                TextView textView = (TextView) convertView.findViewById( mTextResId );
+                textView.setText( formatter.format(getItem( position )) );
+
+                ViewGroup.LayoutParams params = convertView.getLayoutParams();
+                params.width = 200;
+
+                return convertView;
+            }
+
+            @Override
+            public int getCount() {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public Date getItem(int position) {
+                if ( mItems.size()==0 ) {
+                    return null;
+                }
+                return mItems.get( position%mItems.size() );
+            }
+
+            public void addFuture(Date date) {
+                mItems.set(first, date);
+                int size = mItems.size();
+                first = (first + 1) % size;
+                last = (last + 1) % size;
+            }
+
+            public void addPast(Date date) {
+                mItems.set(last, date);
+                int size = mItems.size();
+                first = (first + (size - 1)) % size;
+                last = (last + (size - 1)) % size;
+            }
+
         }
 
     }
