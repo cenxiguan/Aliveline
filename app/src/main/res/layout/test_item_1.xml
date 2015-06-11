@@ -5,7 +5,7 @@
     android:background="@drawable/text_background_selector"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="10dip">
+    android:padding="10dp">
 
     <!--<ImageView-->
         <!--android:id="@+id/image"-->
@@ -17,8 +17,8 @@
 
     <TextView
         android:id="@android:id/text1"
-        android:layout_width="200dp"
-        android:layout_height="270dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 

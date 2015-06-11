@@ -7,9 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,7 +25,6 @@ import com.roomorama.caldroid.CaldroidListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -239,104 +238,60 @@ public class CalendarFragment extends Fragment {
     }
 
     private class CalendarDayFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
-        private View view;
-        HListView listView;
-        InfiniteAdapter mAdapter;
+        private View dayView;
+        private HListView listView;
+        private InfiniteAdapter mAdapter;
+
         private static final String LOG_TAG = "CalendarDay";
-
-
         private final int width = mActivity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
-        private final int day_center = width / 2 - 100;
+        private final int day_center = width / 2 - 120;
+
+        private Calendar past = Calendar.getInstance();
+        private Calendar future = Calendar.getInstance();
+        private int first;
+        private int last;
 
         public CalendarDayFragment() {}
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState){
-            view = inflater.inflate(R.layout.fragment_calendar_day, container, false);
-            listView = (HListView) view.findViewById( R.id.hListView1 );
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(selectedDate);
-            cal.add(Calendar.DAY_OF_YEAR, -31);
+            dayView = inflater.inflate(R.layout.fragment_calendar_day, container, false);
+            listView = (HListView) dayView.findViewById( R.id.hListView1 );
+            past.setTime(selectedDate);
+            past.add(Calendar.DAY_OF_YEAR, -30);
+            future.setTime(selectedDate);
+            future.add(Calendar.DAY_OF_YEAR, 30);
 
             Log.w(LOG_TAG, "Created View");
 
-            List<String> items = new ArrayList<String>();
+            List<Date> items = new ArrayList<>();
 
-            for(int i = 0; i < 61; i++) {
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-                items.add(formatter.format(cal.getTime()).toString());
+            for(int i = 1; i <= 61; i++) {
+                items.add(past.getTime());
+                past.add(Calendar.DAY_OF_YEAR, 1);
             }
+            first = 0;
+            last = items.size() - 1;
+            past.setTime(selectedDate);
+            past.add(Calendar.DAY_OF_YEAR, -30);
 
-//            listView.setSelectionFromLeft(30, day_center); //Zooms and aligns center
-
-//            // Add the most recent past 30 days
-//            for(int i = 30; i > 0; i--) {
-//                other.add(Calendar.DATE, -i);
-//
-//            }
-//
-//            // Add the selected Date
-//            items.add(selectedDate.toString());
-//
-//            // Add the future 30 days after selected date
-//            for( int i = 0; i < 30; i++ ) {
-//                items.add( String.valueOf( i ) );
-//            }
             mAdapter = new InfiniteAdapter( mActivity, R.layout.test_item_1, android.R.id.text1, items );
             listView.setHeaderDividersEnabled(true);
             listView.setFooterDividersEnabled(true);
-
-//            if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE_MODAL ) {
-//                listView.setMultiChoiceModeListener( new MultiChoiceModeListener() {
-//
-//                    @Override
-//                    public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
-//                        return true;
-//                    }
-//
-//                    @Override
-//                    public void onDestroyActionMode( ActionMode mode ) {
-//                    }
-//
-//                    @Override
-//                    public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
-//                        menu.add( 0, 0, 0, "Delete" );
-//                        return true;
-//                    }
-//
-//                    @Override
-//                    public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
-//                        Log.d( LOG_TAG, "onActionItemClicked: " + item.getItemId() );
-//
-//                        final int itemId = item.getItemId();
-//                        if( itemId == 0 ) {
-//                            deleteSelectedItems();
-//                        }
-//
-//                        mode.finish();
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public void onItemCheckedStateChanged( ActionMode mode, int position, long id, boolean checked ) {
-//                        mode.setTitle( "What the fuck!" );
-//                        mode.setSubtitle( "Selected items: " + listView.getCheckedItemCount() );
-//                    }
-//                } );
-//            } else if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
-                listView.setOnItemClickListener( this );
-//            }
-
-
+            listView.setOnItemClickListener(this);
             listView.setAdapter(mAdapter);
-            listView.setSelectionFromLeft(30, day_center); //Zooms and aligns center
+            listView.setSelectionFromLeft(Integer.MAX_VALUE/2 + 32, day_center); //Zooms and aligns center
 
             listView.setOnScrollListener(new EndlessScrollListener() {
                 @Override
-                public void onLoadMore(int page, int totalItemsCount) {
+                public void onLoadMore(int page, int totalItemsCount, boolean direction) {
                     // Triggered only when new data needs to be appended to the list
                     // Add whatever code is needed to append new items to your AdapterView
 //                    addElements();
+                    if (direction)
+                        addFuture();
+                    else
+                        addPast();
                     customLoadMoreDataFromApi(page);
                     // or customLoadMoreDataFromApi(totalItemsCount);
                 }
@@ -344,11 +299,11 @@ public class CalendarFragment extends Fragment {
                 public void onScrollStateChanged(AbsHListView View, int scrollState) {}
             });
 
-            TextView txt = (TextView) view.findViewById(R.id.txt);
+            TextView txt = (TextView) dayView.findViewById(R.id.txt);
             txt.setText(selectedDate.toString());
 
 
-            return view;
+            return dayView;
         }
 
         public void onClick( View v ) {
@@ -357,43 +312,37 @@ public class CalendarFragment extends Fragment {
                         Toast.LENGTH_SHORT).show();
         }
 
-        private void addElements() {
-            for( int i = 0; i < 10; i++ ) {
-//			mAdapter.mItems.add( Math.min( mAdapter.mItems.size(), 2), String.valueOf( mAdapter.mItems.size() ) );
-                mAdapter.mItems.add(String.valueOf(mAdapter.mItems.size()));
+        private void addPast() {
+            for (int i = 0; i < 7; i++) {
+                past.add(Calendar.DAY_OF_YEAR, -1);
+                future.add(Calendar.DAY_OF_YEAR, -1);
+                mAdapter.addPast(past.getTime());
             }
+//            for(int i = 0; i < 7; i++) {
+//                past.add(Calendar.DAY_OF_YEAR, -1);
+//                mAdapter.addToFront(formatter.format(past.getTime()));
+//            }
+//
+////            listView.setSelection();
             mAdapter.notifyDataSetChanged();
         }
 
-        private void removeElements() {
-            for( int i = 0; i < 5; i++ ) {
-                if( mAdapter.mItems.size() > 0 ) {
-                    mAdapter.mItems.remove(mAdapter.mItems.size()-1);
-                }
+        private void addFuture() {
+            for (int i = 0; i < 7; i++) {
+                past.add(Calendar.DAY_OF_YEAR, 1);
+                future.add(Calendar.DAY_OF_YEAR, 1);
+                mAdapter.addFuture(future.getTime());
             }
+//            for(int i = 0; i < 7; i++) {
+//                future.add(Calendar.DAY_OF_YEAR, 1);
+//                mAdapter.addToBack(formatter.format(future.getTime()));
+//            }
             mAdapter.notifyDataSetChanged();
-        }
-
-        private void deleteSelectedItems() {
-            SparseArrayCompat<Boolean> checkedItems = listView.getCheckedItemPositions();
-            ArrayList<Integer> sorted = new ArrayList<Integer>( checkedItems.size() );
-
-            Log.i( LOG_TAG, "deleting: " + checkedItems.size() );
-
-            for( int i = 0; i < checkedItems.size(); i++ ) {
-                if( checkedItems.valueAt( i ) ) {
-                    sorted.add( checkedItems.keyAt( i ) );
-                }
-            }
-
-            Collections.sort(sorted);
-
-            for( int i = sorted.size()-1; i >= 0; i-- ) {
-                int position = sorted.get( i );
-                Log.d( LOG_TAG, "Deleting item at: " + position );
-                mAdapter.mItems.remove( position );
-            }
-            mAdapter.notifyDataSetChanged();
+//            for( int i = 0; i < 10; i++ ) {
+////			mAdapter.mItems.add( Math.min( mAdapter.mItems.size(), 2), String.valueOf( mAdapter.mItems.size() ) );
+//                mAdapter.mItems.add(String.valueOf(mAdapter.mItems.size()));
+//            }
+//            mAdapter.notifyDataSetChanged();
         }
 
         // Append more data into the adapter
@@ -409,28 +358,34 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
-
+            Date date = mAdapter.getMItems().get(position%61);
+//            Toast.makeText(mActivity.getApplicationContext(), mAdapter.getMItems().get(position%61),
+//                    Toast.LENGTH_SHORT).show();
+            TextView txt = (TextView) dayView.findViewById(R.id.txt);
+            txt.setText(formatter.format(date));
             Log.w(LOG_TAG, "Clicked");
-            if(position%2 == 0){
-                listView.smoothScrollToPositionFromLeft(position, day_center, 1000);
-//                listView.setSelection(position);        //Zooms and aligns left
-//            }else if(position%4 == 1){
-////                listView.setSelectionFromLeft(position, width/2 - 100); //Zooms and aligns center
-//            }else if(position%4 == 2){
-//                listView.smoothScrollToPosition(position);  //scrolls and align left
-            }else
-                listView.smoothScrollToPositionFromLeft(position, day_center); //Scroll and align center
-
+            listView.post(new ScrollRunnable(position));
         }
 
-        class InfiniteAdapter extends ArrayAdapter<String> {
+        private class ScrollRunnable implements Runnable{
+            private int position;
 
-            List<String> mItems;
-            LayoutInflater mInflater;
-            int mResource;
-            int mTextResId;
+            public ScrollRunnable(int position) { this.position = position; }
 
-            public InfiniteAdapter( Context context, int resourceId, int textViewResourceId, List<String> objects ) {
+            public void run() {
+                listView.smoothScrollToPositionFromLeft(position, day_center, 1000);
+            }
+        }
+
+        private class InfiniteAdapter extends ArrayAdapter<Date> {
+
+            private List<Date> mItems;
+            private LayoutInflater mInflater;
+            private int mResource;
+            private int mTextResId;
+            ViewGroup parent;
+
+            public InfiniteAdapter( Context context, int resourceId, int textViewResourceId, List<Date> objects ) {
                 super( context, resourceId, textViewResourceId, objects );
                 mInflater = LayoutInflater.from( context );
                 mResource = resourceId;
@@ -460,7 +415,7 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public View getView( int position, View convertView, ViewGroup parent ) {
-
+                this.parent = parent;
                 position%=mItems.size();
 
                 View front= convertView;
@@ -470,35 +425,63 @@ public class CalendarFragment extends Fragment {
                 }
 
                 TextView textView = (TextView) convertView.findViewById( mTextResId );
-                textView.setText( getItem( position ) );
-
-                int type = getItemViewType( position );
+                textView.setText( formatter.format(getItem( position )) );
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
                 params.width = 200;
-//                if( type == 0 ) {
-//                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_1 );
-//                } else if( type == 1 ) {
-//                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_2 );
-//                } else {
-//                    params.width = getResources().getDimensionPixelSize( R.dimen.item_size_3 );
-//                }
 
                 return convertView;
             }
 
-//		public int getCount() {
-//			return Integer.MAX_VALUE;
-//		}
+            @Override
+            public int getCount()
+            {
+                return Integer.MAX_VALUE;
+            }
 
             @Override
-            public String getItem(int position) {
+            public Date getItem(int position) {
                 if ( mItems.size()==0 ) {
                     return null;
                 }
 
                 // mod the list index to the actual element count
                 return mItems.get( position%mItems.size() );
+            }
+
+            public void addToFront(Date date) {
+                mItems.add(0, date);
+            }
+
+            public void addToBack(Date date) {
+                mItems.add(date);
+            }
+
+            public void addFuture(Date date) {
+                mItems.set(first, date);
+                int size = mItems.size();
+                first = (first + 1) % size;
+                last = (last + 1) % size;
+            }
+
+            public void addPast(Date date) {
+                mItems.set(last, date);
+                int size = mItems.size();
+                first = (first + (size - 1)) % size;
+                last = (last + (size - 1)) % size;
+            }
+
+            public List<Date> getMItems() {
+                return mItems;
+            }
+
+            public boolean onTouchEvent(MotionEvent p_event) {
+                if (p_event.getAction() == MotionEvent.ACTION_MOVE
+                        && parent != null) {
+                    parent.requestDisallowInterceptTouchEvent(true);
+                }
+
+                return parent.onTouchEvent(p_event);
             }
 
         }
