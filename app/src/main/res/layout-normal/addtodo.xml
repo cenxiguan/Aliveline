@@ -73,19 +73,9 @@
         android:layout_alignTop="@+id/estimated_time_prompt"
         android:layout_toRightOf="@+id/estimated_time_prompt"
         android:layout_toEndOf="@+id/estimated_time_prompt"
-        android:layout_marginLeft="15dp"/>
-
-    <TextView
-        style="@style/text_style2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hours"
-        android:id="@+id/hours"
-        android:layout_above="@+id/time_usage_prompt"
-        android:layout_toRightOf="@+id/estimated_time_field"
-        android:layout_toEndOf="@+id/estimated_time_field"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp" />
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_above="@+id/time_usage_prompt" />
 
     <TextView
         style="@style/text_style2"
@@ -139,7 +129,6 @@
         android:layout_alignTop="@+id/month_field"
         android:layout_above="@+id/estimated_time_prompt" />
 
-
     <TextView
         style="@style/text_style2"
         android:layout_width="wrap_content"
@@ -153,7 +142,7 @@
         android:layout_toEndOf="@+id/day_field" />
 
     <EditText
-        style="@style/text_style2"
+        style="@style/text_style4"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"

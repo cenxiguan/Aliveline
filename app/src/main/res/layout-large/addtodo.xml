@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
     android:background="#FFFFFF">
 
     <TextView
@@ -9,8 +10,6 @@
         android:layout_height="wrap_content"
         android:text="Title:" style="@style/text_style1"
         android:id="@+id/title_prompt"
-        android:layout_marginLeft="38dp"
-        android:layout_marginStart="38dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -18,7 +17,7 @@
 
     <EditText
         style="@style/text_style4"
-        android:layout_width="380dp"
+        android:layout_width="310dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/title_field"
@@ -39,7 +38,7 @@
         android:layout_below="@+id/title_prompt"
         android:layout_alignLeft="@+id/title_prompt"
         android:layout_alignStart="@+id/title_prompt"
-        android:layout_marginTop="32dp" />
+        android:layout_marginTop="20dp" />
 
     <TextView
         style="@style/text_style1"
@@ -47,7 +46,7 @@
         android:layout_height="wrap_content"
         android:text="Total Estimated Time:"
         android:id="@+id/estimated_time_prompt"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/due_date_prompt"
         android:layout_alignLeft="@+id/due_date_prompt"
         android:layout_alignStart="@+id/due_date_prompt" />
@@ -58,7 +57,7 @@
         android:layout_height="wrap_content"
         android:text="Time Usage (Select One):"
         android:id="@+id/time_usage_prompt"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/estimated_time_prompt"
         android:layout_alignLeft="@+id/estimated_time_prompt"
         android:layout_alignStart="@+id/estimated_time_prompt" />
@@ -70,34 +69,13 @@
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/estimated_time_field"
         android:inputType="text"
+        android:hint="Hours"
         android:layout_alignTop="@+id/estimated_time_prompt"
         android:layout_toRightOf="@+id/estimated_time_prompt"
         android:layout_toEndOf="@+id/estimated_time_prompt"
-        android:layout_marginLeft="15dp"/>
-
-    <TextView
-        style="@style/text_style2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hours"
-        android:id="@+id/hours"
-        android:layout_above="@+id/time_usage_prompt"
-        android:layout_toRightOf="@+id/estimated_time_field"
-        android:layout_toEndOf="@+id/estimated_time_field"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp" />
-
-    <TextView
-        style="@style/text_style2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hours"
-        android:id="@+id/hours"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_alignBottom="@+id/estimated_time_field"
-        android:layout_toRightOf="@+id/estimated_time_field"
-        android:layout_toEndOf="@+id/estimated_time_field" />
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_above="@+id/time_usage_prompt" />
 
     <EditText
         style="@style/text_style4"
@@ -106,6 +84,7 @@
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/month_field"
         android:inputType="text"
+        android:hint="MM"
         android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
         android:layout_above="@+id/estimated_time_prompt"
@@ -132,13 +111,13 @@
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/day_field"
         android:inputType="text"
+        android:hint="DD"
         android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         android:layout_toRightOf="@+id/month"
         android:layout_toEndOf="@+id/month"
         android:layout_alignTop="@+id/month_field"
         android:layout_above="@+id/estimated_time_prompt" />
-
 
     <TextView
         style="@style/text_style2"
@@ -153,12 +132,13 @@
         android:layout_toEndOf="@+id/day_field" />
 
     <EditText
-        style="@style/text_style2"
+        style="@style/text_style4"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/year_field"
         android:inputType="text"
+        android:hint="YYYY"
         android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         android:layout_alignTop="@+id/day_field"
@@ -166,45 +146,35 @@
         android:layout_toEndOf="@+id/day"
         android:layout_above="@+id/estimated_time_prompt" />
 
-    <TextView
-        style="@style/text_style2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="(MM/DD/YYYY)"
-        android:id="@+id/year"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_alignTop="@+id/day"
-        android:layout_toRightOf="@+id/year_field"
-        android:layout_toEndOf="@+id/year_field" />
-
     <ImageButton
-        android:layout_width="155dp"
-        android:layout_height="155dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/up_curve"
+        android:scaleType="fitXY"
         android:src="@drawable/up2"
         android:background="@drawable/time_usage_unselected"
         android:layout_below="@+id/time_usage_prompt" />
 
     <ImageButton
-        android:layout_width="155dp"
-        android:layout_height="155dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/no_curve"
+        android:scaleType="fitXY"
         android:src="@drawable/flat2"
         android:background="@drawable/time_usage_unselected"
         android:layout_below="@+id/time_usage_prompt"
         android:layout_toRightOf="@+id/up_curve"/>
 
     <ImageButton
-        android:layout_width="155dp"
-        android:layout_height="155dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/down_curve"
+        android:scaleType="fitXY"
         android:src="@drawable/down2"
         android:background="@drawable/time_usage_unselected"
         android:layout_below="@+id/time_usage_prompt"
@@ -216,25 +186,26 @@
         android:layout_height="wrap_content"
         android:text="Select Days to Work:"
         android:id="@+id/days_available_prompt"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/up_curve"
         android:layout_alignLeft="@+id/estimated_time_prompt"
         android:layout_alignStart="@+id/estimated_time_prompt" />
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Sun"
         android:id="@+id/button"
         android:layout_below="@+id/days_available_prompt"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
         android:layout_alignLeft="@+id/days_available_prompt"
         android:layout_alignStart="@+id/days_available_prompt"
         android:background="@drawable/time_usage_unselected"/>
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Mon"
         android:id="@+id/button2"
@@ -245,7 +216,8 @@
         android:background="@drawable/time_usage_unselected"/>
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Tue"
         android:id="@+id/button3"
@@ -255,7 +227,8 @@
         android:background="@drawable/time_usage_unselected"/>
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Wed"
         android:id="@+id/button4"
@@ -265,7 +238,8 @@
         android:background="@drawable/time_usage_unselected"/>
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Thu"
         android:id="@+id/button5"
@@ -275,7 +249,8 @@
         android:background="@drawable/time_usage_unselected"/>
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Fri"
         android:id="@+id/button6"
@@ -285,7 +260,8 @@
         android:background="@drawable/time_usage_unselected"/>
 
     <Button
-        android:layout_width="wrap_content"
+        style="@style/text_style5"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:text="Sat"
         android:id="@+id/button7"
