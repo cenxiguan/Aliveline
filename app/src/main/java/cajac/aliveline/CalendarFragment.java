@@ -40,7 +40,8 @@ public class CalendarFragment extends Fragment {
     protected FragmentActivity mActivity;
 
     private Fragment currentCal;
-    private Date selectedDate = Calendar.getInstance().getTime();
+    private Date currentDate;
+    private Date selectedDate;
     private String formattedSelectDate;
     final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
     private Switch dayOrMonth;
@@ -51,13 +52,22 @@ public class CalendarFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.HOUR_OF_DAY);
+        cal.clear(Calendar.HOUR);
+        cal.clear(Calendar.AM_PM);
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        selectedDate = cal.getTime();
+        currentDate = selectedDate;
+
+        // Needed in case the fragment disappears
         if(currentCal instanceof CalendarDayFragment) {
             switchFrame(new CalendarDayFragment());
         }else {
             switchFrame(new CalendarMonthFragment());
-            Log.w("CalFrag", currentCal.toString());
         }
-
 
         dayOrMonth = (Switch) view.findViewById(R.id.day_month_switch);
         dayOrMonth.setChecked(false);
@@ -123,16 +133,12 @@ public class CalendarFragment extends Fragment {
                 args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
                 args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
                 args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, true);
-                Date date = new Date(cal.get(Calendar.YEAR),
-                        cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH));
-                formattedSelectDate = formatter.format(date);
+                formattedSelectDate = formatter.format(selectedDate);
                 textView.setText(formattedSelectDate);
 
                 caldroidFragment.setBackgroundResourceForDate(R.color.selected, selectedDate);
                 caldroidFragment.setTextColorForDate(R.color.white, selectedDate);
                 caldroidFragment.refreshView();
-                Log.w("CalFrag", "Createview");
                 // Uncomment this line to use dark theme
 //            args.putInt(CaldroidFragment.THEME_RESOURCE, com.caldroid.R.style.CaldroidDefaultDark);
                 caldroidFragment.setArguments(args);
@@ -148,6 +154,8 @@ public class CalendarFragment extends Fragment {
 
                 @Override
                 public void onSelectDate(Date date, View view) {
+                    Log.w("CalMon d ", date.toString());
+                    Log.w("CalMon s ", selectedDate.toString());
                     if(date.equals(selectedDate)) {
                         dayOrMonth.setChecked(true);
                         CalendarDayFragment dayView = new CalendarDayFragment();
@@ -196,9 +204,6 @@ public class CalendarFragment extends Fragment {
                 @Override
                 public void onCaldroidViewCreated() {
                     if (caldroidFragment.getLeftArrowButton() != null) {
-//                    Toast.makeText(getActivity().getApplicationContext(),
-//                            "Caldroid view is created", Toast.LENGTH_SHORT)
-//                            .show();
                     }
                 }
 
@@ -247,8 +252,10 @@ public class CalendarFragment extends Fragment {
 
         private Calendar past = Calendar.getInstance();
         private Calendar future = Calendar.getInstance();
-        private int first;
-        private int last;
+        private int head;
+        private int tail;
+        private int selectedPosition;
+        private View oldView;
 
         public CalendarDayFragment() {}
 
@@ -267,8 +274,8 @@ public class CalendarFragment extends Fragment {
                 items.add(past.getTime());
                 past.add(Calendar.DAY_OF_YEAR, 1);
             }
-            first = 0;
-            last = items.size() - 1;
+            head = 0;
+            tail = items.size() - 1;
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
 
@@ -277,7 +284,9 @@ public class CalendarFragment extends Fragment {
             listView.setFooterDividersEnabled(true);
             listView.setOnItemClickListener(this);
             listView.setAdapter(mAdapter);
-            listView.setSelectionFromLeft(Integer.MAX_VALUE / 2 + 32, day_center); //Zooms and aligns center
+            selectedPosition = Integer.MAX_VALUE / 2 + 32;
+            listView.setSelectionFromLeft(selectedPosition, day_center); //Zooms and aligns center
+            oldView = listView.getAdapter().getView(selectedPosition, null, container);
 
             listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
                 @Override
@@ -344,6 +353,13 @@ public class CalendarFragment extends Fragment {
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
             Date date = mAdapter.getItem(position);
             selectedDate = date;
+            if(oldView == view)
+
+            selectedPosition = position;
+            oldView.setBackgroundColor(getResources().getColor(R.color.day_item));
+            oldView = view;
+            view.setBackgroundColor(getResources().getColor(R.color.selected));
+
             TextView txt = (TextView) dayView.findViewById(R.id.txt);
             txt.setText(formatter.format(date));
             listView.post(new ScrollRunnable(position));
@@ -388,14 +404,21 @@ public class CalendarFragment extends Fragment {
             @Override
             public View getView( int position, View convertView, ViewGroup parent ) {
                 this.parent = parent;
-                position%=mItems.size();
+//                position%=mItems.size();
 
                 if( null == convertView ) {
                     convertView = mInflater.inflate( mResource, parent, false );
                 }
 
+                if ( position == selectedPosition) {
+                    oldView = convertView;
+                    convertView.setBackgroundColor(getResources().getColor(R.color.selected));
+                } else
+                    convertView.setBackgroundColor(getResources().getColor(R.color.day_item));
+
+
                 TextView textView = (TextView) convertView.findViewById( mTextResId );
-                textView.setText( formatter.format(getItem( position )) );
+                textView.setText( formatter.format(getItem( position%mItems.size() )) );
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
                 params.width = 200;
@@ -417,17 +440,17 @@ public class CalendarFragment extends Fragment {
             }
 
             public void addFuture(Date date) {
-                mItems.set(first, date);
+                mItems.set(head, date);
                 int size = mItems.size();
-                first = (first + 1) % size;
-                last = (last + 1) % size;
+                head = (head + 1) % size;
+                tail = (tail + 1) % size;
             }
 
             public void addPast(Date date) {
-                mItems.set(last, date);
+                mItems.set(tail, date);
                 int size = mItems.size();
-                first = (first + (size - 1)) % size;
-                last = (last + (size - 1)) % size;
+                head = (head + (size - 1)) % size;
+                tail = (tail + (size - 1)) % size;
             }
 
         }
