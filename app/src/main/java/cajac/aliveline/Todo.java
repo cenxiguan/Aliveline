@@ -9,17 +9,18 @@ public class Todo {
     public String title;
     public String description;
     public Date dueDate;
-    public int estimatedTime;
+    public String estimatedTime;
     public int timeUsage;
     int id;
     public String startTime;
     public String remainingTime;
+    public String locks;
 
     public Todo(){
 
     }
 
-    public Todo(String title, String description, Date dueDate, int estimatedTime){
+    public Todo(String title, String description, Date dueDate, String estimatedTime){
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
@@ -53,12 +54,12 @@ public class Todo {
 
     //this part of the code and some of the fields edited by Alex.
     //at the moment, the google doc says that the estimated time is in minutes.
-    public int getEstimatedTime() {
+    public String getEstimatedTime() {
         return this.estimatedTime;
     }
 
 
-    public void setEstimatedTime(int newEstimate) {
+    public void setEstimatedTime(String newEstimate) {
         this.estimatedTime = newEstimate;
     }
 
@@ -93,5 +94,13 @@ public class Todo {
 
     public String getRemainingTime(){
         return remainingTime;
+    }
+
+    public void setLocks(String locks){
+        this.locks = locks;
+    }
+
+    public String getLocks(){
+        return locks;
     }
 }

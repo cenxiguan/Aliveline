@@ -10,6 +10,7 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +48,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String KEY_TODO_ID = "todo_id";
     public static final String KEY_DATES_ID = "dates_id";
 
-    public static final String HOURS = "hours";
     public static final String LOCK = "lock";
     public static final String COLUMN_TIME_REQUIRED = "time_required";
     public static final String COLUMN_TIME_COMPLETED = "time_completed";
@@ -55,15 +55,15 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " + COLUMN_DESCRIPTION + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
-    + "TEXT" + ")";
+    + " TEXT" + ")";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_DATE + " DATETIME" + ")";
+            + COLUMN_DATE + " DATETIME UNIQUE" + ")";
 
     //What columns should be included in relational?
-    public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + "(" + KEY_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            KEY_TODO_ID + "INTEGER," + KEY_DATES_ID + "INTEGER," + HOURS + "INTEGER," + LOCK + "INTEGER, " + COLUMN_TIME_REQUIRED + "TEXT, " +
-            COLUMN_TIME_COMPLETED + "TEXT" + ")";
+    public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + TABLE_TODO_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            KEY_TODO_ID + " INTEGER," + KEY_DATES_ID + " INTEGER," + LOCK + " INTEGER, " + COLUMN_TIME_REQUIRED + " TEXT, " +
+            COLUMN_TIME_COMPLETED + " TEXT" + ")";
 
 
     public DatabaseHelper(Context context) {
@@ -89,37 +89,88 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
 
-    //need to edit based on how the days_ids are being formed
     public long createToDo(Todo todo, long[] days_ids) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values = setTodoContentValues(todo, values);
-
-//        values.put(COLUMN_TITLE, todo.getTitle());
-//        values.put(COLUMN_DESCRIPTION, todo.getDescription());
-//        values.put(COLUMN_ESTIMATED_TIME, todo.getEstimatedTime());
-//        values.put(COLUMN_TIME_USAGE, todo.getTimeUsage());
-//        values.put(COLUMN_DUE_DATE, createDate(todo.getDueDate()));
-//        values.put(COLUMN_START_TIME, todo.getStartTime());
-//        values.put(COLUMN_REMAINING_TIME, todo.getRemainingTime());
-
         // insert row
         long todo_id = db.insert(TABLE_TODO, null, values);
-
-        // assigning tags to todo
-//        for (long days_id : days_ids) {
-//            createTodoTag(todo_id, days_id);
-//        }
-
         return todo_id;
+    }
+
+    public void addToRemainingTables(long todo_id, Todo todo){
+        String firstDayString = dateToStringFormat(new Date());
+        firstDayString = getNextDay(firstDayString);
+        String lastDay = dateToStringFormat(todo.getDueDate());
+        int boolPos = 0;
+        String locks = todo.getLocks();
+        while (!firstDayString.equals(lastDay)){
+            Date firstDayDate = convertStringDate(firstDayString);
+            long date_id = createDate(firstDayDate);
+            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
+            String timeRequired = getTimeForDay(locks, lock, todo);
+            addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
+            firstDayString = getNextDay(firstDayString);
+            boolPos++;
+        }
+    }
+
+    public String getTimeForDay(String locks, int lock, Todo todo){
+        int numOfDaysWorking = locks.length() - locks.replace("1","").length();
+        String total_hours = todo.getStartTime();
+        int minutes = timeInMinutes(total_hours);
+        if (lock == 0){
+            return "00:00";
+        } else {
+            int dist = minutes/numOfDaysWorking;
+            String distIntHours = timeInHours(dist);
+            return distIntHours;
+        }
+    }
+
+    public int timeInMinutes(String hoursString){
+        String[] hours_min = hoursString.split(":");
+        int hours = Integer.parseInt(hours_min[0]);
+        int min = Integer.parseInt(hours_min[1]);
+        min = min + hours * 60;
+        return min;
+    }
+
+    public String timeInHours(int minutes){
+        int hours = minutes / 60;
+        int minutesRemainder = minutes % 60;
+        String hoursStr = String.valueOf(hours);
+        String minutesRemainStr = String.valueOf(minutesRemainder);
+        if (hoursStr.length() == 1){
+            hoursStr = "0" + hoursStr;
+        }
+        if (minutesRemainStr.length() == 1){
+            minutesRemainStr = "0" + minutesRemainStr;
+        }
+        String hoursAndMin = hoursStr + ":" + minutesRemainStr;
+        return hoursAndMin;
+    }
+
+
+    public String getNextDay(String day){
+        Date date = convertStringDate(day);
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            c.setTime(sdf.parse(day));
+        } catch(ParseException e) {
+            e.printStackTrace();
+        }
+        c.add(Calendar.DATE, 1);
+        day = sdf.format(c.getTime());
+        return day;
     }
 
     public long createDate(Date date){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        //java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         String dateString = dateToStringFormat(date);
         contentValues.put(COLUMN_DATE, dateString);
 
@@ -132,8 +183,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE "
                 + KEY_ID + " = "  + date_id;
-
-        //Log.e(LOG, selectQuerey);
         Cursor c = db.rawQuery(selectQuery, null);
         if (c != null) {
             c.moveToFirst();
@@ -141,6 +190,23 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String dateString = c.getString(c.getColumnIndex(COLUMN_DATE));
         Date date = convertStringDate(dateString);
         return date;
+    }
+    //Testing purposes
+    public List<String> getAllDates(){
+        ArrayList<String> dates = new ArrayList<String>();
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT  * FROM " + TABLE_DATES;
+
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()){
+            do {
+                int id = c.getInt(c.getColumnIndex(KEY_ID));
+                String date = c.getString(c.getColumnIndex(COLUMN_DATE));
+                String date_with_id = id + ":" + date;
+                dates.add(date_with_id);
+            }while (c.moveToNext());
+        }
+        return dates;
     }
 
     public int getDateID(Date date){
@@ -157,7 +223,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public String dateToStringFormat(Date date){
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String dateString = sdf.format(date);
         return dateString;
     }
@@ -187,23 +253,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         Todo td = new Todo();
         td = setTodoValues(td, c);
-//        td.setId(c.getInt(c.getColumnIndex("id")));
-//        td.setTitle(c.getString(c.getColumnIndex("title")));
-//        td.setDescription(c.getString(c.getColumnIndex("desc")));
-//        String dateString = c.getString(c.getColumnIndex("due_date"));
-//        Date dueDate = convertStringDate(dateString);
-//        td.setDueDate(dueDate);
-//        //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
-//        td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
-//        td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
-//        td.setStartTime(c.getString(c.getColumnIndex(COLUMN_START_TIME)));
-//        td.setRemainingTime(c.getString(c.getColumnIndex(COLUMN_REMAINING_TIME)));
-
         return td;
     }
 
     public Date convertStringDate(String dateString){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = null;
         try {
             date = simpleDateFormat.parse(dateString);
@@ -228,17 +282,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             do {
                 Todo td = new Todo();
                 td = setTodoValues(td, c);
-//                td.setId(c.getInt(c.getColumnIndex("id")));
-//                td.setTitle(c.getString(c.getColumnIndex("title")));
-//                td.setDescription(c.getString(c.getColumnIndex("desc")));
-//                //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
-//                String dateString = c.getString(c.getColumnIndex("due_date"));
-//                Date dueDate = convertStringDate(dateString);
-//                td.setDueDate(dueDate);
-//                td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
-//                td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
-//                td.setStartTime(c.getString(c.getColumnIndex(COLUMN_START_TIME)));
-//                td.setRemainingTime(c.getString(c.getColumnIndex(COLUMN_REMAINING_TIME)));
                 // adding to todo list
                 todos.add(td);
             } while (c.moveToNext());
@@ -253,13 +296,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public List<Todo> getAllToDosByDay(String givenDay) {
 
         List<Todo> todos = new ArrayList<Todo>();
-
-//        String selectQuery = "SELECT  * FROM " + TABLE_TODO + " to, "
-//                + TABLE_DATES + "td , " + TABLE_TODO_DATES + " ttd WHERE td."
-//                + COLUMN_DATE + " = '" + tag_name + "'" + " AND td." + KEY_ID
-//                + " = " + "tt." + KEY_TAG_ID + " AND td." + KEY_ID + " = "
-//                + "tt." + KEY_TODO_ID;
-
         Date date = convertStringDate(givenDay);
         int date_id = getDateID(date);
 
@@ -274,19 +310,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             do {
                 int todo_id = c.getInt(c.getColumnIndex(KEY_TODO_ID));
                 Todo td = getTodo(todo_id);
-                //td = setTodoValues(td, c);
-//                td.setId(c.getInt(c.getColumnIndex("id")));
-//                td.setTitle(c.getString(c.getColumnIndex("title")));
-//                td.setDescription(c.getString(c.getColumnIndex("desc")));
-//                //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
-//                String dateString = c.getString(c.getColumnIndex("due_date"));
-//                Date dueDate = convertStringDate(dateString);
-//                td.setDueDate(dueDate);
-//                td.setEstimatedTime(c.getInt(c.getColumnIndex("est_time")));
-//                td.setTimeUsage(c.getInt(c.getColumnIndex("time_usage")));
-//                td.setStartTime(c.getString(c.getColumnIndex(COLUMN_START_TIME)));
-//                td.setRemainingTime(c.getString(c.getColumnIndex(COLUMN_REMAINING_TIME)));
-                // adding to todo list
                 todos.add(td);
             } while (c.moveToNext());
         }
@@ -298,13 +321,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values = setTodoContentValues(todo, values);
-//        values.put(COLUMN_TITLE, todo.getTitle());
-//        values.put(COLUMN_DESCRIPTION, todo.getDescription());
-//        values.put(COLUMN_ESTIMATED_TIME, todo.getEstimatedTime());
-//        values.put(COLUMN_TIME_USAGE, todo.getTimeUsage());
-//        values.put(COLUMN_DUE_DATE, dateToStringFormat(todo.getDueDate()));
-//        values.put(COLUMN_START_TIME, todo.getStartTime());
-//        values.put(COLUMN_REMAINING_TIME, todo.getRemainingTime());
         // updating row
         return db.update(TABLE_TODO, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo.getId()) });
@@ -316,25 +332,46 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 new String[] { String.valueOf(todo_id) });
     }
 
-    public long addTodoDate(long todo_id, long date_id, int hours, int lock, String timeRequired, String timeCompleted ){
+    public long addTodoDate(long todo_id, long date_id, int lock, String timeRequired, String timeCompleted ){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_TODO_ID, todo_id);
         values.put(KEY_DATES_ID, date_id);
-        values.put(HOURS, hours);
         values.put(LOCK, lock);
         values.put(COLUMN_TIME_REQUIRED, timeRequired);
         values.put(COLUMN_TIME_COMPLETED, timeCompleted);
         long todo_date_id = db.insert(TABLE_TODO_DATES, null, values);
         return todo_date_id;
     }
+    //THis is for testing purposes, will be removed later on
+    public List<String> getAllTodoDates(){
+        SQLiteDatabase db = getReadableDatabase();
+        List<String> todoDates = new ArrayList<String>();
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES;
+        Cursor c = db.rawQuery(selectQuery, null);
 
-    public long updateTodoDate(long id, long todo_id, long date_id, int hours, int lock, String timeRequired, String timeCompleted){
+        if (c.moveToFirst()){
+            do {
+                int id = c.getInt(c.getColumnIndex(KEY_ID));
+                int date_id = c.getInt(c.getColumnIndex(KEY_DATES_ID));
+                int todo_id = c.getInt(c.getColumnIndex(KEY_TODO_ID));
+                String timeRequired = c.getString(c.getColumnIndex(COLUMN_TIME_REQUIRED));
+                String timeComp = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
+                int lock = c.getInt(c.getColumnIndex(LOCK));
+                String todo_date = KEY_ID + " " + id + " date_id " + date_id + " todo_id " + todo_id
+                        + " Time required " + timeRequired + " " + " Time compl. " + timeComp + " lock " + lock;
+                todoDates.add(todo_date);
+
+            }while (c.moveToNext());
+        }
+        return todoDates;
+    }
+
+    public long updateTodoDate(long id, long todo_id, long date_id, int lock, String timeRequired, String timeCompleted){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_TODO_ID, todo_id);
         values.put(KEY_DATES_ID, date_id);
-        values.put(HOURS, hours);
         values.put(LOCK, lock);
         values.put(COLUMN_TIME_REQUIRED, timeRequired);
         values.put(COLUMN_TIME_COMPLETED, timeCompleted);
@@ -352,11 +389,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         td.setId(c.getInt(c.getColumnIndex(KEY_ID)));
         td.setTitle(c.getString(c.getColumnIndex(COLUMN_TITLE)));
         td.setDescription(c.getString(c.getColumnIndex(COLUMN_DESCRIPTION)));
-        //td.setDueDate(c.getString(c.getColumnIndex("due_date")));
         String dateString = c.getString(c.getColumnIndex(COLUMN_DUE_DATE));
         Date dueDate = convertStringDate(dateString);
         td.setDueDate(dueDate);
-        td.setEstimatedTime(c.getInt(c.getColumnIndex(COLUMN_ESTIMATED_TIME)));
+        td.setEstimatedTime(c.getString(c.getColumnIndex(COLUMN_ESTIMATED_TIME)));
         td.setTimeUsage(c.getInt(c.getColumnIndex(COLUMN_TIME_USAGE)));
         td.setStartTime(c.getString(c.getColumnIndex(COLUMN_START_TIME)));
         td.setRemainingTime(c.getString(c.getColumnIndex(COLUMN_REMAINING_TIME)));
