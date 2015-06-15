@@ -5,6 +5,8 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
@@ -84,6 +86,12 @@ public class MainActivity extends FragmentActivity implements
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+
+        String[] group = {"whatever", "what", "hangout", "skype", "the", "hnkjdfs", "heroes", "mine", "youtube"};
+        ListView LV = (ListView) findViewById(R.id.list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, group);
+        LV.setAdapter(adapter);
+
 
         
 

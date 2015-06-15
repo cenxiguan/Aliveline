@@ -23,13 +23,11 @@
         android:layout_weight="0.5"
         android:background="#0099CC">
 
-
         <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/cardsListView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/android:list"
             android:background="#FFFFFF"
-            android:layout_toStartOf="@+id/add_todo_button"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true">
