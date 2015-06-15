@@ -14,6 +14,7 @@ public class Todo {
     int id;
     public String startTime;
     public String remainingTime;
+    public String locks;
 
     public Todo(){
 
@@ -93,5 +94,13 @@ public class Todo {
 
     public String getRemainingTime(){
         return remainingTime;
+    }
+
+    public void setLocks(String locks){
+        this.locks = locks;
+    }
+
+    public String getLocks(){
+        return locks;
     }
 }
