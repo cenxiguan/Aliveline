@@ -2,6 +2,7 @@ package cajac.aliveline;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -118,6 +119,8 @@ public class CalendarFragment extends Fragment {
             final TextView textView = (TextView) view.findViewById(R.id.textview);
             caldroidFragment = new CaldroidFragment();
 
+
+
             // Setup arguments
             // If Activity is created after rotation
             if (savedInstanceState != null) {
@@ -148,6 +151,8 @@ public class CalendarFragment extends Fragment {
             FragmentTransaction t = mActivity.getSupportFragmentManager().beginTransaction();
             t.replace(R.id.calendar1, caldroidFragment);
             t.commit();
+
+
 
             // Setup listener
             final CaldroidListener listener = new CaldroidListener() {
@@ -205,6 +210,17 @@ public class CalendarFragment extends Fragment {
                 public void onCaldroidViewCreated() {
                     if (caldroidFragment.getLeftArrowButton() != null) {
                     }
+                    TextView titleButton = caldroidFragment.getMonthTitleTextView();
+                    Log.w("CalFrag", titleButton.toString());
+                    titleButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                            addTodo a = new addTodo();
+                            a.show(ft, "addTodo");
+
+                        }
+                    });
                 }
 
             };
@@ -247,8 +263,11 @@ public class CalendarFragment extends Fragment {
         private InfiniteAdapter mAdapter;
 
         private static final String LOG_TAG = "CalendarDay";
-        private final int width = mActivity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
-        private final int day_center = width / 2 - 120;
+        private final Resources dayResources = mActivity.getApplicationContext().getResources();
+        private final int width = dayResources.getDisplayMetrics().widthPixels;
+        private final int dayWidth = width / 4;
+        private final int day_center = width / 2 - dayWidth / 2
+                - (int) (dayResources.getDimension(R.dimen.hlv_divider));
 
         private Calendar past = Calendar.getInstance();
         private Calendar future = Calendar.getInstance();
@@ -313,8 +332,8 @@ public class CalendarFragment extends Fragment {
                 }
             });
 
-            TextView txt = (TextView) dayView.findViewById(R.id.txt);
-            txt.setText(selectedDate.toString());
+//            TextView txt = (TextView) dayView.findViewById(R.id.txt);
+//            txt.setText(selectedDate.toString());
 
             return dayView;
         }
@@ -360,8 +379,8 @@ public class CalendarFragment extends Fragment {
             oldView = view;
             view.setBackgroundColor(getResources().getColor(R.color.selected));
 
-            TextView txt = (TextView) dayView.findViewById(R.id.txt);
-            txt.setText(formatter.format(date));
+//            TextView txt = (TextView) dayView.findViewById(R.id.txt);
+//            txt.setText(formatter.format(date));
             listView.post(new ScrollRunnable(position));
         }
 
@@ -421,7 +440,7 @@ public class CalendarFragment extends Fragment {
                 textView.setText( formatter.format(getItem( position%mItems.size() )) );
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
-                params.width = 200;
+                params.width = dayWidth;
 
                 return convertView;
             }
