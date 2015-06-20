@@ -2,6 +2,8 @@ package cajac.aliveline;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -85,7 +87,13 @@ public class MainActivity extends FragmentActivity implements
             }
         });
 
-        
+        //setting orientation
+        if(isScreenLarge()) {
+            // width > height, better to use Landscape
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
 
     }
@@ -116,4 +124,11 @@ public class MainActivity extends FragmentActivity implements
         // empty
     }
 
+    //getting screen information for orientation
+    public boolean isScreenLarge() {
+        final int screenSize = getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK;
+        return screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE
+                || screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
 }
