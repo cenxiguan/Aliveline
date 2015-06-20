@@ -128,7 +128,6 @@ public class MainActivity extends FragmentActivity implements
     public boolean isScreenLarge() {
         final int screenSize = getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK;
-        return screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE
-                || screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
+        return screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 }
