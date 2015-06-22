@@ -39,7 +39,10 @@ public class addTodo extends DialogFragment {
         builder.setPositiveButton(R.string.submit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                //delete previous records if they exist
+                //get code from textviews and create a 2do
+                //send 2do to database
+                //call algorithm for time distribution and create relational database entries
             }
         });
 
