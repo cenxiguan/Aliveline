@@ -6,4 +6,10 @@
     <color name="hl_background">#DEDEDE</color>
     <color name="semi_transparent">#11000000</color>
 
+    <color name="transparent">#00FFFFFF</color>
+    <color name="grey">#555555</color>
+    <color name="green">#4499CC00</color>
+    <color name="darkgreen">#FF669900</color>
+
+
 </resources>
