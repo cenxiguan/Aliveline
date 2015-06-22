@@ -88,6 +88,20 @@ public class CalendarFragment extends Fragment {
             }
         });
 
+        //////////////////////////////////////////////////////////////
+        /////////////////START DATE PICKER STUFF//////////////////////
+        Button b = (Button) view.findViewById(R.id.select_date);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                CalendarDatePicker cdp = new CalendarDatePicker();
+                cdp.show(ft,"CalendarDatePicker");
+            }
+        });
+        ////////////////END DATE PICKER STUFF/////////////////////////
+        //////////////////////////////////////////////////////////////
+
         return view;
     }
 

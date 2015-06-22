@@ -3,4 +3,36 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="hlv_divider">20dp</dimen>
+
+    <!-- Small addTodo -->
+    <dimen name="small_image_button_dimens">50dp</dimen>
+    <dimen name="small_button_width">20dp</dimen>
+    <dimen name="small_button_height">15dp</dimen>
+    <dimen name="small_button_spacing">2dp</dimen>
+    <dimen name="small_text_spacing">4dp</dimen>
+    <dimen name="small_button_elevation">2dp</dimen>
+
+    <!-- Normal addTodo -->
+    <dimen name="normal_image_button_dimens">85dp</dimen>
+    <dimen name="normal_button_width">35dp</dimen>
+    <dimen name="normal_button_height">30dp</dimen>
+    <dimen name="normal_button_spacing">5dp</dimen>
+    <dimen name="normal_text_spacing">10dp</dimen>
+    <dimen name="normal_button_elevation">5dp</dimen>
+
+    <!-- Large addTodo -->
+    <dimen name="large_image_button_dimens">130dp</dimen>
+    <dimen name="large_button_width">55dp</dimen>
+    <dimen name="large_button_spacing">5dp</dimen>
+    <dimen name="large_text_spacing">20dp</dimen>
+    <dimen name="large_button_elevation">7dp</dimen>
+
+    <!-- xLarge addTodo -->
+    <dimen name="xlarge_image_button_dimens">120dp</dimen>
+    <dimen name="xlarge_button_width">60dp</dimen>
+    <dimen name="xlarge_button_height">40dp</dimen>
+    <dimen name="xlarge_button_spacing">5dp</dimen>
+    <dimen name="xlarge_image_button_spacing">15dp</dimen>
+    <dimen name="xlarge_text_spacing">32dp</dimen>
+    <dimen name="xlarge_button_elevation">6dp</dimen>
 </resources>
