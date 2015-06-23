@@ -1,13 +1,9 @@
 package cajac.aliveline;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 
 import java.util.Calendar;
 
@@ -25,6 +21,7 @@ public class CalendarDatePicker extends DialogFragment {
 
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), dateSettings, year, month, day);
         dialog.setTitle("Pick Date");
+        dialog.getDatePicker().setCalendarViewShown(false);
         dialog.setCanceledOnTouchOutside(true);
         return dialog;
     }
