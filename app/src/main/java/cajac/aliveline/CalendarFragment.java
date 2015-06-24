@@ -261,7 +261,7 @@ public class CalendarFragment extends Fragment {
             future.setTime(selectedDate);
             future.add(Calendar.DAY_OF_YEAR, 30);
 
-            List<Date> items = new ArrayList<>();
+            List<Date> items = new ArrayList<Date>();
 
             for(int i = 1; i <= 61; i++) {
                 items.add(past.getTime());
