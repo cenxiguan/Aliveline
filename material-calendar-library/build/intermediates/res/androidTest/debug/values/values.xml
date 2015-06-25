@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <attr format="reference" name="drawerArrowStyle"/>
     <attr format="dimension" name="height"/>
@@ -165,10 +165,10 @@
     <item name="action_menu_divider" type="id"/>
     <item name="action_menu_presenter" type="id"/>
     <item name="home" type="id"/>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/bundles/debug/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/bundles/debug/res/values/values.xml -->
     <eat-comment/>
     <item name="mcv_pager" type="id"/>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <item name="progress_circular" type="id"/>
     <item name="progress_horizontal" type="id"/>
@@ -196,10 +196,10 @@
     <string name="abc_shareactionprovider_share_with">Share with</string>
     <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/bundles/debug/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/bundles/debug/res/values/values.xml -->
     <eat-comment/>
     <string name="app_name">material-calendar-library</string>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>
@@ -1317,7 +1317,7 @@
     </style>
     <style name="TextAppearance.AppCompat.Widget.Switch" parent="Base.TextAppearance.AppCompat.Widget.Switch"/>
     <style name="TextAppearance.AppCompat.Widget.TextView.SpinnerItem" parent="Base.TextAppearance.AppCompat.Widget.TextView.SpinnerItem"/>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/bundles/debug/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/bundles/debug/res/values/values.xml -->
     <eat-comment/>
     <style name="TextAppearance.MaterialCalendarWidget.Date" parent="android:TextAppearance.DeviceDefault.Small">
         <item name="android:textSize">12sp</item>
@@ -1329,7 +1329,7 @@
     <style name="TextAppearance.MaterialCalendarWidget.WeekDay" parent="android:TextAppearance.DeviceDefault.Small">
         <item name="android:textSize">12sp</item>
     </style>
-    <!-- From: file:/C:/Users/Christine/Desktop/CHRISTINE/Computer%20Science/Android/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Jonathan%20Maeda/AndroidStudioProjects/Aliveline/material-calendar-library/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="TextAppearance.StatusBar.EventContent" parent=""/>
     <style name="TextAppearance.StatusBar.EventContent.Info" parent=""/>
