@@ -21,14 +21,22 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.CharArrayReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 /**
  * Created by Jonathan Maeda on 5/31/2015.
  */
 public class addTodo extends DialogFragment {
 
+    //Initialize Constants
     private AlertDialog dialog;
-    EditText title, dueDay, dueMonth, dueYear, estTime;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
+    EditText title, dueDay, dueMonth, dueYear, estTime;
     ImageButton up,flat,down;
     View view;
     TextWatcher textWatcher = new TextWatcher() {
@@ -37,10 +45,10 @@ public class addTodo extends DialogFragment {
         }
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-            checkFieldsForEmptyValues(buttonPos);
         }
         @Override
         public void afterTextChanged(Editable editable) {
+            checkSubmitButtonConditions(buttonPos);
         }
     };
 
@@ -98,9 +106,14 @@ public class addTodo extends DialogFragment {
 
         //getting positive button and initial check
         buttonPos = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        checkFieldsForEmptyValues(buttonPos);
+        checkSubmitButtonConditions(buttonPos);
     }
 
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    //////////////Methods to help set up the view///////////////////
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
     public void setButtons(View view){
         sun = (Button)view.findViewById(R.id.button);
         mon = (Button)view.findViewById(R.id.button2);
@@ -120,42 +133,49 @@ public class addTodo extends DialogFragment {
             @Override
             public void onClick(View v) {
                 changeSelected(sun, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
         mon.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 changeSelected(mon, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
         tue.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 changeSelected(tue, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
         wed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeSelected(wed, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
         thu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeSelected(thu, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
-        fri.setOnClickListener(new View.OnClickListener() {
+                fri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeSelected(fri, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
         sat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeSelected(sat, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
 
@@ -163,7 +183,8 @@ public class addTodo extends DialogFragment {
             @Override
             public void onClick(View v) {
                 up.setSelected(true);
-                adjustOtherSelected(up,v);
+                adjustOtherSelected(up, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
 
@@ -171,7 +192,8 @@ public class addTodo extends DialogFragment {
             @Override
             public void onClick(View v) {
                 flat.setSelected(true);
-                adjustOtherSelected(flat,v);
+                adjustOtherSelected(flat, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
 
@@ -179,7 +201,8 @@ public class addTodo extends DialogFragment {
             @Override
             public void onClick(View v) {
                 down.setSelected(true);
-                adjustOtherSelected(down,v);
+                adjustOtherSelected(down, v);
+                checkSubmitButtonConditions(buttonPos);
             }
         });
     }
@@ -198,13 +221,18 @@ public class addTodo extends DialogFragment {
         estTime.addTextChangedListener(textWatcher);
     }
 
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    /////////Dealing with selected and unselected buttons///////////
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
     public void adjustOtherSelected(ImageButton b, View v){
         comparison(b, up, v);
         comparison(b, flat, v);
         comparison(b, down, v);
     }
 
-    public void changeSelected(Button b,View v){
+    public void changeSelected(Button b, View v) {
         b.setSelected(!b.isSelected());
 
         if (b.isSelected()) {
@@ -228,8 +256,10 @@ public class addTodo extends DialogFragment {
             return 1;
         } else if (flat.isSelected()){
             return 2;
-        } else {
+        } else if (down.isSelected()){
             return 3;
+        } else {
+            return 0;
         }
     }
 
@@ -247,24 +277,102 @@ public class addTodo extends DialogFragment {
         }
     }
 
-    private  void checkFieldsForEmptyValues(Button pos) {
+    /////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
+    ///////////////////Making sure input is correct//////////////////////
+    /////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
+    private  void checkSubmitButtonConditions(Button pos) {
         String s1 = title.getText().toString();
-        String s2 = dueDay.getText().toString();
-        String s3 = dueMonth.getText().toString();
-        String s4 = dueYear.getText().toString();
-        String s5 = estTime.getText().toString();
+        int i2 = convertToInt(dueDay.getText().toString());
+        int i3 = convertToInt(dueMonth.getText().toString());
+        int i4 = convertToInt(dueYear.getText().toString());
+        int i5 = convertToInt(estTime.getText().toString());
 
-        if (s1.equals("") || s2.equals("") || s3.equals("") || s4.equals("") || s5.equals("")) {
-            pos.setEnabled(false);
-        } else {
+        if (s1.length() > 0 && dateCheck(i2,i3,i4) && atLeast(i5,1) && daysSelected()) {
             pos.setEnabled(true);
+        } else {
+            pos.setEnabled(false);
         }
     }
-    //CONVERSTION TO INT IF NECESSARY
-    //int intTodoEstTime;
-    //try {
-    //    intTodoEstTime = Integer.parseInt(todoEstTime);
-    //} catch(NumberFormatException nfe) {
-    //    throw new RuntimeException (nfe);
-    //}
+
+    public int convertToInt(String s){
+        int i;
+        try{
+            i = Integer.parseInt(s);
+        } catch(NumberFormatException nfe) {
+            return 0;
+        }
+
+        return i;
+    }
+
+    public boolean atLeast(int test, int min){
+        return test > min - 1;
+    }
+
+    public boolean between(int test, int min, int max){
+        return test > min - 1 && test < max + 1;
+    }
+
+    public boolean dateCheck(int day, int month, int year){
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+        int currentDate = calendar.get(Calendar.DAY_OF_MONTH);
+
+        if (validDate(day,month,year)&& atLeast(year,currentYear)){
+            Date today = new Date(currentYear, currentMonth, currentDate);
+            Date test = new Date(year,month,day);
+            return test.compareTo(today) > 0;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean validDate(int date, int month, int year){
+        switch(month){
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                if (date > 0 && date < 32){
+                    return true;
+                } else {
+                    return false;
+                }
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                if (date > 0 && date < 31){
+                    return true;
+                } else {
+                    return false;
+                }
+            case 2:
+                if(date > 0 && date < 29 && year % 4 != 0){
+                    return true;
+                } else if (date > 0 && date < 30 && year % 4 == 0){
+                    return true;
+                } else {
+                    return false;
+                }
+            default:
+                return false;
+        }
+    }
+
+    public boolean daysSelected(){
+        int curves = getSelectedCurve();
+        String days = getSelectedDays();
+        if(curves == 0 || days.equals("0000000")){
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
