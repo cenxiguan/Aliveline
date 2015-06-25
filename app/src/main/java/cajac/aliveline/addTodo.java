@@ -1,13 +1,12 @@
 package cajac.aliveline;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.Image;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,6 +27,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by Jonathan Maeda on 5/31/2015.
  */
@@ -38,7 +40,8 @@ public class addTodo extends DialogFragment {
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
     Date enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
-    ImageButton up,flat,down;
+    ImageButton cal,up,flat,down;
+    private static final int REQUEST_DATE = 1;
     View view;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -99,6 +102,16 @@ public class addTodo extends DialogFragment {
             return;
         }
 
+        cal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                CalendarDialogFragment cdp = new CalendarDialogFragment();
+                cdp.setTargetFragment(addTodo.this, REQUEST_DATE);
+                cdp.show(ft,"CalendarDialogFragment");
+            }
+        });
+
         //Scaling dialog
         int dialogWidth = getActivity().getResources().getDisplayMetrics().widthPixels;
         int dialogHeight = getActivity().getResources().getDisplayMetrics().heightPixels;
@@ -115,6 +128,8 @@ public class addTodo extends DialogFragment {
     ////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////
     public void setButtons(View view){
+        cal = (ImageButton) view.findViewById(R.id.calendar_dialog);
+
         sun = (Button)view.findViewById(R.id.button);
         mon = (Button)view.findViewById(R.id.button2);
         tue = (Button)view.findViewById(R.id.button3);
@@ -207,6 +222,7 @@ public class addTodo extends DialogFragment {
         });
     }
 
+
     public void setEditTexts(View view){
         title = (EditText) view.findViewById(R.id.title_field);
         dueDay = (EditText) view.findViewById(R.id.day_field);
@@ -248,6 +264,18 @@ public class addTodo extends DialogFragment {
         } else {
             compare.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_unselected));
             compare.setSelected(false);
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Make sure fragment codes match up
+        if (requestCode == CalendarDialogFragment.RESULT_DATE) {
+            Date date = (Date) data.getSerializableExtra(CalendarDialogFragment.SELECTED_DATE);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            dueMonth.setText(String.valueOf(cal.get(Calendar.MONTH) + 1));
+            dueDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+            dueYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
         }
     }
 

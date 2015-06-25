@@ -94,11 +94,13 @@ public class MaterialCalendarView extends FrameLayout {
                 pager.setCurrentItem(pager.getCurrentItem() + 1, true);
             } else if(v == buttonPast) {
                 pager.setCurrentItem(pager.getCurrentItem() - 1, true);
-            } else if(v == title) {
-                // Open dialogue to get datepicker dial
             }
         }
     };
+
+    public void setTitleOnClickListener(OnClickListener listener) {
+        title.setOnClickListener(listener);
+    }
 
     private final ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
