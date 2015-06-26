@@ -2,7 +2,6 @@
 
 package cajac.aliveline;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -20,7 +19,7 @@ import android.widget.ListView;
  * Fragment for the first tab: HOME
  * layout file in fragment_home.xml
  */
-public class HomeFragment extends Fragment implements View.OnClickListener{
+public class HomeFragment extends Fragment{
 
     private static ListView list1;
 
@@ -41,13 +40,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
                 a.show(ft, "addTodo");
             }
         });
-        barGraph = (Button)rootView.findViewById(R.id.button8);
-        barGraph.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent graphMode = new Intent();
-            }
-        });
+
+
+        //barGraph = (Button)rootView.findViewById(R.id.button8);
+        //barGraph.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        Intent graphMode = new Intent();
+      //      }
+      //  });
 
 
 
