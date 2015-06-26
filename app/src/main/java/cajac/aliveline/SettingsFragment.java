@@ -2,6 +2,8 @@ package cajac.aliveline;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +51,16 @@ public class SettingsFragment extends Fragment {
                 Toast.makeText(getActivity().getApplicationContext(),
                         "You have clicked on " + item, Toast.LENGTH_LONG)
                         .show();
+
+                switch(item) {
+                    case "About":
+                        // go to about fragment
+                        Fragment fragment = new SettingsAboutFrag();
+                        FragmentManager fm = getFragmentManager();
+                        FragmentTransaction transaction = fm.beginTransaction();
+                        transaction.replace(R.id.contentFragment, fragment);
+                        transaction.commit();
+                }
             }
         });
     }

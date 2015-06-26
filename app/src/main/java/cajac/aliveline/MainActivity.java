@@ -56,6 +56,8 @@ public class MainActivity extends FragmentActivity implements
         viewPager.setAdapter(mAdapter);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(false);
 
         // Adding Tabs with Icons
         for (int i=0; i < tabs.length; i++){
