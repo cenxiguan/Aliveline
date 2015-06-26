@@ -2,11 +2,13 @@ package cajac.aliveline;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,13 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.roomorama.caldroid.CaldroidFragment;
-import com.roomorama.caldroid.CaldroidListener;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateChangedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,7 +47,8 @@ public class CalendarFragment extends Fragment {
     protected FragmentActivity mActivity;
 
     private Fragment currentCal;
-    private Date selectedDate = Calendar.getInstance().getTime();
+    private Date currentDate;
+    private Date selectedDate;
     private String formattedSelectDate;
     final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
     private Switch dayOrMonth;
@@ -51,13 +59,22 @@ public class CalendarFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.HOUR_OF_DAY);
+        cal.clear(Calendar.HOUR);
+        cal.clear(Calendar.AM_PM);
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        selectedDate = cal.getTime();
+        currentDate = selectedDate;
+
+        // Needed in case the fragment disappears
         if(currentCal instanceof CalendarDayFragment) {
             switchFrame(new CalendarDayFragment());
         }else {
             switchFrame(new CalendarMonthFragment());
-            Log.w("CalFrag", currentCal.toString());
         }
-
 
         dayOrMonth = (Switch) view.findViewById(R.id.day_month_switch);
         dayOrMonth.setChecked(false);
@@ -71,6 +88,20 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
+
+        //////////////////////////////////////////////////////////////
+        /////////////////START DATE PICKER STUFF//////////////////////
+        Button b = (Button) view.findViewById(R.id.select_date);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                CalendarDatePicker cdp = new CalendarDatePicker();
+                cdp.show(ft,"CalendarDatePicker");
+            }
+        });
+        ////////////////END DATE PICKER STUFF/////////////////////////
+        //////////////////////////////////////////////////////////////
 
         return view;
     }
@@ -95,9 +126,13 @@ public class CalendarFragment extends Fragment {
         return selectedDate;
     }
 
-    private class CalendarMonthFragment extends Fragment {
-        private CaldroidFragment caldroidFragment;
+    private class CalendarMonthFragment extends Fragment implements OnMonthChangedListener {
+//        private CaldroidFragment caldroidFragment;
+        private CalendarView calendar;
         private View view;
+        private TextView textView;
+        private final DateFormat FORMATTER = SimpleDateFormat.getDateInstance();
+
 
         public CalendarMonthFragment() {}
 
@@ -105,122 +140,145 @@ public class CalendarFragment extends Fragment {
                                  Bundle savedInstanceState) {
             view = inflater.inflate(R.layout.fragment_calendar_month, container, false);
 
-            final TextView textView = (TextView) view.findViewById(R.id.textview);
-            caldroidFragment = new CaldroidFragment();
+            textView = (TextView) view.findViewById(R.id.textview);
+            final MaterialCalendarView widget = (MaterialCalendarView) view.findViewById(R.id.calendarView);
+            widget.setOnDateChangedListener(new OnDateClickListener());
+            widget.setOnMonthChangedListener(this);
+            widget.setSelectedDate(selectedDate);
 
-            // Setup arguments
-            // If Activity is created after rotation
-            if (savedInstanceState != null) {
-                caldroidFragment.restoreStatesFromKey(savedInstanceState,
-                        "CALDROID_SAVED_STATE");
-            }
-            // If activity is created from fresh
-            else {
-                Bundle args = new Bundle();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(selectedDate);
-                args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
-                args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
-                args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-                args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, true);
-                Date date = new Date(cal.get(Calendar.YEAR),
-                        cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH));
-                formattedSelectDate = formatter.format(date);
-                textView.setText(formattedSelectDate);
-
-                caldroidFragment.setBackgroundResourceForDate(R.color.selected, selectedDate);
-                caldroidFragment.setTextColorForDate(R.color.white, selectedDate);
-                caldroidFragment.refreshView();
-                Log.w("CalFrag", "Createview");
-                // Uncomment this line to use dark theme
-//            args.putInt(CaldroidFragment.THEME_RESOURCE, com.caldroid.R.style.CaldroidDefaultDark);
-                caldroidFragment.setArguments(args);
-            }
-
-            // Attach to the activity
-            FragmentTransaction t = mActivity.getSupportFragmentManager().beginTransaction();
-            t.replace(R.id.calendar1, caldroidFragment);
-            t.commit();
-
-            // Setup listener
-            final CaldroidListener listener = new CaldroidListener() {
-
-                @Override
-                public void onSelectDate(Date date, View view) {
-                    if(date.equals(selectedDate)) {
-                        dayOrMonth.setChecked(true);
-                        CalendarDayFragment dayView = new CalendarDayFragment();
-                        Log.w("CalFrag", "date selected");
-                        switchFrame(dayView);
-                        return;
-                    }
-
-                    caldroidFragment.clearBackgroundResourceForDate(selectedDate);
-                    caldroidFragment.clearTextColorForDate(selectedDate);
-                    selectedDate = date;
-                    caldroidFragment.setBackgroundResourceForDate(R.color.selected, selectedDate);
-                    caldroidFragment.setTextColorForDate(R.color.white, selectedDate);
-                    caldroidFragment.refreshView();
-
-                    formattedSelectDate = formatter.format(selectedDate);
-
-//                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+//            caldroidFragment = new CaldroidFragment();
 //
-//                if(sharedPref.contains(formattedSelectDate)) {
-//                    textView.setText(sharedPref.getString(formattedSelectDate, "ERROR!!!"));
-////                    Toast.makeText(getActivity().getApplicationContext(), sharedPref.getString(formattedSelectDate, null),
-////                            Toast.LENGTH_SHORT).show();
+//            initializeCalendar();
 //
-//                }else {
-//                    textView.setText(formattedSelectDate);
-////                    Toast.makeText(getActivity().getApplicationContext(), formattedSelectDate,
-////                            Toast.LENGTH_SHORT).show();
+//
+//            // Setup arguments
+//            // If Activity is created after rotation
+//            if (savedInstanceState != null) {
+//                caldroidFragment.restoreStatesFromKey(savedInstanceState,
+//                        "CALDROID_SAVED_STATE");
+//            }
+//            // If activity is created from fresh
+//            else {
+//                Bundle args = new Bundle();
+//                Calendar cal = Calendar.getInstance();
+//                cal.setTime(selectedDate);
+//                args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
+//                args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
+//                args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
+//                args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, true);
+//                formattedSelectDate = formatter.format(selectedDate);
+//                textView.setText(formattedSelectDate);
+//
+//                caldroidFragment.setBackgroundResourceForDate(R.color.selected, selectedDate);
+//                caldroidFragment.setTextColorForDate(R.color.white, selectedDate);
+//                caldroidFragment.refreshView();
+//                // Uncomment this line to use dark theme
+////            args.putInt(CaldroidFragment.THEME_RESOURCE, com.caldroid.R.style.CaldroidDefaultDark);
+//                caldroidFragment.setArguments(args);
+//            }
+//
+//            // Attach to the activity
+//            FragmentTransaction t = mActivity.getSupportFragmentManager().beginTransaction();
+////            t.replace(R.id.calendar1, caldroidFragment);
+////            t.commit();
+//
+//
+//
+//            // Setup listener
+//            final CaldroidListener listener = new CaldroidListener() {
+//
+//                @Override
+//                public void onSelectDate(Date date, View view) {
+//                    Log.w("CalMon d ", date.toString());
+//                    Log.w("CalMon s ", selectedDate.toString());
+//                    if(date.equals(selectedDate)) {
+//                        dayOrMonth.setChecked(true);
+//                        CalendarDayFragment dayView = new CalendarDayFragment();
+//                        Log.w("CalFrag", "date selected");
+//                        switchFrame(dayView);
+//                        return;
+//                    }
+//
+//                    caldroidFragment.clearBackgroundResourceForDate(selectedDate);
+//                    caldroidFragment.clearTextColorForDate(selectedDate);
+//                    selectedDate = date;
+//                    caldroidFragment.setBackgroundResourceForDate(R.color.selected, selectedDate);
+//                    caldroidFragment.setTextColorForDate(R.color.white, selectedDate);
+//                    caldroidFragment.refreshView();
+//
+//                    formattedSelectDate = formatter.format(selectedDate);
+//
+////                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+////
+////                if(sharedPref.contains(formattedSelectDate)) {
+////                    textView.setText(sharedPref.getString(formattedSelectDate, "ERROR!!!"));
+//////                    Toast.makeText(getActivity().getApplicationContext(), sharedPref.getString(formattedSelectDate, null),
+//////                            Toast.LENGTH_SHORT).show();
+////
+////                }else {
+////                    textView.setText(formattedSelectDate);
+//////                    Toast.makeText(getActivity().getApplicationContext(), formattedSelectDate,
+//////                            Toast.LENGTH_SHORT).show();
+////                }
 //                }
-                }
-
-                @Override
-                public void onChangeMonth(int month, int year) {
-                    String text = "month: " + month + " year: " + year;
-//                Toast.makeText(getActivity().getApplicationContext(), "onChangeMonth",
-//                        Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onLongClickDate(Date date, View view) {
-//                Toast.makeText(getActivity().getApplicationContext(),
-//                        "Long click " + formatter.format(date),
-//                        Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onCaldroidViewCreated() {
-                    if (caldroidFragment.getLeftArrowButton() != null) {
-//                    Toast.makeText(getActivity().getApplicationContext(),
-//                            "Caldroid view is created", Toast.LENGTH_SHORT)
-//                            .show();
-                    }
-                }
-
-            };
-
-            // Setup Caldroid
-            caldroidFragment.setCaldroidListener(listener);
-
-            Button save = (Button) view.findViewById(R.id.save);
-            save.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                EditText input = (EditText) view.findViewById(R.id.edit);
-//                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-//                SharedPreferences.Editor edit = sharedPref.edit();
 //
-//                edit.putString(formattedSelectDate, input.getText().toString());
-//                edit.commit();
-                }
-            });
+//                @Override
+//                public void onChangeMonth(int month, int year) {
+//                    String text = "month: " + month + " year: " + year;
+////                Toast.makeText(getActivity().getApplicationContext(), "onChangeMonth",
+////                        Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onLongClickDate(Date date, View view) {
+////                Toast.makeText(getActivity().getApplicationContext(),
+////                        "Long click " + formatter.format(date),
+////                        Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onCaldroidViewCreated() {
+//                    if (caldroidFragment.getLeftArrowButton() != null) {
+//                    }
+//                    TextView titleButton = caldroidFragment.getMonthTitleTextView();
+//                    Log.w("CalFrag", titleButton.toString());
+//                    titleButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            android.app.FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+//                            addTodo a = new addTodo();
+//                            a.show(ft, "addTodo");
+//
+//                        }
+//                    });
+//                }
+//
+//            };
+//
+//            // Setup Caldroid
+//            caldroidFragment.setCaldroidListener(listener);
+
+//            Button save = (Button) view.findViewById(R.id.save);
+//            save.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+////                EditText input = (EditText) view.findViewById(R.id.edit);
+////                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+////                SharedPreferences.Editor edit = sharedPref.edit();
+////
+////                edit.putString(formattedSelectDate, input.getText().toString());
+////                edit.commit();
+//                }
+//            });
 
             return view;
+        }
+
+
+
+        @Override
+        public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+            Toast.makeText(getActivity(), FORMATTER.format(date.getDate()), Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -228,10 +286,30 @@ public class CalendarFragment extends Fragment {
             // TODO Auto-generated method stub
             super.onSaveInstanceState(outState);
 
-            if (caldroidFragment != null) {
-                caldroidFragment.saveStatesToKey(outState, "CALDROID_SAVED_STATE");
+//            if (caldroidFragment != null) {
+//                caldroidFragment.saveStatesToKey(outState, "CALDROID_SAVED_STATE");
+//            }
+
+        }
+
+        private class OnDateClickListener implements OnDateChangedListener {
+            @Override
+            public void onDateChanged(@NonNull MaterialCalendarView widget, @Nullable CalendarDay date) {
+                if(date == null) {
+                    textView.setText(null);
+                }
+                else {
+                    Date convertDate = date.getDate();
+                    selectedDate = convertDate;
+                }
             }
 
+            public void sameDate() {
+                dayOrMonth.setChecked(true);
+                CalendarDayFragment dayView = new CalendarDayFragment();
+                Log.w("CalFrag", "date selected");
+                switchFrame(dayView);
+            }
         }
 
     }
@@ -242,13 +320,18 @@ public class CalendarFragment extends Fragment {
         private InfiniteAdapter mAdapter;
 
         private static final String LOG_TAG = "CalendarDay";
-        private final int width = mActivity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
-        private final int day_center = width / 2 - 120;
+        private final Resources dayResources = mActivity.getApplicationContext().getResources();
+        private final int width = dayResources.getDisplayMetrics().widthPixels;
+        private final int dayWidth = width / 4;
+        private final int day_center = width / 2 - dayWidth / 2
+                - (int) (dayResources.getDimension(R.dimen.hlv_divider));
 
         private Calendar past = Calendar.getInstance();
         private Calendar future = Calendar.getInstance();
-        private int first;
-        private int last;
+        private int head;
+        private int tail;
+        private int selectedPosition;
+        private View oldView;
 
         public CalendarDayFragment() {}
 
@@ -267,8 +350,8 @@ public class CalendarFragment extends Fragment {
                 items.add(past.getTime());
                 past.add(Calendar.DAY_OF_YEAR, 1);
             }
-            first = 0;
-            last = items.size() - 1;
+            head = 0;
+            tail = items.size() - 1;
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
 
@@ -277,7 +360,9 @@ public class CalendarFragment extends Fragment {
             listView.setFooterDividersEnabled(true);
             listView.setOnItemClickListener(this);
             listView.setAdapter(mAdapter);
-            listView.setSelectionFromLeft(Integer.MAX_VALUE / 2 + 32, day_center); //Zooms and aligns center
+            selectedPosition = Integer.MAX_VALUE / 2 + 32;
+            listView.setSelectionFromLeft(selectedPosition, day_center); //Zooms and aligns center
+            oldView = listView.getAdapter().getView(selectedPosition, null, container);
 
             listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
                 @Override
@@ -304,8 +389,8 @@ public class CalendarFragment extends Fragment {
                 }
             });
 
-            TextView txt = (TextView) dayView.findViewById(R.id.txt);
-            txt.setText(selectedDate.toString());
+//            TextView txt = (TextView) dayView.findViewById(R.id.txt);
+//            txt.setText(selectedDate.toString());
 
             return dayView;
         }
@@ -344,8 +429,15 @@ public class CalendarFragment extends Fragment {
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
             Date date = mAdapter.getItem(position);
             selectedDate = date;
-            TextView txt = (TextView) dayView.findViewById(R.id.txt);
-            txt.setText(formatter.format(date));
+            if(oldView == view)
+
+            selectedPosition = position;
+            oldView.setBackgroundColor(getResources().getColor(R.color.day_item));
+            oldView = view;
+            view.setBackgroundColor(getResources().getColor(R.color.selected));
+
+//            TextView txt = (TextView) dayView.findViewById(R.id.txt);
+//            txt.setText(formatter.format(date));
             listView.post(new ScrollRunnable(position));
         }
 
@@ -388,17 +480,24 @@ public class CalendarFragment extends Fragment {
             @Override
             public View getView( int position, View convertView, ViewGroup parent ) {
                 this.parent = parent;
-                position%=mItems.size();
+//                position%=mItems.size();
 
                 if( null == convertView ) {
                     convertView = mInflater.inflate( mResource, parent, false );
                 }
 
+                if ( position == selectedPosition) {
+                    oldView = convertView;
+                    convertView.setBackgroundColor(getResources().getColor(R.color.selected));
+                } else
+                    convertView.setBackgroundColor(getResources().getColor(R.color.day_item));
+
+
                 TextView textView = (TextView) convertView.findViewById( mTextResId );
-                textView.setText( formatter.format(getItem( position )) );
+                textView.setText( formatter.format(getItem( position%mItems.size() )) );
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
-                params.width = 200;
+                params.width = dayWidth;
 
                 return convertView;
             }
@@ -417,17 +516,17 @@ public class CalendarFragment extends Fragment {
             }
 
             public void addFuture(Date date) {
-                mItems.set(first, date);
+                mItems.set(head, date);
                 int size = mItems.size();
-                first = (first + 1) % size;
-                last = (last + 1) % size;
+                head = (head + 1) % size;
+                tail = (tail + 1) % size;
             }
 
             public void addPast(Date date) {
-                mItems.set(last, date);
+                mItems.set(tail, date);
                 int size = mItems.size();
-                first = (first + (size - 1)) % size;
-                last = (last + (size - 1)) % size;
+                head = (head + (size - 1)) % size;
+                tail = (tail + (size - 1)) % size;
             }
 
         }

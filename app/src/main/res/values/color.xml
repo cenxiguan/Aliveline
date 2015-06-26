@@ -3,7 +3,14 @@
     <color name="white">#ffffff</color>
     <color name="selected">#ff33b5e5</color>
     <color name="day_item">#DFF2F1</color>
-    <color name="hl_background">#11000000</color>
+    <color name="hl_background">#DEDEDE</color>
+    <color name="semi_transparent">#11000000</color>
+
+    <color name="transparent">#00FFFFFF</color>
+    <color name="grey">#555555</color>
+    <color name="green">#4499CC00</color>
+    <color name="darkgreen">#FF669900</color>
+
 
     <color name="text">#ffffff</color>
     <color name="button_hey">#6eabb2</color>

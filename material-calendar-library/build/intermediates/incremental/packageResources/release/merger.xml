@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res"><file name="mcv_text_date_dark" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\color\mcv_text_date_dark.xml" qualifiers="" type="color"/><file name="mcv_text_date_light" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\color\mcv_text_date_light.xml" qualifiers="" type="color"/><file name="mcv_action_next" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\drawable-xxxhdpi\mcv_action_next.png" qualifiers="xxxhdpi" type="drawable"/><file name="mcv_action_previous" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\drawable-xxxhdpi\mcv_action_previous.png" qualifiers="xxxhdpi" type="drawable"/><file name="ic_launcher" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\mipmap-hdpi\ic_launcher.png" qualifiers="hdpi" type="mipmap"/><file name="ic_launcher" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\mipmap-mdpi\ic_launcher.png" qualifiers="mdpi" type="mipmap"/><file name="ic_launcher" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\mipmap-xhdpi\ic_launcher.png" qualifiers="xhdpi" type="mipmap"/><file name="ic_launcher" path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\mipmap-xxhdpi\ic_launcher.png" qualifiers="xxhdpi" type="mipmap"/><file path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\values\attrs.xml" qualifiers=""><declare-styleable name="MaterialCalendarView">
+
+        <attr format="reference" name="mcv_dateTextAppearance"/>
+        <attr format="reference" name="mcv_weekDayTextAppearance"/>
+        <attr format="reference" name="mcv_headerTextAppearance"/>
+
+        <attr format="color" name="mcv_arrowColor"/>
+        <attr format="reference" name="mcv_leftArrowMask"/>
+        <attr format="reference" name="mcv_rightArrowMask"/>
+        <attr format="color" name="mcv_selectionColor"/>
+
+        <attr format="boolean" name="mcv_showOtherDates"/>
+
+        <attr format="reference" name="mcv_weekDayLabels"/>
+        <attr format="reference" name="mcv_monthLabels"/>
+
+        <attr format="dimension" name="mcv_tileSize"/>
+
+        <attr format="enum" name="mcv_firstDayOfWeek">
+            <enum name="sunday" value="1"/>
+            <enum name="monday" value="2"/>
+            <enum name="tuesday" value="3"/>
+            <enum name="wednesday" value="4"/>
+            <enum name="thursday" value="5"/>
+            <enum name="friday" value="6"/>
+            <enum name="saturday" value="7"/>
+        </attr>
+
+    </declare-styleable></file><file path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\values\ids.xml" qualifiers=""><item name="mcv_pager" type="id"/></file><file path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\values\strings.xml" qualifiers=""><string name="app_name">material-calendar-library</string></file><file path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\main\res\values\styles.xml" qualifiers=""><style name="TextAppearance.MaterialCalendarWidget.WeekDay" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textSize">12sp</item>
+    </style><style name="TextAppearance.MaterialCalendarWidget.Date" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/mcv_text_date_light</item>
+    </style><style name="TextAppearance.MaterialCalendarWidget.Header" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textStyle">bold</item>
+    </style></file></source><source path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\build\generated\res\rs\release"/><source path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\build\generated\res\generated\release"/></dataSet><dataSet config="release"><source path="C:\Users\Christine\Desktop\CHRISTINE\Computer Science\Android\Aliveline\material-calendar-library\src\release\res"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="MaterialCalendarView"><attr format="reference" name="mcv_dateTextAppearance"/><attr format="reference" name="mcv_weekDayTextAppearance"/><attr format="reference" name="mcv_headerTextAppearance"/><attr format="color" name="mcv_arrowColor"/><attr format="reference" name="mcv_leftArrowMask"/><attr format="reference" name="mcv_rightArrowMask"/><attr format="color" name="mcv_selectionColor"/><attr format="boolean" name="mcv_showOtherDates"/><attr format="reference" name="mcv_weekDayLabels"/><attr format="reference" name="mcv_monthLabels"/><attr format="dimension" name="mcv_tileSize"/><attr format="enum" name="mcv_firstDayOfWeek"><enum name="sunday" value="1"/><enum name="monday" value="2"/><enum name="tuesday" value="3"/><enum name="wednesday" value="4"/><enum name="thursday" value="5"/><enum name="friday" value="6"/><enum name="saturday" value="7"/></attr></declare-styleable></configuration></mergedItems></merger>

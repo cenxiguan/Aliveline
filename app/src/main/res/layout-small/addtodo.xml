@@ -40,7 +40,7 @@
         android:layout_below="@+id/title_prompt"
         android:layout_alignLeft="@+id/title_prompt"
         android:layout_alignStart="@+id/title_prompt"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="@dimen/small_text_spacing" />
 
     <TextView
         style="@style/text_style1_small"
@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:text="Total Estimated Time:"
         android:id="@+id/estimated_time_prompt"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/small_text_spacing"
         android:layout_below="@+id/due_date_prompt"
         android:layout_alignLeft="@+id/due_date_prompt"
         android:layout_alignStart="@+id/due_date_prompt" />
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:text="Time Usage (Select One):"
         android:id="@+id/time_usage_prompt"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/small_text_spacing"
         android:layout_below="@+id/estimated_time_prompt"
         android:layout_alignLeft="@+id/estimated_time_prompt"
         android:layout_alignStart="@+id/estimated_time_prompt" />
@@ -149,39 +149,42 @@
         android:layout_above="@+id/estimated_time_prompt" />
 
     <ImageButton
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="8dp"
+        android:layout_width="@dimen/small_image_button_dimens"
+        android:layout_height="@dimen/small_image_button_dimens"
+        android:layout_alignLeft="@+id/time_usage_prompt"
         android:layout_marginTop="3dp"
         android:id="@+id/up_curve"
         android:scaleType="fitXY"
         android:src="@drawable/up2"
         android:background="@drawable/time_usage_unselected"
-        android:layout_below="@+id/time_usage_prompt" />
+        android:layout_below="@+id/time_usage_prompt"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <ImageButton
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="3dp"
+        android:layout_width="@dimen/small_image_button_dimens"
+        android:layout_height="@dimen/small_image_button_dimens"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_marginTop="3dp"
         android:id="@+id/no_curve"
         android:scaleType="fitXY"
         android:src="@drawable/flat2"
         android:background="@drawable/time_usage_unselected"
         android:layout_below="@+id/time_usage_prompt"
-        android:layout_toRightOf="@+id/up_curve"/>
+        android:layout_toRightOf="@+id/up_curve"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <ImageButton
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="3dp"
+        android:layout_width="@dimen/small_image_button_dimens"
+        android:layout_height="@dimen/small_image_button_dimens"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_marginTop="3dp"
         android:id="@+id/down_curve"
         android:scaleType="fitXY"
         android:src="@drawable/down2"
         android:background="@drawable/time_usage_unselected"
         android:layout_below="@+id/time_usage_prompt"
-        android:layout_toRightOf="@+id/no_curve"/>
+        android:layout_toRightOf="@+id/no_curve"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <TextView
         style="@style/text_style1_small"
@@ -189,96 +192,103 @@
         android:layout_height="wrap_content"
         android:text="Select Days to Work:"
         android:id="@+id/days_available_prompt"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/small_text_spacing"
         android:layout_below="@+id/up_curve"
         android:layout_alignLeft="@+id/estimated_time_prompt"
         android:layout_alignStart="@+id/estimated_time_prompt" />
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Sun"
         android:id="@+id/button"
         android:layout_below="@+id/days_available_prompt"
         android:layout_marginTop="1dp"
         android:layout_alignLeft="@+id/days_available_prompt"
         android:layout_alignStart="@+id/days_available_prompt"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation" />
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Mon"
         android:id="@+id/button2"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button"
         android:layout_toEndOf="@+id/button"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Tue"
         android:id="@+id/button3"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button2"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Wed"
         android:id="@+id/button4"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button3"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Thu"
         android:id="@+id/button5"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button4"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Fri"
         android:id="@+id/button6"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button5"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <Button
         style="@style/text_style3_small"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/small_button_width"
+        android:layout_height="@dimen/small_button_height"
         android:text="Sat"
         android:id="@+id/button7"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="@dimen/small_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button6"
-        android:background="@drawable/time_usage_unselected"/>
+        android:background="@drawable/time_usage_unselected"
+        android:elevation="@dimen/small_button_elevation"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
         android:id="@+id/blank_space"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="@dimen/small_text_spacing"
         android:layout_below="@+id/button"/>
 
 </RelativeLayout>
