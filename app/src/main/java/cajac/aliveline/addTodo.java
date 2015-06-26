@@ -38,6 +38,7 @@ public class addTodo extends DialogFragment {
     //Initialize Constants
     private AlertDialog dialog;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
+    Date enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
     ImageButton cal,up,flat,down;
     private static final int REQUEST_DATE = 1;
@@ -80,7 +81,6 @@ public class addTodo extends DialogFragment {
                 String selectedDays = getSelectedDays();
 
                 //create and send 2do to database
-
             }
         });
         dialog = builder.create();
@@ -351,8 +351,8 @@ public class addTodo extends DialogFragment {
 
         if (validDate(day,month,year)&& atLeast(year,currentYear)){
             Date today = new Date(currentYear, currentMonth, currentDate);
-            Date test = new Date(year,month,day);
-            return test.compareTo(today) > 0;
+            enteredDate = new Date(year,month,day);
+            return enteredDate.compareTo(today) > 0;
         } else {
             return false;
         }
