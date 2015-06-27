@@ -7,7 +7,6 @@ import java.util.Date;
  */
 public class Todo {
     public String title;
-    public String description;
     public Date dueDate;
     public String estimatedTime;
     public int timeUsage;
@@ -20,9 +19,8 @@ public class Todo {
 
     }
 
-    public Todo(String title, String description, Date dueDate, String estimatedTime){
+    public Todo(String title, Date dueDate, String estimatedTime){
         this.title = title;
-        this.description = description;
         this.dueDate = dueDate;
         this.estimatedTime = estimatedTime;
     }
@@ -31,9 +29,6 @@ public class Todo {
         return title;
     }
 
-    public String getDescription(){
-        return description;
-    }
 
     public Date getDueDate(){
         return dueDate;
@@ -43,9 +38,6 @@ public class Todo {
         this.title = newTitle;
     }
 
-    public void setDescription(String newDesc){
-        this.description = newDesc;
-    }
 
     public void setDueDate(Date newDate){
         this.dueDate = newDate;

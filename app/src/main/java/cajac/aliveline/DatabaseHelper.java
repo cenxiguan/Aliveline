@@ -36,7 +36,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     //Column names for Todo table
     public static final String KEY_ID = "id";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_DESCRIPTION = "desc";
     public static final String COLUMN_DUE_DATE = "due_date";
     public static final String COLUMN_ESTIMATED_TIME = "est_time";
     public static final String COLUMN_TIME_USAGE = "time_usage";
@@ -54,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String COLUMN_TIME_COMPLETED = "time_completed";
 
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
-            KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " + COLUMN_DESCRIPTION + " TEXT, " +
+            KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
     + " TEXT" + LOCKS + " TEXT" +  ")";
 
@@ -450,7 +449,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public Todo setTodoValues(Todo td, Cursor c){
         td.setId(c.getInt(c.getColumnIndex(KEY_ID)));
         td.setTitle(c.getString(c.getColumnIndex(COLUMN_TITLE)));
-        td.setDescription(c.getString(c.getColumnIndex(COLUMN_DESCRIPTION)));
         String dateString = c.getString(c.getColumnIndex(COLUMN_DUE_DATE));
         td.setLocks(c.getString(c.getColumnIndex(LOCKS)));
         Date dueDate = convertStringDate(dateString);
@@ -465,7 +463,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public ContentValues setTodoContentValues(Todo todo, ContentValues values){
         values.put(COLUMN_TITLE, todo.getTitle());
         values.put(LOCKS, todo.getLocks());
-        values.put(COLUMN_DESCRIPTION, todo.getDescription());
         values.put(COLUMN_ESTIMATED_TIME, todo.getEstimatedTime());
         values.put(COLUMN_TIME_USAGE, todo.getTimeUsage());
         values.put(COLUMN_DUE_DATE, dateToStringFormat(todo.getDueDate()));
