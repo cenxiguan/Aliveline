@@ -102,7 +102,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     public void addToRemainingTables(long todo_id, Todo todo){
         String firstDayString = dateToStringFormat(new Date());
-        firstDayString = getNextDay(firstDayString);
+        //For now, first day will be the day that Todo is created
+        //firstDayString = getNextDay(firstDayString);
         String lastDay = dateToStringFormat(todo.getDueDate());
         int boolPos = 0;
         String locks = todo.getLocks();

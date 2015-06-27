@@ -10,5 +10,6 @@
     <string name="submit">Submit</string>
 
     <string name="select">Select</string>
+    <string name="no_todos">No Todos for Today</string>
 
 </resources>
