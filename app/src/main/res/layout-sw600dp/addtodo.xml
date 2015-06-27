@@ -158,6 +158,7 @@
         android:layout_alignTop="@+id/day_field"
         android:src="@drawable/ic_calendar"
         android:layout_above="@id/estimated_time_prompt"
+        android:background="@drawable/time_usage_unselected"
         android:elevation="1dp"
         />
 

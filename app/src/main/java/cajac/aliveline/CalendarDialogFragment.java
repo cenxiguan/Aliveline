@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -91,6 +93,17 @@ public class CalendarDialogFragment extends DialogFragment {
         int dialogHeight = getActivity().getResources().getDisplayMetrics().heightPixels;
 
         getDialog().getWindow().setLayout((int) (dialogWidth * .9), (int) (dialogHeight * .7));
-        calendarView.setTileSize((int) (dialogWidth * 0.9 / 9));
+
+        if(isScreenLarge()) {
+            calendarView.setTileSize((int) (dialogWidth * 0.4 / 9));
+        } else {
+            calendarView.setTileSize((int) (dialogWidth * 0.9 / 9));
+        }
+    }
+
+    public boolean isScreenLarge() {
+        final int screenSize = getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK;
+        return screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 }
