@@ -13,3 +13,4 @@ NOTICE
 	- Added sameDate() method
 		- Added feature in order to allow for a second click on the previously clicked date
 			- For UI purposes
+			
