@@ -1,0 +1,16 @@
+NOTICE
+
+- MaterialCalendarView
+	- Added sameDate() method in Callbacks which calls the listener's sameDate method
+	- Changed OnClickListener() to also listen for a click on the title text
+		- Added in order to have a dialog pop up on click
+			- For UI purposes
+- MonthView
+	- Changed onClick method to recognize clicks on the previously selected date
+	- Added sameDate() method to the Callbacks interface
+
+- OnDateChangedListener
+	- Added sameDate() method
+		- Added feature in order to allow for a second click on the previously clicked date
+			- For UI purposes
+			
