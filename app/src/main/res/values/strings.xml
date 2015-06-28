@@ -13,5 +13,6 @@
     <string name="title_activity_home">HomeActivity</string>
 
     <string name="select">Select</string>
+    <string name="no_todos">No Todos for Today</string>
 
 </resources>

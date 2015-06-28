@@ -1,13 +1,15 @@
 package cajac.aliveline;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 /**
  * Created by Amauris on 6/3/2015.
  */
-public class Todo {
+public class Todo implements Parcelable {
     public String title;
-    public String description;
     public Date dueDate;
     public String estimatedTime;
     public int timeUsage;
@@ -15,14 +17,15 @@ public class Todo {
     public String startTime;
     public String remainingTime;
     public String locks;
+    public int mData;
+
 
     public Todo(){
 
     }
 
-    public Todo(String title, String description, Date dueDate, String estimatedTime){
+    public Todo(String title, Date dueDate, String estimatedTime){
         this.title = title;
-        this.description = description;
         this.dueDate = dueDate;
         this.estimatedTime = estimatedTime;
     }
@@ -31,9 +34,6 @@ public class Todo {
         return title;
     }
 
-    public String getDescription(){
-        return description;
-    }
 
     public Date getDueDate(){
         return dueDate;
@@ -43,9 +43,6 @@ public class Todo {
         this.title = newTitle;
     }
 
-    public void setDescription(String newDesc){
-        this.description = newDesc;
-    }
 
     public void setDueDate(Date newDate){
         this.dueDate = newDate;
@@ -102,5 +99,27 @@ public class Todo {
 
     public String getLocks(){
         return locks;
+    }
+
+    public void writeToParcel(Parcel dest, int flags){
+        dest.writeInt(mData);
+    }
+
+    public int describeContents(){
+        return 0;
+    }
+
+    public static final Parcelable.Creator<Todo> CREATOR=
+            new Parcelable.Creator<Todo>() {
+                public Todo createFromParcel(Parcel in) {
+                    return new Todo(in);
+                }
+
+                public Todo[] newArray(int size){
+                    return new Todo[size];
+                }
+            };
+    private Todo(Parcel in){
+        mData = in.readInt();
     }
 }

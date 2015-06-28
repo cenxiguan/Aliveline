@@ -31,8 +31,6 @@ public class CardArrayAdapter extends ArrayAdapter<Todo> {
 
         CardView cardView = (CardView)v.findViewById(R.id.card_view);
         TextView tv = (TextView)cardView.findViewById(R.id.card_header);
-        TextView desc = (TextView)cardView.findViewById(R.id.desc);
-        desc.setText(todo.getDescription());
         tv.setText(todo.getTitle());
 
         return v;

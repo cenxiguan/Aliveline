@@ -35,7 +35,7 @@ import java.util.Date;
  */
 public class addTodo extends DialogFragment {
 
-    //Initialize Constants
+    //Initialize Variables
     private AlertDialog dialog;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
     Date enteredDate;
@@ -80,7 +80,7 @@ public class addTodo extends DialogFragment {
                 int selectedCurve = getSelectedCurve();
                 String selectedDays = getSelectedDays();
 
-                //create and send 2do to database
+                //create and send 2do to database (Use enteredDate)
             }
         });
         dialog = builder.create();

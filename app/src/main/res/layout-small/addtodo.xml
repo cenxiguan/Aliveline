@@ -135,7 +135,7 @@
 
     <EditText
         style="@style/text_style4_small"
-        android:layout_width="40dp"
+        android:layout_width="35dp"
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/year_field"
@@ -150,14 +150,16 @@
 
     <ImageButton
         android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_height="12dp"
         android:id="@+id/calendar_dialog"
         android:scaleType="fitXY"
-        android:paddingLeft="2dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
         android:layout_toEndOf="@id/year_field"
         android:layout_toRightOf="@id/year_field"
         android:layout_alignTop="@+id/day_field"
-        android:src="@drawable/ic_home"
+        android:src="@drawable/ic_calendar"
+        android:background="@drawable/time_usage_unselected"
         android:elevation="2dp"
         />
 
