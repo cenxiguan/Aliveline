@@ -81,6 +81,10 @@ public class addTodo extends DialogFragment {
                 String selectedDays = getSelectedDays();
 
                 //create and send 2do to database (Use enteredDate)
+                Todo todo = new Todo(todoTitle,enteredDate,todoEstTime);
+                DatabaseHelper dh = new DatabaseHelper(getActivity());
+                //dh.createToDo(todo,);
+
             }
         });
         dialog = builder.create();
