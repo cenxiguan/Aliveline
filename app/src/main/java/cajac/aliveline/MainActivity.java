@@ -108,22 +108,6 @@ public class MainActivity extends AppCompatActivity implements
         ((TextView) findViewById(titleView)).setText(title);
     }*/
 
-//    @Override
-//    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-//        // on tab selected show respected fragment view
-//        viewPager.setCurrentItem(tab.getPosition());
-//    }
-//
-//    @Override
-//    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-//        // empty
-//    }
-//
-//    @Override
-//    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-//        // empty
-//    }
-
     //getting screen information for orientation
     public boolean isScreenLarge() {
         final int screenSize = getResources().getConfiguration().screenLayout
@@ -133,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction ft) {
-
+        viewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override

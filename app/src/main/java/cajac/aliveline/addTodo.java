@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
@@ -21,14 +22,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.CharArrayReader;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by Jonathan Maeda on 5/31/2015.
@@ -38,7 +42,7 @@ public class addTodo extends DialogFragment {
     //Initialize Variables
     private AlertDialog dialog;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
-    Date enteredDate;
+    String today, enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
     ImageButton cal,up,flat,down;
     private static final int REQUEST_DATE = 1;
@@ -74,17 +78,23 @@ public class addTodo extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 //get text from edittexts
                 String todoTitle = title.getText().toString();
-                String todoEstTime = estTime.getText().toString();
+                String EstTime = estTime.getText().toString();
+                String todoEstTime = EstTime + ":00";
 
-                //get selected Curve and Days
-                int selectedCurve = getSelectedCurve();
-                String selectedDays = getSelectedDays();
-
-                //create and send 2do to database (Use enteredDate)
-                Todo todo = new Todo(todoTitle,enteredDate,todoEstTime);
                 DatabaseHelper dh = new DatabaseHelper(getActivity());
-                //dh.createToDo(todo,);
 
+                //create 2do
+                Todo todo = new Todo();
+                todo.setTitle(todoTitle);
+                todo.setEstimatedTime("00:00");
+                todo.setStartTime(todoEstTime);
+                todo.setRemainingTime(todoEstTime);
+                todo.setDueDate(dh.convertStringDate(enteredDate));
+                todo.setTimeUsage(getSelectedCurve());
+                todo.setLocks(testLocks(today, enteredDate, dh));
+
+                //sending 2do to database
+                dh.createToDo(todo);
             }
         });
         dialog = builder.create();
@@ -112,7 +122,7 @@ public class addTodo extends DialogFragment {
                 android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 CalendarDialogFragment cdp = new CalendarDialogFragment();
                 cdp.setTargetFragment(addTodo.this, REQUEST_DATE);
-                cdp.show(ft,"CalendarDialogFragment");
+                cdp.show(ft, "CalendarDialogFragment");
             }
         });
 
@@ -142,6 +152,14 @@ public class addTodo extends DialogFragment {
         fri = (Button)view.findViewById(R.id.button6);
         sat = (Button)view.findViewById(R.id.button7);
 
+        sun.setSelected(true);
+        mon.setSelected(true);
+        tue.setSelected(true);
+        wed.setSelected(true);
+        thu.setSelected(true);
+        fri.setSelected(true);
+        sat.setSelected(true);
+
         up = (ImageButton)view.findViewById(R.id.up_curve);
         flat = (ImageButton)view.findViewById(R.id.no_curve);
         down = (ImageButton)view.findViewById(R.id.down_curve);
@@ -155,14 +173,14 @@ public class addTodo extends DialogFragment {
                 checkSubmitButtonConditions(buttonPos);
             }
         });
-        mon.setOnClickListener(new View.OnClickListener(){
+        mon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeSelected(mon, v);
                 checkSubmitButtonConditions(buttonPos);
             }
         });
-        tue.setOnClickListener(new View.OnClickListener(){
+        tue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeSelected(tue, v);
@@ -184,12 +202,12 @@ public class addTodo extends DialogFragment {
             }
         });
                 fri.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeSelected(fri, v);
-                checkSubmitButtonConditions(buttonPos);
-            }
-        });
+                    @Override
+                    public void onClick(View v) {
+                        changeSelected(fri, v);
+                        checkSubmitButtonConditions(buttonPos);
+                    }
+                });
         sat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -354,8 +372,8 @@ public class addTodo extends DialogFragment {
         int currentDate = calendar.get(Calendar.DAY_OF_MONTH);
 
         if (validDate(day,month,year)&& atLeast(year,currentYear)){
-            Date today = new Date(currentYear, currentMonth, currentDate);
-            enteredDate = new Date(year,month,day);
+            today = "" + currentYear + "-" + currentMonth + "-" + currentDate;
+            enteredDate = "" + year + "-" + month + "-" + day;
             return enteredDate.compareTo(today) > 0;
         } else {
             return false;
@@ -406,5 +424,20 @@ public class addTodo extends DialogFragment {
         } else {
             return true;
         }
+    }
+
+    ///////Test METHOD
+    ///////WILL REMOVE LATER
+    public String testLocks(String startDay, String endDay, DatabaseHelper dh){
+        String locks = "1";
+        Log.e("", "" + startDay);
+        startDay = dh.getNextDay(startDay);
+        startDay = dh.getNextDay(startDay);
+        while (!startDay.equals(endDay)){
+            Random ran = new Random();
+            locks = locks + ran.nextInt(2);
+            startDay = dh.getNextDay(startDay);
+        }
+        return locks;
     }
 }

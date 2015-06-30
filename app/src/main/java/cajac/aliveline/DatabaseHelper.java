@@ -90,7 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
 
-    public long createToDo(Todo todo, long[] days_ids) {
+    public long createToDo(Todo todo) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -108,10 +108,16 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String lastDay = dateToStringFormat(todo.getDueDate());
         int boolPos = 0;
         String locks = todo.getLocks();
+        Log.e("", "" + lastDay);
         while (!firstDayString.equals(lastDay)){
             Date firstDayDate = convertStringDate(firstDayString);
             long date_id = createDate(firstDayDate, null);
-            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
+            int lock;
+            if(boolPos == locks.length()){
+                lock = Integer.parseInt(locks.substring(boolPos));
+            } else {
+                lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
+            }
             String timeRequired = getTimeForDay(locks, lock, todo);
             addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
             firstDayString = getNextDay(firstDayString);

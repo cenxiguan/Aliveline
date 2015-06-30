@@ -157,7 +157,7 @@
         android:layout_toRightOf="@id/year_field"
         android:layout_alignTop="@+id/day_field"
         android:src="@drawable/ic_calendar"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:layout_above="@id/estimated_time_prompt"
         android:elevation="1dp"
         />
@@ -169,7 +169,7 @@
         android:id="@+id/up_curve"
         android:scaleType="fitXY"
         android:src="@drawable/up2"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:layout_below="@+id/time_usage_prompt"
         android:elevation="@dimen/large_button_elevation"/>
 
@@ -203,7 +203,7 @@
         style="@style/text_style1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Days to Work:"
+        android:text="Days to Work: (orange = selected)"
         android:id="@+id/days_available_prompt"
         android:layout_marginTop="@dimen/large_text_spacing"
         android:layout_below="@+id/up_curve"
@@ -220,7 +220,7 @@
         android:layout_marginTop="10dp"
         android:layout_alignLeft="@+id/days_available_prompt"
         android:layout_alignStart="@+id/days_available_prompt"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <Button
@@ -233,7 +233,7 @@
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button"
         android:layout_toEndOf="@+id/button"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <Button
@@ -245,7 +245,7 @@
         android:layout_marginLeft="@dimen/large_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button2"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <Button
@@ -257,7 +257,7 @@
         android:layout_marginLeft="@dimen/large_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button3"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <Button
@@ -269,7 +269,7 @@
         android:layout_marginLeft="@dimen/large_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button4"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <Button
@@ -281,7 +281,7 @@
         android:layout_marginLeft="@dimen/large_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button5"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <Button
@@ -293,7 +293,7 @@
         android:layout_marginLeft="@dimen/large_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button6"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/large_button_elevation"/>
 
     <TextView
