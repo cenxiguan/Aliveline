@@ -27,7 +27,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             super(v);
             cardView = v.findViewById(R.id.card_view);
             cardTitle =  (TextView)v.findViewById(R.id.card_header);
-            //timeLeft = (TextView)v.findViewById(R.id.time_left);
+            timeLeft = (TextView)v.findViewById(R.id.time_left);
             dueDate = (TextView)v.findViewById(R.id.due_date);
         }
     }
@@ -47,7 +47,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     public void onBindViewHolder(CardViewHolder viewHolder, int i) {
         Todo todo = dataSet.get(i);
         viewHolder.cardTitle.setText(todo.getTitle());
-        //viewHolder.timeLeft.setText("Time Required for Today: " + todo.getTodaysTimeLeft());
+        viewHolder.timeLeft.setText("For Today: " + todo.getTodaysTimeLeft());
         viewHolder.dueDate.setText("Due Date: " + todo.getDueDateString());
     }
 

@@ -42,7 +42,7 @@ public class addTodo extends DialogFragment {
     //Initialize Variables
     private AlertDialog dialog;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
-    String today, enteredDate;
+    Date today, enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
     ImageButton cal,up,flat,down;
     private static final int REQUEST_DATE = 1;
@@ -89,9 +89,9 @@ public class addTodo extends DialogFragment {
                 todo.setEstimatedTime("00:00");
                 todo.setStartTime(todoEstTime);
                 todo.setRemainingTime(todoEstTime);
-                todo.setDueDate(dh.convertStringDate(enteredDate));
+                todo.setDueDate(enteredDate);
                 todo.setTimeUsage(getSelectedCurve());
-                todo.setLocks(testLocks(today, enteredDate, dh));
+                todo.setLocks(makeLocks(dh.dateToStringFormat(today), dh.dateToStringFormat(enteredDate), dh));
 
                 //sending 2do to database
                 dh.createToDo(todo);
@@ -335,7 +335,7 @@ public class addTodo extends DialogFragment {
     private  void checkSubmitButtonConditions(Button pos) {
         String s1 = title.getText().toString();
         int i2 = convertToInt(dueDay.getText().toString());
-        int i3 = convertToInt(dueMonth.getText().toString());
+        int i3 = convertToInt(dueMonth.getText().toString()) - 1;
         int i4 = convertToInt(dueYear.getText().toString());
         int i5 = convertToInt(estTime.getText().toString());
 
@@ -367,13 +367,12 @@ public class addTodo extends DialogFragment {
 
     public boolean dateCheck(int day, int month, int year){
         Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
         int currentYear = calendar.get(Calendar.YEAR);
-        int currentMonth = calendar.get(Calendar.MONTH) + 1;
-        int currentDate = calendar.get(Calendar.DAY_OF_MONTH);
 
         if (validDate(day,month,year)&& atLeast(year,currentYear)){
-            today = "" + currentYear + "-" + currentMonth + "-" + currentDate;
-            enteredDate = "" + year + "-" + month + "-" + day;
+            today = new Date();
+            enteredDate = calendar.getTime();
             return enteredDate.compareTo(today) > 0;
         } else {
             return false;
@@ -426,16 +425,17 @@ public class addTodo extends DialogFragment {
         }
     }
 
-    ///////Test METHOD
-    ///////WILL REMOVE LATER
-    public String testLocks(String startDay, String endDay, DatabaseHelper dh){
-        String locks = "1";
-        Log.e("", "" + startDay);
-        startDay = dh.getNextDay(startDay);
-        startDay = dh.getNextDay(startDay);
+    public String makeLocks(String startDay, String endDay, DatabaseHelper dh){
+        Calendar cal = Calendar.getInstance();
+        int dayOfWeek =cal.get(Calendar.DAY_OF_WEEK);
+        String selected = getSelectedDays();
+        String locks = "";
         while (!startDay.equals(endDay)){
-            Random ran = new Random();
-            locks = locks + ran.nextInt(2);
+            if (dayOfWeek == 8){
+                dayOfWeek = 1;
+            }
+            locks = locks + selected.charAt(dayOfWeek - 1);
+            dayOfWeek++;
             startDay = dh.getNextDay(startDay);
         }
         return locks;

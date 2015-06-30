@@ -43,21 +43,6 @@ public class HomeFragment extends Fragment{
         noTodos = (TextView)rootView.findViewById(R.id.empty_list);
 
         dbh = new DatabaseHelper(getActivity());
-//        Todo test = new Todo();
-//        test.setTitle("Test 2");
-//        Date today = new Date();
-//        String todayString = dbh.dateToStringFormat(today);
-//        for (int i = 0; i < 5; i++) {
-////            Log.e("", "" + todayString);
-//            todayString = dbh.getNextDay(todayString);
-//        }
-//        test.setDueDate(dbh.convertStringDate(todayString));
-//        test.setStartTime("60:00");
-//        test.setRemainingTime("60:00");
-//        test.setEstimatedTime("3:00");
-//        test.setTimeUsage(0);
-//        test.setLocks("10111");
-       // dbh.createToDo(test, days_ids);
         if (savedInstanceState != null) {
             todaysList = savedInstanceState.getParcelableArrayList("list");
         } else {

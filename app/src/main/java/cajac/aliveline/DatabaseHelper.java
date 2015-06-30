@@ -108,16 +108,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String lastDay = dateToStringFormat(todo.getDueDate());
         int boolPos = 0;
         String locks = todo.getLocks();
-        Log.e("", "" + lastDay);
         while (!firstDayString.equals(lastDay)){
             Date firstDayDate = convertStringDate(firstDayString);
             long date_id = createDate(firstDayDate, null);
-            int lock;
-            if(boolPos == locks.length()){
-                lock = Integer.parseInt(locks.substring(boolPos));
-            } else {
-                lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
-            }
+            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
             String timeRequired = getTimeForDay(locks, lock, todo);
             addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
             firstDayString = getNextDay(firstDayString);
@@ -265,8 +259,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         String selectQuery = "SELECT  * FROM " + TABLE_TODO + " WHERE "
                 + KEY_ID + " = " + todo_id;
-
-        // Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -499,7 +491,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         int timeRqdInt = timeInMinutes(timeRequired);
         int timeCmpltInt = timeInMinutes(timeCompleted);
         int timeLeft = timeRqdInt - timeCmpltInt;
-        String timeLeftStr = timeInHours(timeLeft);
-        return timeLeftStr;
+        int hoursLeft = timeLeft / 60;
+        int minutesLeft = timeLeft % 60;
+        return hoursLeft + " Hours, " + minutesLeft + " Minutes left ";
     }
 }
