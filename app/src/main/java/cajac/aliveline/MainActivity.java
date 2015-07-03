@@ -1,12 +1,14 @@
 package cajac.aliveline;
 
-import android.app.ActionBar;
+//import android.app.ActionBar;
+import android.support.v7.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
@@ -15,7 +17,7 @@ import android.support.v4.view.ViewPager;
    Google link on Material Design --> http://www.google.com/design/spec/components/tabs.html
 
  */
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends AppCompatActivity implements
         ActionBar.TabListener {
 
 
@@ -23,7 +25,6 @@ public class MainActivity extends FragmentActivity implements
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
-    private DatabaseHelper db;
     // Tab titles and icons
     private String[] tabs = { "Home", "Calendar", "Timer", "Settings" };
     private int[] icons = {R.drawable.ic_home,
@@ -43,14 +44,11 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        db = new DatabaseHelper(this);
-
-
 
 
         // Initialization for tabs
         viewPager = (ViewPager) findViewById(R.id.pager);
-        actionBar = getActionBar();
+        actionBar = getSupportActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(mAdapter);
@@ -110,26 +108,25 @@ public class MainActivity extends FragmentActivity implements
         ((TextView) findViewById(titleView)).setText(title);
     }*/
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // on tab selected show respected fragment view
-        viewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // empty
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // empty
-    }
-
     //getting screen information for orientation
     public boolean isScreenLarge() {
         final int screenSize = getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK;
         return screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction ft) {
+        viewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction ft) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction ft) {
+
     }
 }

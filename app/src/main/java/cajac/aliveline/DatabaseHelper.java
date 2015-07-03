@@ -36,7 +36,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     //Column names for Todo table
     public static final String KEY_ID = "id";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_DESCRIPTION = "desc";
     public static final String COLUMN_DUE_DATE = "due_date";
     public static final String COLUMN_ESTIMATED_TIME = "est_time";
     public static final String COLUMN_TIME_USAGE = "time_usage";
@@ -44,21 +43,23 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String COLUMN_REMAINING_TIME = "time_remaining";
     //Column names for Dates table
     public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_NOTES = "notes";
     //Column names for todo_dates table
     public static final String KEY_TODO_ID = "todo_id";
     public static final String KEY_DATES_ID = "dates_id";
 
     public static final String LOCK = "lock";
+    public static final String LOCKS = "locks";
     public static final String COLUMN_TIME_REQUIRED = "time_required";
     public static final String COLUMN_TIME_COMPLETED = "time_completed";
 
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
-            KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " + COLUMN_DESCRIPTION + " TEXT, " +
+            KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
-    + " TEXT" + ")";
+    + " TEXT, " + LOCKS + " TEXT" +  ")";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_DATE + " DATETIME UNIQUE" + ")";
+            + COLUMN_DATE + " DATETIME UNIQUE, " + COLUMN_NOTES + " TEXT" + ")";
 
     //What columns should be included in relational?
     public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + TABLE_TODO_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -89,25 +90,27 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
 
-    public long createToDo(Todo todo, long[] days_ids) {
+    public long createToDo(Todo todo) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values = setTodoContentValues(todo, values);
         // insert row
         long todo_id = db.insert(TABLE_TODO, null, values);
+        addToRemainingTables(todo_id, todo);
         return todo_id;
     }
 
     public void addToRemainingTables(long todo_id, Todo todo){
         String firstDayString = dateToStringFormat(new Date());
-        firstDayString = getNextDay(firstDayString);
+        //For now, first day will be the day that Todo is created
+        //firstDayString = getNextDay(firstDayString);
         String lastDay = dateToStringFormat(todo.getDueDate());
         int boolPos = 0;
         String locks = todo.getLocks();
         while (!firstDayString.equals(lastDay)){
             Date firstDayDate = convertStringDate(firstDayString);
-            long date_id = createDate(firstDayDate);
+            long date_id = createDate(firstDayDate, null);
             int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
             String timeRequired = getTimeForDay(locks, lock, todo);
             addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
@@ -167,12 +170,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return day;
     }
 
-    public long createDate(Date date){
+    public long createDate(Date date, String notes){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
         String dateString = dateToStringFormat(date);
         contentValues.put(COLUMN_DATE, dateString);
+        contentValues.put(COLUMN_NOTES, notes);
 
         long date_id = db.insert(TABLE_DATES, null, contentValues);
 
@@ -190,6 +194,18 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String dateString = c.getString(c.getColumnIndex(COLUMN_DATE));
         Date date = convertStringDate(dateString);
         return date;
+    }
+    public String getNotes(String date){
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE " +
+                COLUMN_DATE + " = " + date;
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        String notes = c.getString(c.getColumnIndex(COLUMN_NOTES));
+
+        return notes;
     }
     //Testing purposes
     public List<String> getAllDates(){
@@ -214,7 +230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String dateString = dateToStringFormat(date);
         int date_id = 0;
         String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE "
-                + COLUMN_DATE + " = " + dateString;
+                + COLUMN_DATE + " = '" + dateString + "'";
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()){
             date_id = c.getInt(c.getColumnIndex(KEY_ID));
@@ -243,8 +259,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         String selectQuery = "SELECT  * FROM " + TABLE_TODO + " WHERE "
                 + KEY_ID + " = " + todo_id;
-
-        // Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -286,7 +300,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 todos.add(td);
             } while (c.moveToNext());
         }
-
         return todos;
     }
 
@@ -301,7 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 
         String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE "
-                + KEY_DATES_ID + " = '" + date_id + "'";
+                + KEY_DATES_ID + " = " + date_id + " AND " + LOCK + " = 1";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -309,7 +322,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         if (c.moveToFirst()) {
             do {
                 int todo_id = c.getInt(c.getColumnIndex(KEY_TODO_ID));
+                String timeRequired = c.getString(c.getColumnIndex(COLUMN_TIME_REQUIRED));
+                String timeCompleted = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
                 Todo td = getTodo(todo_id);
+                String timeLeftToday = getTimeLeftforToday(timeRequired, timeCompleted);
+                td.setTodaysTimeLeft(timeLeftToday);
                 todos.add(td);
             } while (c.moveToNext());
         }
@@ -321,15 +338,75 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values = setTodoContentValues(todo, values);
-        // updating row
-        return db.update(TABLE_TODO, values, KEY_ID + " = ?",
+        int updated = db.update(TABLE_TODO, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo.getId()) });
+        // updating row
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_TODO_ID + " = '"
+                + todo.getId() + "'";
+        String startDay = dateToStringFormat(new Date());
+        startDay = getNextDay(startDay);
+        String lastDay = dateToStringFormat(todo.getDueDate());
+        Cursor c = db.rawQuery(selectQuery, null);
+        int lock_ind = 0;
+        String locks = todo.getLocks();
+        if (c.moveToFirst()){
+            do {
+                long id = c.getLong(c.getColumnIndex(KEY_ID));
+                long todo_id = c.getLong(c.getColumnIndex(KEY_TODO_ID));
+                Date firstDayDate = convertStringDate(startDay);
+                long date_id = createDate(firstDayDate, null);
+                int lock = Integer.parseInt(locks.substring(lock_ind, lock_ind + 1));
+                String timeRequired = getTimeForDay(locks, lock, todo);
+                updateTodoDate(id, todo_id, date_id, lock, timeRequired, "00:00");
+                startDay = getNextDay(startDay);
+                lock_ind++;
+            } while(c.moveToNext() && !startDay.equals(lastDay));
+        }
+        if (!c.moveToNext() && !startDay.equals(lastDay)){
+            addMoreRows(todo, lock_ind, startDay, lastDay);
+        }else if (startDay.equals(lastDay)){
+            removeExtraRows(c);
+        }
+        return updated;
+    }
+
+    public void addMoreRows(Todo todo, int lock_ind, String startDay, String lastDay){
+        while (!startDay.equals(lastDay)){
+            Date firstDayDate = convertStringDate(startDay);
+            String locks = todo.getLocks();
+            long date_id = createDate(firstDayDate, null);
+            int lock = Integer.parseInt(locks.substring(lock_ind, lock_ind + 1));
+            String timeRequired = getTimeForDay(locks, lock, todo);
+            addTodoDate(todo.getId(), date_id, lock, timeRequired, "00:00");
+            startDay = getNextDay(startDay);
+            lock_ind++;
+        }
+    }
+
+    public void removeExtraRows(Cursor c){
+        //Cursor moves back twice in order to start in the first row that must be deleted
+        for (int i = 0; i < 2; i++) {
+            c.moveToPrevious();
+        }
+        while (c.moveToNext()){
+            long todo_dateID = c.getInt(c.getColumnIndex(KEY_ID));
+            deleteTodoDateRow(todo_dateID);
+        }
     }
 
     public void deleteToDo(long todo_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TODO, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo_id) });
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " +
+                KEY_TODO_ID + " = '" + todo_id + "'";
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()){
+            do {
+                long todo_dateRowId = c.getLong(c.getColumnIndex(KEY_ID));
+                deleteTodoDateRow(todo_dateRowId);
+            } while (c.moveToNext());
+        }
     }
 
     public long addTodoDate(long todo_id, long date_id, int lock, String timeRequired, String timeCompleted ){
@@ -388,8 +465,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public Todo setTodoValues(Todo td, Cursor c){
         td.setId(c.getInt(c.getColumnIndex(KEY_ID)));
         td.setTitle(c.getString(c.getColumnIndex(COLUMN_TITLE)));
-        td.setDescription(c.getString(c.getColumnIndex(COLUMN_DESCRIPTION)));
         String dateString = c.getString(c.getColumnIndex(COLUMN_DUE_DATE));
+        td.setLocks(c.getString(c.getColumnIndex(LOCKS)));
         Date dueDate = convertStringDate(dateString);
         td.setDueDate(dueDate);
         td.setEstimatedTime(c.getString(c.getColumnIndex(COLUMN_ESTIMATED_TIME)));
@@ -401,12 +478,21 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     //setTodoContentValues sets the content values for todos, created to get rid of repetition
     public ContentValues setTodoContentValues(Todo todo, ContentValues values){
         values.put(COLUMN_TITLE, todo.getTitle());
-        values.put(COLUMN_DESCRIPTION, todo.getDescription());
+        values.put(LOCKS, todo.getLocks());
         values.put(COLUMN_ESTIMATED_TIME, todo.getEstimatedTime());
         values.put(COLUMN_TIME_USAGE, todo.getTimeUsage());
         values.put(COLUMN_DUE_DATE, dateToStringFormat(todo.getDueDate()));
         values.put(COLUMN_START_TIME, todo.getStartTime());
         values.put(COLUMN_REMAINING_TIME, todo.getRemainingTime());
         return values;
+    }
+
+    private String getTimeLeftforToday(String timeRequired, String timeCompleted){
+        int timeRqdInt = timeInMinutes(timeRequired);
+        int timeCmpltInt = timeInMinutes(timeCompleted);
+        int timeLeft = timeRqdInt - timeCmpltInt;
+        int hoursLeft = timeLeft / 60;
+        int minutesLeft = timeLeft % 60;
+        return hoursLeft + " Hours, " + minutesLeft + " Minutes left ";
     }
 }

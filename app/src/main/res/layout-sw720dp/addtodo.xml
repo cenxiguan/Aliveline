@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Title:" style="@style/text_style1"
         android:id="@+id/title_prompt"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:text="Time Usage (Select One):"
         android:id="@+id/time_usage_prompt"
-        android:layout_marginLeft="64dp"
+        android:layout_marginLeft="72dp"
         android:layout_alignTop="@id/title_field"
         android:layout_toRightOf="@id/title_field" />
 
@@ -68,7 +68,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/estimated_time_field"
-        android:inputType="text"
+        android:inputType="number"
         android:hint="Hours"
         android:layout_alignTop="@+id/estimated_time_prompt"
         android:layout_toRightOf="@+id/estimated_time_prompt"
@@ -82,7 +82,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/month_field"
-        android:inputType="text"
+        android:inputType="number"
         android:hint="MM"
         android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
@@ -109,7 +109,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/day_field"
-        android:inputType="text"
+        android:inputType="number"
         android:hint="DD"
         android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
@@ -136,7 +136,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/add_todo_edittext"
         android:id="@+id/year_field"
-        android:inputType="text"
+        android:inputType="number"
         android:hint="YYYY"
         android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
@@ -157,6 +157,7 @@
         android:layout_alignTop="@+id/day_field"
         android:src="@drawable/ic_calendar"
         android:layout_above="@id/estimated_time_prompt"
+        android:background="@drawable/time_usage_unselected"
         android:elevation="1dp"
         />
 
@@ -202,7 +203,7 @@
         style="@style/text_style1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Days to Work:"
+        android:text="Select Days to Work: (orange is selected)"
         android:id="@+id/days_available_prompt"
         android:layout_marginTop="@dimen/xlarge_text_spacing"
         android:layout_below="@+id/up_curve"
@@ -218,7 +219,7 @@
         android:layout_marginTop="10dp"
         android:layout_alignLeft="@+id/days_available_prompt"
         android:layout_alignStart="@+id/days_available_prompt"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <Button
@@ -230,7 +231,7 @@
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button"
         android:layout_toEndOf="@+id/button"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <Button
@@ -241,7 +242,7 @@
         android:layout_marginLeft="@dimen/xlarge_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button2"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <Button
@@ -252,7 +253,7 @@
         android:layout_marginLeft="@dimen/xlarge_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button3"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <Button
@@ -263,7 +264,7 @@
         android:layout_marginLeft="@dimen/xlarge_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button4"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <Button
@@ -274,7 +275,7 @@
         android:layout_marginLeft="@dimen/xlarge_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button5"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <Button
@@ -285,7 +286,7 @@
         android:layout_marginLeft="@dimen/xlarge_button_spacing"
         android:layout_alignTop="@+id/button"
         android:layout_toRightOf="@+id/button6"
-        android:background="@drawable/time_usage_unselected"
+        android:background="@drawable/time_usage_selected"
         android:elevation="@dimen/xlarge_button_elevation"/>
 
     <TextView
@@ -299,9 +300,10 @@
     <View
         android:layout_width="2dp"
         android:layout_height="fill_parent"
+        android:id="@+id/vertical_line"
         android:background="#FF2693FF"
-        android:layout_marginLeft="30dp"
-        android:layout_toRightOf="@id/title_field"/>
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/calendar_dialog"/>
 
     <View
         android:layout_width="fill_parent"

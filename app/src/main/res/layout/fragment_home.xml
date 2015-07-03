@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:id="@+id/recycler_home"
     android:weightSum="1">
 
     <RelativeLayout
@@ -20,21 +21,23 @@
         android:id="@+id/bottomHalf"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"
-        android:background="#0099CC">
+        android:layout_weight="0.5">
+       <!-- android:background="#0099CC">-->
 
-
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/cardsListView"
-            android:background="#FFFFFF"
-            android:layout_toStartOf="@+id/add_todo_button"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="30sp"
+            android:textStyle="italic"
+            android:id="@+id/empty_list"
+            android:text=""/>
+        <RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recycler_view"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
-
-        </ListView>
+            android:layout_centerHorizontal="true" />
 
         <ImageButton
             android:id="@+id/add_todo_button"
