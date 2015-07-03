@@ -41,6 +41,7 @@ public class addTodo extends DialogFragment {
 
     //Initialize Variables
     private AlertDialog dialog;
+    Boolean changed = false;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
     Date today, enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
@@ -60,6 +61,7 @@ public class addTodo extends DialogFragment {
         @Override
         public void afterTextChanged(Editable editable) {
             checkSubmitButtonConditions(buttonPos);
+            checkIfChangesSaved();
         }
     };
 
@@ -98,6 +100,12 @@ public class addTodo extends DialogFragment {
 
                 //sending 2do to database
                 dh.createToDo(todo);
+
+                if(changed){
+                    Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
+                }
             }
         });
         dialog = builder.create();
@@ -492,5 +500,22 @@ public class addTodo extends DialogFragment {
         this.providedEstTime = estTime;
         this.providedWorkDays = workDays;
         this.providedTimeUsage = timeUsage;
+    }
+
+    public void checkIfChangesSaved(){
+        String cTitle = title.getText().toString();
+        String cDay = dueDay.getText().toString();
+        String cMonth = dueMonth.getText().toString();
+        String cYear = dueYear.getText().toString();
+        String cTime = estTime.getText().toString();
+        String cWorkingDays = getSelectedDays();
+        int cUsage = getSelectedCurve();
+
+        if(providedTitle.equals(cTitle) && providedDay.equals(cDay) && providedMonth.equals(cMonth) && providedYear.equals(cYear)
+                && providedEstTime.equals(cTime) &&providedWorkDays.equals(cWorkingDays) && providedTimeUsage == cUsage){
+            changed = false;
+        } else {
+            changed = true;
+        }
     }
 }

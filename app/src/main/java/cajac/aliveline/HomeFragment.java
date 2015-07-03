@@ -8,6 +8,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +74,29 @@ public class HomeFragment extends Fragment{
         mAdapter = new CardAdapter(todaysList);
         recyclerView.setAdapter(mAdapter);
         setSwipeDismiss();
+
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        addTodo a = new addTodo();
+
+                        //send data to the dialog
+                        String theTitle = ((CardAdapter)mAdapter).getTitle(position);
+                        String theDay = ((CardAdapter)mAdapter).getDay(position);
+                        String theMonth = ((CardAdapter)mAdapter).getMonth(position);
+                        String theYear = ((CardAdapter)mAdapter).getYear(position);
+                        String theEstTime = ((CardAdapter)mAdapter).getEstTime(position);
+                        String theWorkDays = ((CardAdapter)mAdapter).getWorkDays(position);
+                        int theTimeUsage = ((CardAdapter)mAdapter).getTimeUsage(position);
+                        a.setInitialValues(theTitle, theDay, theMonth, theYear, theEstTime, theWorkDays, theTimeUsage);
+
+                        //open the dialog
+                        a.show(ft, "addTodo");
+                    }
+                })
+        );
     }
 
     public void setSwipeDismiss(){
