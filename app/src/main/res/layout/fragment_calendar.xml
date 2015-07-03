@@ -3,29 +3,49 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
     <FrameLayout
         android:id="@+id/calendar_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/switch_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:gravity="center_horizontal"
+        android:orientation="horizontal"
         android:background="#27a">
 
         <Switch
             android:id="@+id/day_month_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
             android:padding="10dp"
             android:textOff="MONTH"
             android:textOn="DAY"
             />
-    </LinearLayout>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/today"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/add_button"
+        android:text="T"
+        android:textColor="@android:color/white"
+        android:tint="@android:color/white"
+        />
 
 </RelativeLayout>

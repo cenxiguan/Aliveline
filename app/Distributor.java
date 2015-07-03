@@ -91,6 +91,9 @@ public class Distributor {
 			double time = (i + 1) * difference;
 			distributedTime[i] = round(time, increment);
 		}
+		if (slope == -1) {
+			reverseArray(distributedTime);
+		}
 	}
 
 	public static void calcLimitedDistribution(double lastTime) {
@@ -155,19 +158,15 @@ public class Distributor {
 		if (stopCounter > arr.length)
 			System.out.println("Not Possiblee!!! Too much work T^T");
 
-
-
 	}
 
 	public static double round(double value, double increment) {
 		double remainder = value % increment;
 		double roundVal = increment / 2.0;
 		double result = value - remainder;
-
 		if (remainder >= roundVal) {
 			result += increment;
 		}
-
 		return result;
 	}
 

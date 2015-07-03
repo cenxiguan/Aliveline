@@ -1,6 +1,7 @@
 NOTICE
 
 - MaterialCalendarView
+	- Overload the setTileSize and setTileSizeDp methods to allow rectangle tiles
 	- Added sameDate() method in Callbacks which calls the listener's sameDate method
 	- Changed OnClickListener() to also listen for a click on the title text
 		- Added in order to have a dialog pop up on click

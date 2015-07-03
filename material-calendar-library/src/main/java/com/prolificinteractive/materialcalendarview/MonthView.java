@@ -204,6 +204,10 @@ class MonthView extends LinearLayout implements View.OnClickListener {
             CalendarDay day = dayView.getDate();
             dayView.setupSelection(showOtherDates, day.isInRange(minDate, maxDate), day.getMonth() == ourMonth);
             dayView.setChecked(day.equals(selection));
+//            if(day.equals(selection)) {
+//                Log.w("DayView d", day.toString());
+//                Log.w("DayView s", selection.toString());
+//            }
         }
         postInvalidate();
     }
