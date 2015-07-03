@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -24,6 +26,8 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateChangedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
+import com.prolificinteractive.materialcalendarview.decorators.Deadline;
+import com.prolificinteractive.materialcalendarview.decorators.OneDayDecorator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,8 +52,9 @@ public class CalendarFragment extends Fragment {
     private int screenHeight;
 
     private Fragment currentCal;
+    private CalendarMonthFragment calMonthFrag;
+    private CalendarDayFragment calDayFrag;
     private Date selectedDate;
-    private String formattedSelectDate;
     final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
     private static final Date today = CalendarDay.today().getDate();
     private Switch dayOrMonth;
@@ -60,31 +65,43 @@ public class CalendarFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        Calendar cal = Calendar.getInstance();
-        cal.clear(Calendar.HOUR_OF_DAY);
-        cal.clear(Calendar.HOUR);
-        cal.clear(Calendar.AM_PM);
-        cal.clear(Calendar.MINUTE);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MILLISECOND);
-        selectedDate = cal.getTime();
+//        Calendar cal = Calendar.getInstance();
+//        cal.clear(Calendar.HOUR_OF_DAY);
+//        cal.clear(Calendar.HOUR);
+//        cal.clear(Calendar.AM_PM);
+//        cal.clear(Calendar.MINUTE);
+//        cal.clear(Calendar.SECOND);
+//        cal.clear(Calendar.MILLISECOND);
+//        selectedDate = cal.getTime();
+        calMonthFrag = new CalendarMonthFragment();
+        calDayFrag = new CalendarDayFragment();
+        selectedDate = CalendarDay.today().getDate();
 
+        if (currentCal == null)
+            switchFrame(calMonthFrag);
         // Needed in case the fragment disappears
-        if(currentCal instanceof CalendarDayFragment) {
-            switchFrame(new CalendarDayFragment());
-        }else {
-            switchFrame(new CalendarMonthFragment());
-        }
+//        if(currentCal instanceof CalendarDayFragment) {
+//            switchFrame(calMonthFrag);
+//        }else {
+//            switchFrame(calDayFrag);
+//        }
 
         dayOrMonth = (Switch) view.findViewById(R.id.day_month_switch);
         dayOrMonth.setChecked(false);
         dayOrMonth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.w("Switch", selectedDate.toString());
                 if (isChecked) {
+//                    calMonthFrag = (CalendarMonthFragment) currentCal;
+//                    switchFrame(calDayFrag);
                     switchFrame(new CalendarDayFragment());
                 } else {
+//                    calDayFrag = (CalendarDayFragment) currentCal;
+//                    calMonthFrag.getCalendarView().setSelectedDate(selectedDate);
+//                    Log.w("Switch", calMonthFrag.getCalendarView().getSelectedDate().toString());
                     switchFrame(new CalendarMonthFragment());
+//                    switchFrame(calMonthFrag);
                 }
             }
         });
@@ -93,19 +110,10 @@ public class CalendarFragment extends Fragment {
         goToToday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentCal == null) switchFrame(new CalendarMonthFragment());
-                else {
-                    if (currentCal instanceof CalendarMonthFragment) {
-                        ((CalendarMonthFragment) currentCal).getCalendarView().setSelectedDate(today);
-                        selectedDate = today;
-                    } else if (currentCal instanceof CalendarDayFragment) {
-//                        ((CalendarDayFragment) currentCal).scrollList();
-//                        ((CalendarDayFragment) currentCal).onItemClick(null, ((CalendarDayFragment) currentCal).getOldView(), Integer.MAX_VALUE / 2 + 32, 0);
-                        ((CalendarDayFragment) currentCal).resetToToday(selectedDate.before(today));
-                        ((CalendarDayFragment) currentCal).scrollList();
-                    }
-                }
-
+                if (currentCal == null)
+                    switchFrame(new CalendarMonthFragment());
+                else
+                    ((CalendarResetter) currentCal).resetToToday();
             }
         });
 
@@ -115,7 +123,7 @@ public class CalendarFragment extends Fragment {
     public void switchFrame(Fragment fragment) {
         currentCal = fragment;
         fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.calendar_frame, currentCal).commit();
+        fragmentManager.beginTransaction().replace(R.id.calendar_frame, fragment).commit();
     }
 
     @Override
@@ -134,12 +142,13 @@ public class CalendarFragment extends Fragment {
         return selectedDate;
     }
 
-    private class CalendarMonthFragment extends Fragment implements OnMonthChangedListener {
+    private class CalendarMonthFragment extends Fragment implements OnMonthChangedListener, CalendarResetter {
         private View view;
         private MaterialCalendarView calendarView;
         private TextView textView;
         private final DateFormat FORMATTER = SimpleDateFormat.getDateInstance();
         private final int REQUEST_DATE = 0;
+        private OneDayDecorator oneDayDecorator = new OneDayDecorator();
 
         public CalendarMonthFragment() {}
 
@@ -151,7 +160,12 @@ public class CalendarFragment extends Fragment {
             calendarView = (MaterialCalendarView) view.findViewById(R.id.calendarView);
             calendarView.setOnDateChangedListener(new OnDateClickListener());
             calendarView.setOnMonthChangedListener(this);
+            calendarView.clearSelection();
             calendarView.setSelectedDate(selectedDate);
+            calendarView.setCurrentDate(selectedDate);
+            Log.w("OnCreateView", calendarView.getSelectedDate().toString());
+
+            calendarView.setSelectionColor(getActivity().getResources().getColor(R.color.selected));
             calendarView.setTitleOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -178,6 +192,13 @@ public class CalendarFragment extends Fragment {
 ////                edit.commit();
 //                }
 //            });
+
+            calendarView.addDecorators(
+                    oneDayDecorator,
+                    new Deadline(tileWidth, tileLength)
+            );
+            oneDayDecorator.setDate(selectedDate);
+            calendarView.invalidateDecorators();
 
             return view;
         }
@@ -216,6 +237,8 @@ public class CalendarFragment extends Fragment {
                 else {
                     Date convertDate = date.getDate();
                     selectedDate = convertDate;
+                    oneDayDecorator.setDate(convertDate);
+                    widget.invalidateDecorators();
                 }
             }
 
@@ -228,9 +251,16 @@ public class CalendarFragment extends Fragment {
 
         public MaterialCalendarView getCalendarView() { return calendarView; }
 
+        public void resetToToday() {
+            selectedDate = today;
+            oneDayDecorator.setDate(selectedDate);
+            calendarView.invalidateDecorators();
+            calendarView.setSelectedDate(selectedDate);
+        }
+
     }
 
-    private class CalendarDayFragment extends Fragment implements AdapterView.OnItemClickListener {
+    private class CalendarDayFragment extends Fragment implements AdapterView.OnItemClickListener, CalendarResetter {
         private View dayView;
         private HListView listView;
         private InfiniteAdapter mAdapter;
@@ -278,15 +308,6 @@ public class CalendarFragment extends Fragment {
             listView.setOnItemClickListener(this);
             listView.setAdapter(mAdapter);
 
-
-
-//            int daysFromToday = Days.daysBetween(b,
-//                    a).getDays();
-//            Log.w("select", a.toString());
-//            Log.w("today", b.toString());
-//            Log.w("Day", ""+ daysFromToday);
-//            selectedPosition = todayPosition + daysFromToday;
-//            Log.w("pos", "s" + selectedPosition + "  t" +todayPosition);
             selectedPosition = todayPosition;
             listView.setSelectionFromLeft(selectedPosition, day_center); //Zooms and aligns center
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
@@ -349,6 +370,12 @@ public class CalendarFragment extends Fragment {
         @Override
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
             Date date = mAdapter.getItem(position);
+            if (selectedDate.equals(date)) {
+                dayOrMonth.setChecked(false);
+                CalendarMonthFragment monthView = new CalendarMonthFragment();
+                switchFrame(monthView);
+                return;
+            }
             selectedDate = date;
             oldView.setBackgroundColor(getResources().getColor(R.color.day_item));
             oldView = view;
@@ -365,7 +392,7 @@ public class CalendarFragment extends Fragment {
 
             public ScrollRunnable(int position) {
                 this.position = position;
-                this.milliseconds = 1000;
+                this.milliseconds = 750;
             }
 
             public ScrollRunnable(int position, int milliseconds) {
@@ -380,8 +407,7 @@ public class CalendarFragment extends Fragment {
 
         public View getOldView() { return oldView; }
 
-        protected void resetToToday(boolean before) {
-            int direction;
+        public void resetToToday() {
             selectedDate = CalendarDay.today().getDate();
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
@@ -399,34 +425,28 @@ public class CalendarFragment extends Fragment {
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
 
-            if (before)
-                direction = -15;
-            else
-                direction = 15;
-
             mAdapter = new InfiniteAdapter( mActivity, R.layout.test_item_1, android.R.id.text1, items );
             listView.setAdapter(mAdapter);
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
-//            listView.smoothScrollToPosition(selectedPosition, day_center);
             listView.setSelectionFromLeft(selectedPosition, day_center); //Zooms and aligns center
-//            listView.smoothScrollBy(-2000, 0);
-//            listView.smoothScrollBy(2000, 1000);
-//            scrollList();
-//            listView.post(new ScrollRunnable(selectedPosition, 500));
-            Log.w(LOG_TAG, "reset");
         }
 
         private class InfiniteAdapter extends ArrayAdapter<Date> {
 
             private List<Date> mItems;
             private LayoutInflater mInflater;
+            private Context mContext;
             private int mResource;
             private int mTextResId;
             ViewGroup parent;
 
+            Animation animation;
+
             public InfiniteAdapter( Context context, int resourceId, int textViewResourceId, List<Date> objects ) {
                 super( context, resourceId, textViewResourceId, objects );
                 mInflater = LayoutInflater.from( context );
+                mContext = context;
+                animation = AnimationUtils.loadAnimation(mContext, R.anim.push_up_in);
                 mResource = resourceId;
                 mTextResId = textViewResourceId;
                 mItems = objects;
@@ -464,6 +484,11 @@ public class CalendarFragment extends Fragment {
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
                 params.width = dayWidth;
+
+//                Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.push_left_in);
+//
+//                animation.setDuration(300);
+                convertView.startAnimation(animation);
 
                 return convertView;
             }
