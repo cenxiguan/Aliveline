@@ -90,7 +90,8 @@ public class HomeFragment extends Fragment{
                         String theEstTime = ((CardAdapter)mAdapter).getEstTime(position);
                         String theWorkDays = ((CardAdapter)mAdapter).getWorkDays(position);
                         int theTimeUsage = ((CardAdapter)mAdapter).getTimeUsage(position);
-                        a.setInitialValues(theTitle, theDay, theMonth, theYear, theEstTime, theWorkDays, theTimeUsage);
+                        int theId = ((CardAdapter)mAdapter).getId(position);
+                        a.setInitialValues(theTitle, theDay, theMonth, theYear, theEstTime, theWorkDays, theTimeUsage, theId);
 
                         //open the dialog
                         a.show(ft, "addTodo");

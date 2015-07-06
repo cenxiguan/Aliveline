@@ -99,7 +99,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     }
 
     public String getEstTime(int pos){
-        return dataSet.get(pos).getStartTime();
+        String time = dataSet.get(pos).getStartTime();
+        return time.substring(0,(time.length() - 3));
     }
 
     public String getWorkDays(int pos){
@@ -108,5 +109,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
     public int getTimeUsage(int pos){
         return dataSet.get(pos).getTimeUsage();
+    }
+
+    public int getId(int pos){
+        return (dataSet.get(pos).getId());
     }
 }

@@ -41,12 +41,12 @@ public class addTodo extends DialogFragment {
 
     //Initialize Variables
     private AlertDialog dialog;
-    Boolean changed = false;
+    Boolean changed = false, updated = false;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
     Date today, enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
     ImageButton cal,up,flat,down;
-    int providedTimeUsage = 0;
+    int providedTimeUsage = 0, providedId;
     private static final int REQUEST_DATE = 1;
     String providedTitle = "", providedDay = "", providedMonth = "", providedYear = "", providedEstTime = "", providedWorkDays = "";
     View view;
@@ -98,13 +98,18 @@ public class addTodo extends DialogFragment {
                 todo.setTimeUsage(getSelectedCurve());
                 todo.setLocks(makeLocks(dh.dateToStringFormat(today), dh.dateToStringFormat(enteredDate), dh));
 
-                //sending 2do to database
-                dh.createToDo(todo);
+                if(updated){
+                    todo.setId(providedId);
+                    dh.updateToDo(todo);
 
-                if(changed){
-                    Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+                    if(changed){
+                        Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
+                    }
                 } else {
-                    Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
+                    //sending 2do to database
+                    dh.createToDo(todo);
                 }
             }
         });
@@ -184,7 +189,7 @@ public class addTodo extends DialogFragment {
             fri.setSelected(workingDayBoolean(providedWorkDays.charAt(5)));
             sat.setSelected(workingDayBoolean(providedWorkDays.charAt(6)));
 
-            timeUsageSetting(providedTimeUsage);
+            timeUsageSetting(view,providedTimeUsage);
         }
     }
 
@@ -356,13 +361,16 @@ public class addTodo extends DialogFragment {
         }
     }
 
-    public void timeUsageSetting(int timeUsage){
+    public void timeUsageSetting(View v, int timeUsage){
         if(timeUsage == 1){
             up.setSelected(true);
+            up.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_selected));
         } else if (timeUsage == 2){
             flat.setSelected(true);
+            flat.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_selected));
         } else if (timeUsage == 3){
             down.setSelected(true);
+            down.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_selected));
         } else {
             //do nothing
         }
@@ -492,7 +500,7 @@ public class addTodo extends DialogFragment {
     ///////Extra methods for keeping track/ setting up the dialog////////
     /////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////
-    public void setInitialValues(String title, String day, String month, String year, String estTime, String workDays, int timeUsage){
+    public void setInitialValues(String title, String day, String month, String year, String estTime, String workDays, int timeUsage, int id){
         this.providedTitle = title;
         this.providedDay = day;
         this.providedMonth = month;
@@ -500,6 +508,9 @@ public class addTodo extends DialogFragment {
         this.providedEstTime = estTime;
         this.providedWorkDays = workDays;
         this.providedTimeUsage = timeUsage;
+        this.providedId = id;
+
+        updated = true;
     }
 
     public void checkIfChangesSaved(){
