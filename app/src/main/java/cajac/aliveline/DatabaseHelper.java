@@ -183,25 +183,27 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         while(!firstDate.equals(lastDate)) {
             Date firstDayDate = convertStringDate(firstDate);
             createDate(firstDayDate, null);
+            firstDate = getNextDay(firstDate);
         }
     }
 
     public List<Integer> getAvailableDates(String firstDate, String lastDate, String locks) {
         SQLiteDatabase db = getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_DATES + " WHERE "
-                + COLUMN_DATE  + " BETWEEN " + firstDate + " AND " + lastDate
-                + " ORDER BY " + COLUMN_DATE;
+                + COLUMN_DATE  + " BETWEEN '" + firstDate + "' AND '" + lastDate
+                + "' ORDER BY " + COLUMN_DATE;
         Cursor c = db.rawQuery(selectQuery, null);
         List<Integer> availableDateIds = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
         String date;
         int dateId;
+//        Log.w("getAvailableDates", locks);
         if (c.moveToFirst()){
             do {
                 date = c.getString(c.getColumnIndex(COLUMN_DATE));
                 cal.setTime(convertStringDate(date));
                 // Filtering out the days here based on the locks selected in addToDo
-                if (locks.charAt(cal.get(Calendar.DAY_OF_WEEK) - 1) == 0) {
+                if (locks.charAt(cal.get(Calendar.DAY_OF_WEEK) % 7) == '1') {
                     dateId = c.getInt(c.getColumnIndex(KEY_ID));
                     availableDateIds.add(dateId);
                 }
