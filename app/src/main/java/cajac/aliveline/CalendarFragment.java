@@ -268,7 +268,7 @@ public class CalendarFragment extends Fragment {
         private static final String LOG_TAG = "CalendarDay";
         private final int dayWidth = screenWidth / 4;
         private final int day_center = screenWidth / 2 - dayWidth / 2
-                - (int) (mActivity.getResources().getDimension(R.dimen.hlv_divider));
+                - (int) (mActivity.getResources().getDimension(R.dimen.normal_hlv_divider));
 
         private Calendar past = Calendar.getInstance();
         private Calendar future = Calendar.getInstance();
