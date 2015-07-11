@@ -106,7 +106,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String firstDate = dateToStringFormat(new Date());
         //For now, first day will be the day that Todo is created
         //firstDate = getNextDay(firstDate);
-        String lastDate = dateToStringFormat(todo.getDueDate());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(todo.getDueDate());
+        cal.add(Calendar.DATE, -1);
+        Date lastDay = cal.getTime();
+        String lastDate = dateToStringFormat(lastDay);
         /*
         Get list of Dates and their hours
         May need to sort the Dates before getting hours though
@@ -131,6 +135,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // Get sum of each day's hours and make list
         List<Double> hoursInDatabase = getAvailableDateHours(availableDates);
 
+//        Log.w("addToRemainBefore", hoursInDatabase.toString());
+//        Log.w("distributedBefore", distributedHours.toString());
+
         // Should combine the numbers in the two lists. If there isn't enough time in a day to fit the
         // schedule for the toDo, the database takes time from the todo on that day and moves it to others
         dist.addTimes(hoursInDatabase, distributedHours);
@@ -141,6 +148,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             distributedTime = timeInHours((int) (distributedHours.get(i) * 60));
             addTodoDate(todo_id, availableDates.get(i), 1, distributedTime, "00:00");
         }
+
+//        Log.w("addToRemain", hoursInDatabase.toString());
+//        Log.w("distributed", distributedHours.toString());
 
 //        while (!firstDayString.equals(lastDay)){
 //            Date firstDayDate = convertStringDate(firstDayString);
@@ -194,19 +204,17 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 + "' ORDER BY " + COLUMN_DATE;
         Cursor c = db.rawQuery(selectQuery, null);
         List<Integer> availableDateIds = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-        String date;
-        int dateId;
+        int dateId, lockIndex = 0;
 //        Log.w("getAvailableDates", locks);
         if (c.moveToFirst()){
             do {
-                date = c.getString(c.getColumnIndex(COLUMN_DATE));
-                cal.setTime(convertStringDate(date));
                 // Filtering out the days here based on the locks selected in addToDo
-                if (locks.charAt(cal.get(Calendar.DAY_OF_WEEK) % 7) == '1') {
+                if (locks.charAt(lockIndex) == '1') {
+//                    Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
                     dateId = c.getInt(c.getColumnIndex(KEY_ID));
                     availableDateIds.add(dateId);
                 }
+                lockIndex++;
             }while (c.moveToNext());
         }
 
