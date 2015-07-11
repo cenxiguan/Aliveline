@@ -51,15 +51,10 @@
             android:id="@+id/empty_list"
             android:text=""/>
         <ListView
-<<<<<<< HEAD
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/list1"
-            android:background="#FFFFFF"
-=======
+
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
->>>>>>> origin
             android:layout_toStartOf="@+id/add_todo_button"
             android:background="#FFFFFF"
             android:id="@android:id/list"

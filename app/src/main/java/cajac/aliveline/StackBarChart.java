@@ -1,8 +1,10 @@
 package cajac.aliveline;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import android.support.v4.app.FragmentTransaction;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -36,25 +38,28 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
             "Party Q", "Party R", "Party S", "Party T", "Party U", "Party V", "Party W", "Party X",
             "Party Y", "Party Z"
     };
+
     private BarChart mChart;
-    private SeekBar mSeekBarX, mSeekBarY;
+    private SeekBar mSeekBarX; //mSeekBarY;
     private TextView tvX, tvY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_barchart);
 
+
         tvX = (TextView) findViewById(R.id.tvXMax);
-        tvY = (TextView) findViewById(R.id.tvYMax);
+   //     tvY = (TextView) findViewById(R.id.tvYMax);
 
         mSeekBarX = (SeekBar) findViewById(R.id.seekBar1);
         mSeekBarX.setOnSeekBarChangeListener(this);
 
-        mSeekBarY = (SeekBar) findViewById(R.id.seekBar2);
-        mSeekBarY.setOnSeekBarChangeListener(this);
+       // mSeekBarY = (SeekBar) findViewById(R.id.seekBar2);
+       // mSeekBarY.setOnSeekBarChangeListener(this);
 
         mChart = (BarChart) findViewById(R.id.chart1);
         mChart.setOnChartValueSelectedListener(this);
@@ -92,7 +97,7 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
 
         // setting data
         mSeekBarX.setProgress(12);
-        mSeekBarY.setProgress(100);
+     //   mSeekBarY.setProgress(100);
 
         Legend l = mChart.getLegend();
         l.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
@@ -202,7 +207,7 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
         tvX.setText("" + (mSeekBarX.getProgress() + 1));
-        tvY.setText("" + (mSeekBarY.getProgress()));
+      //  tvY.setText("" + (mSeekBarY.getProgress()));
 
         ArrayList<String> xVals = new ArrayList<String>();
         for (int i = 0; i < mSeekBarX.getProgress() + 1; i++) {
@@ -210,12 +215,15 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
         }
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+        float val1 = 0;
+        float val2 = 0;
+        float val3 = 0;
 
         for (int i = 0; i < mSeekBarX.getProgress() + 1; i++) {
-            float mult = (mSeekBarY.getProgress() + 1);
-            float val1 = (float) (Math.random() * mult) + mult / 3;
-            float val2 = (float) (Math.random() * mult) + mult / 3;
-            float val3 = (float) (Math.random() * mult) + mult / 3;
+            //float mult = (mSeekBarY.getProgress() + 1);
+            val1 = (float) (Math.random() * 24);
+            val2 = (float) 3;
+            val3 = (float) 3;
 
             yVals1.add(new BarEntry(new float[] {
                     val1, val2, val3
@@ -223,10 +231,18 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
         }
 
         BarDataSet set1 = new BarDataSet(yVals1, "Statistics Vienna 2014");
-        set1.setColors(getColors());
+
+        float redTest = val1 + val2 + val3;
+
+        if(redTest >= 24) {
+            set1.setColors(getRed());
+        }else {
+            set1.setColors(getColors());
+        }
         set1.setStackLabels(new String[] {
                 "Births", "Divorces", "Marriages"
         });
+
 
         ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
         dataSets.add(set1);
@@ -256,9 +272,14 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
-        BarEntry entry = (BarEntry) e;
-        Log.i("VAL SELECTED",
-                "Value: " + entry.getVals()[h.getStackIndex()]);
+    //    BarEntry entry = (BarEntry) e;
+    //    Log.i("VAL SELECTED",
+    //            "Value: " + entry.getVals()[h.getStackIndex()]);
+
+
+        FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
+        addTodo a = new addTodo();
+        a.show(ft, "addTodo");
     }
 
     @Override
@@ -276,6 +297,19 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
 
         for(int i = 0; i < stacksize; i++) {
             colors[i] = ColorTemplate.VORDIPLOM_COLORS[i];
+        }
+
+        return colors;
+    }
+
+    private int[] getRed(){
+        int stacksize = 4;
+
+        // have as many colors as stack-values per entry
+        int []colors = new int[stacksize];
+
+        for(int i = 0; i < stacksize; i++) {
+            colors[i] = Color.rgb(255, 0, 0);
         }
 
         return colors;
