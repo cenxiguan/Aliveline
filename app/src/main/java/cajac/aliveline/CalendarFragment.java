@@ -78,13 +78,13 @@ public class CalendarFragment extends Fragment {
         selectedDate = CalendarDay.today().getDate();
 
         if (currentCal == null)
-            switchFrame(calMonthFrag);
+            switchFrame(new CalendarMonthFragment());
         // Needed in case the fragment disappears
-//        if(currentCal instanceof CalendarDayFragment) {
-//            switchFrame(calMonthFrag);
-//        }else {
-//            switchFrame(calDayFrag);
-//        }
+        if(currentCal instanceof CalendarDayFragment) {
+            switchFrame(new CalendarDayFragment());
+        }else {
+            switchFrame(new CalendarMonthFragment());
+        }
 
         dayOrMonth = (Switch) view.findViewById(R.id.day_month_switch);
         dayOrMonth.setChecked(false);
