@@ -179,6 +179,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         contentValues.put(COLUMN_NOTES, notes);
 
         long date_id = db.insert(TABLE_DATES, null, contentValues);
+        if (date_id == -1){
+            date_id = getDateID(date);
+        }
 
         return date_id;
     }
@@ -306,10 +309,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     //getting all the toDo's that are under a specific day
     //not sure how to accept the day name
 
-    public List<Todo> getAllToDosByDay(String givenDay) {
-
+    public List<Todo> getAllToDosByDay(Date date) {
         List<Todo> todos = new ArrayList<Todo>();
-        Date date = convertStringDate(givenDay);
         int date_id = getDateID(date);
 
 

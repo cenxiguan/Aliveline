@@ -98,8 +98,8 @@ public class HomeFragment extends Fragment{
 
     public void getTodaysList(){
         todaysList = new ArrayList<Todo>();
-        String today = dbh.dateToStringFormat(new Date());
-        todaysList = dbh.getAllToDosByDay(today);
+       // todaysList = dbh.getAllToDosByDay(today);
+        todaysList = dbh.getAllToDosByDay(new Date());
     }
 
     public void showList() {

@@ -114,7 +114,6 @@ public class Distributor {
 			removeExtra(distributedTime, extraTime);
 		}else 
 			distributeExtra(distributedTime, extraTime, posNeg);
-
 	}
 
 	public static void removeExtra(double[] arr, double extra) {
