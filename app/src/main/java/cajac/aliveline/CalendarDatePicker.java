@@ -1,11 +1,14 @@
 package cajac.aliveline;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.DatePicker;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -21,6 +24,7 @@ public class CalendarDatePicker extends DialogFragment {
     private Date mDate;
     public static final int RESULT_DATE = 0;
     public static final String DATE = "DATE";
+    private AlertDialog dialog;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -36,12 +40,18 @@ public class CalendarDatePicker extends DialogFragment {
                 sendResult(RESULT_DATE);
             }
         };
-        DatePickerDialog dialog = new DatePickerDialog(getActivity(), dateSettings, year, month, day);
-        dialog.setTitle("Pick Date");
-        dialog.getDatePicker().setCalendarViewShown(false);
-        dialog.setCanceledOnTouchOutside(true);
+        //DatePickerDialog dialog = new DatePickerDialog(getActivity(), dateSettings, year, month, day);
+        //dialog.setTitle("Pick Date");
+        //dialog.getDatePicker().setCalendarViewShown(false);
+        //dialog.getDatePicker().setSpinnersShown(true);
+        //dialog.setCanceledOnTouchOutside(true);
 
-        DatePicker datePicker = dialog.getDatePicker();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.date_picker, null);
+        builder.setView(view);
+
+        DatePicker datePicker = (DatePicker)view.findViewById(R.id.dialog_date_datePicker);
         datePicker.init(year, month, day, new DatePicker.OnDateChangedListener() {
             public void onDateChanged(DatePicker view, int year, int month,
                                       int day) {
@@ -53,6 +63,9 @@ public class CalendarDatePicker extends DialogFragment {
                 // Update argument to preserve selected value on rotation
             }
         });
+        dialog = builder.create();
+        dialog.setTitle("Pick Date");
+        dialog.setCanceledOnTouchOutside(true);
 
         return dialog;
     }

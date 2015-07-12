@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,4 +72,46 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         notifyItemRangeChanged(0, dataSet.size());
     }
 
+    //GET METHODS FOR INFORMATION FROM DATASET
+    public String getTitle(int pos){
+        return dataSet.get(pos).getTitle();
+    }
+
+    public String getDay(int pos){
+        Todo todo = dataSet.get(pos);
+        Date d = todo.getDueDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("d");
+        return sdf.format(d);
+    }
+
+    public String getMonth(int pos){
+        Todo todo = dataSet.get(pos);
+        Date d = todo.getDueDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("M");
+        return sdf.format(d);
+    }
+
+    public String getYear(int pos){
+        Todo todo = dataSet.get(pos);
+        Date d = todo.getDueDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+        return sdf.format(d);
+    }
+
+    public String getEstTime(int pos){
+        String time = dataSet.get(pos).getStartTime();
+        return time.substring(0,(time.length() - 3));
+    }
+
+    public String getWorkDays(int pos){
+        return dataSet.get(pos).getLocks();
+    }
+
+    public int getTimeUsage(int pos){
+        return dataSet.get(pos).getTimeUsage();
+    }
+
+    public int getId(int pos){
+        return (dataSet.get(pos).getId());
+    }
 }

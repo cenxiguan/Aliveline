@@ -330,6 +330,21 @@ public class MaterialCalendarView extends FrameLayout {
     }
 
     /**
+     * Set the size of each tile that makes up the calendar.
+     * Overload to allow for rectangle tiles.
+     * @param width the width of each tile in pixels
+     * @param length the length of each tile in pixels
+     */
+    public void setTileSize(int width, int length) {
+        LayoutParams p = new LayoutParams(
+                width * MonthView.DEFAULT_DAYS_IN_WEEK,
+                length * (MonthView.DEFAULT_MONTH_TILE_HEIGHT + 1)
+        );
+        p.gravity = Gravity.CENTER;
+        root.setLayoutParams(p);
+    }
+
+    /**
      * @see #setTileSize(int)
      *
      * @param tileSizeDp the new size for each tile in dips
@@ -338,6 +353,15 @@ public class MaterialCalendarView extends FrameLayout {
         setTileSize((int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, tileSizeDp, getResources().getDisplayMetrics()
         ));
+    }
+
+    public void setTileSizeDp(int tileWidthDp, int tileLengthDp) {
+        setTileSize(
+                (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, tileWidthDp, getResources().getDisplayMetrics()),
+                (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, tileLengthDp, getResources().getDisplayMetrics())
+        );
     }
 
     /**

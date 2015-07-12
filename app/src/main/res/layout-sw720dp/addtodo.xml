@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Title:" style="@style/text_style1"
         android:id="@+id/title_prompt"
+        android:maxLength="100"
         android:layout_marginLeft="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -304,6 +305,12 @@
         android:background="#FF2693FF"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/calendar_dialog"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#FF2693FF"
+        android:layout_alignParentTop="true"/>
 
     <View
         android:layout_width="fill_parent"

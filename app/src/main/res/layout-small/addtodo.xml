@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Title:" style="@style/text_style1_small"
         android:id="@+id/title_prompt"
+        android:maxLength="100"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_alignParentTop="true"

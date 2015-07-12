@@ -41,12 +41,16 @@ public class addTodo extends DialogFragment {
 
     //Initialize Variables
     private AlertDialog dialog;
+    Boolean changed = false, updated = false;
     Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
     Date today, enteredDate;
     EditText title, dueDay, dueMonth, dueYear, estTime;
     ImageButton cal,up,flat,down;
+    int providedTimeUsage = 0, providedId;
     private static final int REQUEST_DATE = 1;
+    String providedTitle = "", providedDay = "", providedMonth = "", providedYear = "", providedEstTime = "", providedWorkDays = "";
     View view;
+
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3){
@@ -57,6 +61,7 @@ public class addTodo extends DialogFragment {
         @Override
         public void afterTextChanged(Editable editable) {
             checkSubmitButtonConditions(buttonPos);
+            checkIfChangesSaved();
         }
     };
 
@@ -93,8 +98,19 @@ public class addTodo extends DialogFragment {
                 todo.setTimeUsage(getSelectedCurve());
                 todo.setLocks(makeLocks(dh.dateToStringFormat(today), dh.dateToStringFormat(enteredDate), dh));
 
-                //sending 2do to database
-                dh.createToDo(todo);
+                if(updated){
+                    todo.setId(providedId);
+                    dh.updateToDo(todo);
+
+                    if(changed){
+                        Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    //sending 2do to database
+                    dh.createToDo(todo);
+                }
             }
         });
         dialog = builder.create();
@@ -152,20 +168,32 @@ public class addTodo extends DialogFragment {
         fri = (Button)view.findViewById(R.id.button6);
         sat = (Button)view.findViewById(R.id.button7);
 
-        sun.setSelected(true);
-        mon.setSelected(true);
-        tue.setSelected(true);
-        wed.setSelected(true);
-        thu.setSelected(true);
-        fri.setSelected(true);
-        sat.setSelected(true);
-
         up = (ImageButton)view.findViewById(R.id.up_curve);
-        flat = (ImageButton)view.findViewById(R.id.no_curve);
-        down = (ImageButton)view.findViewById(R.id.down_curve);
+        flat = (ImageButton) view.findViewById(R.id.no_curve);
+        down = (ImageButton) view.findViewById(R.id.down_curve);
+
+        if(providedWorkDays.equals("")){
+            sun.setSelected(true);
+            mon.setSelected(true);
+            tue.setSelected(true);
+            wed.setSelected(true);
+            thu.setSelected(true);
+            fri.setSelected(true);
+            sat.setSelected(true);
+        } else {
+            sun.setSelected(workingDayBoolean(providedWorkDays.charAt(0)));
+            mon.setSelected(workingDayBoolean(providedWorkDays.charAt(1)));
+            tue.setSelected(workingDayBoolean(providedWorkDays.charAt(2)));
+            wed.setSelected(workingDayBoolean(providedWorkDays.charAt(3)));
+            thu.setSelected(workingDayBoolean(providedWorkDays.charAt(4)));
+            fri.setSelected(workingDayBoolean(providedWorkDays.charAt(5)));
+            sat.setSelected(workingDayBoolean(providedWorkDays.charAt(6)));
+
+            timeUsageSetting(view,providedTimeUsage);
+        }
     }
 
-    public void setOnClickListeners(View view){
+    public void setOnClickListeners(View view) {
         sun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -201,13 +229,13 @@ public class addTodo extends DialogFragment {
                 checkSubmitButtonConditions(buttonPos);
             }
         });
-                fri.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        changeSelected(fri, v);
-                        checkSubmitButtonConditions(buttonPos);
-                    }
-                });
+        fri.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeSelected(fri, v);
+                checkSubmitButtonConditions(buttonPos);
+            }
+        });
         sat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -251,6 +279,12 @@ public class addTodo extends DialogFragment {
         dueMonth = (EditText) view.findViewById(R.id.month_field);
         dueYear = (EditText) view.findViewById(R.id.year_field);
         estTime = (EditText) view.findViewById(R.id.estimated_time_field);
+
+        title.setText(providedTitle);
+        dueDay.setText(providedDay);
+        dueMonth.setText(providedMonth);
+        dueYear.setText(providedYear);
+        estTime.setText(providedEstTime);
 
         title.addTextChangedListener(textWatcher);
         dueDay.addTextChangedListener(textWatcher);
@@ -325,6 +359,25 @@ public class addTodo extends DialogFragment {
         } else {
             return "0";
         }
+    }
+
+    public void timeUsageSetting(View v, int timeUsage){
+        if(timeUsage == 1){
+            up.setSelected(true);
+            up.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_selected));
+        } else if (timeUsage == 2){
+            flat.setSelected(true);
+            flat.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_selected));
+        } else if (timeUsage == 3){
+            down.setSelected(true);
+            down.setBackground(ContextCompat.getDrawable(v.getContext(), R.drawable.time_usage_selected));
+        } else {
+            //do nothing
+        }
+    }
+
+    public boolean workingDayBoolean(char check){
+        return check == '1';
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -425,6 +478,7 @@ public class addTodo extends DialogFragment {
         }
     }
 
+
     public String makeLocks(String startDay, String endDay, DatabaseHelper dh){
         Calendar cal = Calendar.getInstance();
         int dayOfWeek =cal.get(Calendar.DAY_OF_WEEK);
@@ -439,5 +493,40 @@ public class addTodo extends DialogFragment {
             startDay = dh.getNextDay(startDay);
         }
         return locks;
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
+    ///////Extra methods for keeping track/ setting up the dialog////////
+    /////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
+    public void setInitialValues(String title, String day, String month, String year, String estTime, String workDays, int timeUsage, int id){
+        this.providedTitle = title;
+        this.providedDay = day;
+        this.providedMonth = month;
+        this.providedYear = year;
+        this.providedEstTime = estTime;
+        this.providedWorkDays = workDays;
+        this.providedTimeUsage = timeUsage;
+        this.providedId = id;
+
+        updated = true;
+    }
+
+    public void checkIfChangesSaved(){
+        String cTitle = title.getText().toString();
+        String cDay = dueDay.getText().toString();
+        String cMonth = dueMonth.getText().toString();
+        String cYear = dueYear.getText().toString();
+        String cTime = estTime.getText().toString();
+        String cWorkingDays = getSelectedDays();
+        int cUsage = getSelectedCurve();
+
+        if(providedTitle.equals(cTitle) && providedDay.equals(cDay) && providedMonth.equals(cMonth) && providedYear.equals(cYear)
+                && providedEstTime.equals(cTime) &&providedWorkDays.equals(cWorkingDays) && providedTimeUsage == cUsage){
+            changed = false;
+        } else {
+            changed = true;
+        }
     }
 }

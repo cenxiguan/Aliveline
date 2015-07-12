@@ -2,20 +2,16 @@ package cajac.aliveline;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,9 +62,14 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             KEY_TODO_ID + " INTEGER," + KEY_DATES_ID + " INTEGER," + LOCK + " INTEGER, " + COLUMN_TIME_REQUIRED + " TEXT, " +
             COLUMN_TIME_COMPLETED + " TEXT" + ")";
 
+    SharedPreferences sharedPreferences;
+    private static int maxHours;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        maxHours = sharedPreferences.getInt(context.getString(R.string.max_hours), 8);
     }
 
     @Override
@@ -102,23 +103,68 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public void addToRemainingTables(long todo_id, Todo todo){
-        String firstDayString = dateToStringFormat(new Date());
+        String firstDate = dateToStringFormat(new Date());
         //For now, first day will be the day that Todo is created
-        //firstDayString = getNextDay(firstDayString);
-        String lastDay = dateToStringFormat(todo.getDueDate());
-        int boolPos = 0;
-        String locks = todo.getLocks();
-        while (!firstDayString.equals(lastDay)){
-            Date firstDayDate = convertStringDate(firstDayString);
-            long date_id = createDate(firstDayDate, null);
-            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
-            String timeRequired = getTimeForDay(locks, lock, todo);
-            addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
-            firstDayString = getNextDay(firstDayString);
-            boolPos++;
+        //firstDate = getNextDay(firstDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(todo.getDueDate());
+        cal.add(Calendar.DATE, -1);
+        Date lastDay = cal.getTime();
+        String lastDate = dateToStringFormat(lastDay);
+        /*
+        Get list of Dates and their hours
+        May need to sort the Dates before getting hours though
+        Maybe we can just get the dates and then sort them and then just go through the list of dates
+
+         */
+
+        // Checks to see if all of the dates included in range exist.
+        // Basically try creating the new row (date) and if it fails that just means it already exists
+        checkDates(firstDate, lastDate);
+
+        // Go through dates table and select dates that are in the range and are not locked
+        // availableDates are the ids, not the dates themselves
+        // SELECT where between first and last AND where locked is 1
+        List<Integer> availableDates = getAvailableDates(firstDate, lastDate, todo.getLocks());
+        double estimatedTime = minToHours(timeInMinutes(todo.getRemainingTime()));
+
+        //Should distribute time
+        Distributor dist = new Distributor(estimatedTime, availableDates.size(), maxHours, todo.getTimeUsage());
+        List<Double> distributedHours = dist.distribute();
+
+        // Get sum of each day's hours and make list
+        List<Double> hoursInDatabase = getAvailableDateHours(availableDates);
+
+//        Log.w("addToRemainBefore", hoursInDatabase.toString());
+//        Log.w("distributedBefore", distributedHours.toString());
+
+        // Should combine the numbers in the two lists. If there isn't enough time in a day to fit the
+        // schedule for the toDo, the database takes time from the todo on that day and moves it to others
+        dist.addTimes(hoursInDatabase, distributedHours);
+
+        // Here I think we're adding the rows to the relational table
+        String distributedTime;
+        for (int i = 0; i < availableDates.size(); i++) {
+            distributedTime = timeInHours((int) (distributedHours.get(i) * 60));
+            addTodoDate(todo_id, availableDates.get(i), 1, distributedTime, "00:00");
         }
+
+//        Log.w("addToRemain", hoursInDatabase.toString());
+//        Log.w("distributed", distributedHours.toString());
+
+//        while (!firstDayString.equals(lastDay)){
+//            Date firstDayDate = convertStringDate(firstDayString);
+//            long date_id = createDate(firstDayDate, null);
+//            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
+//            String timeRequired = getTimeForDay(locks, lock, todo);
+//            addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
+//            firstDayString = getNextDay(firstDayString);
+//            boolPos++;
+//        }
     }
 
+    // Don't need because of Distributor class
+    // Keep this for now so other parts of code works
     public String getTimeForDay(String locks, int lock, Todo todo){
         int numOfDaysWorking = locks.length() - locks.replace("1","").length();
         String total_hours = todo.getStartTime();
@@ -132,12 +178,85 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }
     }
 
+    /**
+     * Makes sure that all dates between two parameters are in the database.
+     * @param firstDate
+     * @param lastDate
+     */
+    public void checkDates(String firstDate, String lastDate) {
+        // Make sure that the range will go from past to future to prevent infinite loop
+        if (convertStringDate(firstDate).after(convertStringDate(lastDate))) {
+            String temp = firstDate;
+            firstDate = lastDate;
+            lastDate = temp;
+        }
+        while(!firstDate.equals(lastDate)) {
+            Date firstDayDate = convertStringDate(firstDate);
+            createDate(firstDayDate, null);
+            firstDate = getNextDay(firstDate);
+        }
+    }
+
+    public List<Integer> getAvailableDates(String firstDate, String lastDate, String locks) {
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_DATES + " WHERE "
+                + COLUMN_DATE  + " BETWEEN '" + firstDate + "' AND '" + lastDate
+                + "' ORDER BY " + COLUMN_DATE;
+        Cursor c = db.rawQuery(selectQuery, null);
+        List<Integer> availableDateIds = new ArrayList<>();
+        int dateId, lockIndex = 0;
+//        Log.w("getAvailableDates", locks);
+        if (c.moveToFirst()){
+            do {
+                // Filtering out the days here based on the locks selected in addToDo
+                if (locks.charAt(lockIndex) == '1') {
+//                    Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
+                    dateId = c.getInt(c.getColumnIndex(KEY_ID));
+                    availableDateIds.add(dateId);
+                }
+                lockIndex++;
+            }while (c.moveToNext());
+        }
+
+        return availableDateIds;
+    }
+
+    public List<Double> getAvailableDateHours(List<Integer> availableDateIds) {
+        List<Double> availableDateHours = new ArrayList<>();
+        for (int id : availableDateIds) {
+            availableDateHours.add(getTotalTimeForDate(id));
+        }
+        return availableDateHours;
+    }
+
+    public double getTotalTimeForDate(int dateId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_TODO_DATES + " WHERE "
+                + KEY_DATES_ID + " = " + dateId;
+        Cursor c = db.rawQuery(selectQuery, null);
+        String requiredTime;
+        double sum = 0;
+        if (c.moveToFirst()) {
+            do {
+                requiredTime = c.getString(c.getColumnIndex(COLUMN_TIME_REQUIRED));
+                sum += minToHours(timeInMinutes(requiredTime));
+            }while (c.moveToNext());
+        }
+        return sum;
+    }
+
     public int timeInMinutes(String hoursString){
         String[] hours_min = hoursString.split(":");
         int hours = Integer.parseInt(hours_min[0]);
         int min = Integer.parseInt(hours_min[1]);
         min = min + hours * 60;
         return min;
+    }
+
+    private double minToHours(int minutes) {
+        double hours = minutes / 60;
+        hours += (minutes % 60) / 60.0;
+        return hours;
     }
 
     public String timeInHours(int minutes){
