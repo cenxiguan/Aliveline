@@ -3,7 +3,9 @@ package cajac.aliveline;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by Amauris on 6/3/2015.
@@ -18,6 +20,9 @@ public class Todo implements Parcelable {
     public String remainingTime;
     public String locks;
     public int mData;
+    public HashMap<String, String> relationalValues;
+    public String todaysTimeLeft;
+    String dueDateString;
 
 
     public Todo(){
@@ -46,6 +51,7 @@ public class Todo implements Parcelable {
 
     public void setDueDate(Date newDate){
         this.dueDate = newDate;
+        setDueDateString(newDate);
     }
 
 
@@ -69,7 +75,7 @@ public class Todo implements Parcelable {
         timeUsage = option;
     }
 
-    public long getId() {
+    public int getId() {
         return this.id;
     }
 
@@ -101,6 +107,30 @@ public class Todo implements Parcelable {
         return locks;
     }
 
+    public void setTodaysTimeLeft(String timeLeft){
+        this.todaysTimeLeft = timeLeft;
+    }
+
+    public String getTodaysTimeLeft(){
+        return todaysTimeLeft;
+    }
+
+    public String getDueDateString(){
+        return dueDateString;
+    }
+
+    public void setDueDateString(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy");
+        String strDate = sdf.format(date);
+        dueDateString = strDate;
+    }
+
+    public String getDateString(){
+        return dueDateString;
+    }
+
+
+
     public void writeToParcel(Parcel dest, int flags){
         dest.writeInt(mData);
     }
@@ -108,6 +138,7 @@ public class Todo implements Parcelable {
     public int describeContents(){
         return 0;
     }
+
 
     public static final Parcelable.Creator<Todo> CREATOR=
             new Parcelable.Creator<Todo>() {

@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String COLUMN_REMAINING_TIME = "time_remaining";
     //Column names for Dates table
     public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_NOTES = "notes";
     //Column names for todo_dates table
     public static final String KEY_TODO_ID = "todo_id";
     public static final String KEY_DATES_ID = "dates_id";
@@ -55,10 +56,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
-    + " TEXT" + LOCKS + " TEXT" +  ")";
+    + " TEXT, " + LOCKS + " TEXT" +  ")";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_DATE + " DATETIME UNIQUE" + ")";
+            + COLUMN_DATE + " DATETIME UNIQUE, " + COLUMN_NOTES + " TEXT" + ")";
 
     //What columns should be included in relational?
     public static final String CREATE_TODO_DATES_TABLE = "CREATE TABLE " + TABLE_TODO_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -89,7 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
 
-    public long createToDo(Todo todo, long[] days_ids) {
+    public long createToDo(Todo todo) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -109,7 +110,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String locks = todo.getLocks();
         while (!firstDayString.equals(lastDay)){
             Date firstDayDate = convertStringDate(firstDayString);
-            long date_id = createDate(firstDayDate);
+            long date_id = createDate(firstDayDate, null);
             int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
             String timeRequired = getTimeForDay(locks, lock, todo);
             addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
@@ -169,12 +170,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return day;
     }
 
-    public long createDate(Date date){
+    public long createDate(Date date, String notes){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
         String dateString = dateToStringFormat(date);
         contentValues.put(COLUMN_DATE, dateString);
+        contentValues.put(COLUMN_NOTES, notes);
 
         long date_id = db.insert(TABLE_DATES, null, contentValues);
 
@@ -192,6 +194,18 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String dateString = c.getString(c.getColumnIndex(COLUMN_DATE));
         Date date = convertStringDate(dateString);
         return date;
+    }
+    public String getNotes(String date){
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE " +
+                COLUMN_DATE + " = " + date;
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        String notes = c.getString(c.getColumnIndex(COLUMN_NOTES));
+
+        return notes;
     }
     //Testing purposes
     public List<String> getAllDates(){
@@ -216,7 +230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String dateString = dateToStringFormat(date);
         int date_id = 0;
         String selectQuery = "SELECT  * FROM " + TABLE_DATES + " WHERE "
-                + COLUMN_DATE + " = " + dateString;
+                + COLUMN_DATE + " = '" + dateString + "'";
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()){
             date_id = c.getInt(c.getColumnIndex(KEY_ID));
@@ -245,8 +259,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         String selectQuery = "SELECT  * FROM " + TABLE_TODO + " WHERE "
                 + KEY_ID + " = " + todo_id;
-
-        // Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -288,7 +300,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 todos.add(td);
             } while (c.moveToNext());
         }
-
         return todos;
     }
 
@@ -303,7 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 
         String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE "
-                + KEY_DATES_ID + " = '" + date_id + "' AND " + LOCK + " = '1'";
+                + KEY_DATES_ID + " = " + date_id + " AND " + LOCK + " = 1";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -311,7 +322,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         if (c.moveToFirst()) {
             do {
                 int todo_id = c.getInt(c.getColumnIndex(KEY_TODO_ID));
+                String timeRequired = c.getString(c.getColumnIndex(COLUMN_TIME_REQUIRED));
+                String timeCompleted = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
                 Todo td = getTodo(todo_id);
+                String timeLeftToday = getTimeLeftforToday(timeRequired, timeCompleted);
+                td.setTodaysTimeLeft(timeLeftToday);
                 todos.add(td);
             } while (c.moveToNext());
         }
@@ -339,7 +354,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 long id = c.getLong(c.getColumnIndex(KEY_ID));
                 long todo_id = c.getLong(c.getColumnIndex(KEY_TODO_ID));
                 Date firstDayDate = convertStringDate(startDay);
-                long date_id = createDate(firstDayDate);
+                long date_id = createDate(firstDayDate, null);
                 int lock = Integer.parseInt(locks.substring(lock_ind, lock_ind + 1));
                 String timeRequired = getTimeForDay(locks, lock, todo);
                 updateTodoDate(id, todo_id, date_id, lock, timeRequired, "00:00");
@@ -359,7 +374,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         while (!startDay.equals(lastDay)){
             Date firstDayDate = convertStringDate(startDay);
             String locks = todo.getLocks();
-            long date_id = createDate(firstDayDate);
+            long date_id = createDate(firstDayDate, null);
             int lock = Integer.parseInt(locks.substring(lock_ind, lock_ind + 1));
             String timeRequired = getTimeForDay(locks, lock, todo);
             addTodoDate(todo.getId(), date_id, lock, timeRequired, "00:00");
@@ -470,5 +485,14 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         values.put(COLUMN_START_TIME, todo.getStartTime());
         values.put(COLUMN_REMAINING_TIME, todo.getRemainingTime());
         return values;
+    }
+
+    private String getTimeLeftforToday(String timeRequired, String timeCompleted){
+        int timeRqdInt = timeInMinutes(timeRequired);
+        int timeCmpltInt = timeInMinutes(timeCompleted);
+        int timeLeft = timeRqdInt - timeCmpltInt;
+        int hoursLeft = timeLeft / 60;
+        int minutesLeft = timeLeft % 60;
+        return hoursLeft + " Hours, " + minutesLeft + " Minutes left ";
     }
 }

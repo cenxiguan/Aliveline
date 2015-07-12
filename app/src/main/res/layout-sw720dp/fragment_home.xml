@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:id="@+id/recycler_home"
     android:weightSum="1">
 
     <RelativeLayout
@@ -51,6 +52,7 @@
             android:textStyle="italic"
             android:id="@+id/empty_list"
             android:text=""/>
+<<<<<<< HEAD
         <ListView
 
             android:layout_width="match_parent"
@@ -63,6 +65,14 @@
             android:dividerHeight="0dp"
             android:divider="@null"
             android:listSelector="@android:color/transparent" />
+=======
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/recycler_view"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+>>>>>>> origin
 
         <ImageButton
             android:id="@+id/add_todo_button"
