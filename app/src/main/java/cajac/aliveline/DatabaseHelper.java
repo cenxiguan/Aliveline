@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -460,8 +461,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         int updated = db.update(TABLE_TODO, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo.getId()) });
         // updating row
-        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_TODO_ID + " = '"
-                + todo.getId() + "'";
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_TODO_ID + " = "
+                + todo.getId();
         String startDay = dateToStringFormat(new Date());
         startDay = getNextDay(startDay);
         String lastDay = dateToStringFormat(todo.getDueDate());
@@ -518,7 +519,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.delete(TABLE_TODO, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo_id) });
         String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " +
-                KEY_TODO_ID + " = '" + todo_id + "'";
+                KEY_TODO_ID + " = " + todo_id;
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()){
             do {
@@ -571,8 +572,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         values.put(LOCK, lock);
         values.put(COLUMN_TIME_REQUIRED, timeRequired);
         values.put(COLUMN_TIME_COMPLETED, timeCompleted);
-        long todo_date_id = db.update(TABLE_TODO_DATES, values, KEY_ID + " = ?" ,
-                new String[] {String.valueOf(id)});
+//        long todo_date_id = db.update(TABLE_TODO_DATES, values, KEY_ID + " = ?" ,
+//                new String[] {String.valueOf(id)});
+        long todo_date_id = db.update(TABLE_TODO_DATES, values, KEY_ID + " = " + id , null);
         return todo_date_id;
     }
     public void deleteTodoDateRow(long id){
