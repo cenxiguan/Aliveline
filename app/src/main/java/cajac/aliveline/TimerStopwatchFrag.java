@@ -1,14 +1,19 @@
 package cajac.aliveline;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Christine on 6/4/2015.
@@ -16,8 +21,9 @@ import android.widget.Chronometer;
  */
 public class TimerStopwatchFrag extends Fragment implements View.OnClickListener {
 
-    private Chronometer chronometer;
     Button start, reset, edit;
+    private Chronometer chronometer;
+    private static final int REQUEST_INT = 2;
     long timeWhenStopped = 0;
 
     @Override
@@ -64,14 +70,25 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
                 start.setText("START");
                 break;
             case R.id.edit_button:
+                timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
                 chronometer.stop();
                 start.setText("START");
 
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 pickTime a = new pickTime();
                 a.show(ft, "pickTime");
-                //chronometer.setBase(SystemClock.elapsedRealtime());
+                a.setTargetFragment(this, REQUEST_INT);
                 break;
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Make sure fragment codes match up
+        if (requestCode == REQUEST_INT) {
+            long timerTime = data.getLongExtra("TIMER_TIME", 0);
+            Log.e("", "Timer time: " + timerTime);
+            chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
+            timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
         }
     }
 }

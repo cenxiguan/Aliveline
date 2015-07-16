@@ -348,8 +348,8 @@ public class CalendarFragment extends Fragment {
 
         private void createRecyclerView(){
             dbh = new DatabaseHelper(getActivity());
-            String selectedDateStr = dbh.dateToStringFormat(selectedDate);
-            recTodos = dbh.getAllToDosByDay(selectedDateStr);
+            //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
+            recTodos = dbh.getAllToDosByDay(selectedDate);
             todosRecyclerV = (RecyclerView)dayView.findViewById(R.id.toDoList);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
             todosRecyclerV.setLayoutManager(layoutManager);
@@ -358,10 +358,10 @@ public class CalendarFragment extends Fragment {
         }
 
         public void udpdateRecyclerAdapter(){
-            String selectedDateStr = dbh.dateToStringFormat(selectedDate);
+            //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
             recTodos.clear();
             recAdapter.notifyDataSetChanged();
-            recTodos.addAll(dbh.getAllToDosByDay(selectedDateStr));
+            recTodos.addAll(dbh.getAllToDosByDay(selectedDate));
             recAdapter.notifyItemRangeChanged(0, recTodos.size());
         }
 
