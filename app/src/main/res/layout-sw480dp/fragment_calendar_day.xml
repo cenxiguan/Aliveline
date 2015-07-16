@@ -32,13 +32,12 @@
         android:paddingBottom="@dimen/normal_hlv_divider"
         android:paddingLeft="20dp">
 
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:id="@+id/toDoList"
-            android:background="#FFFFFF">
-
-        </ListView>
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
     </LinearLayout>
 

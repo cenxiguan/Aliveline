@@ -16,7 +16,7 @@ public final class DayViewFacade {
 
     private Drawable backgroundDrawable = null;
     private Drawable selectionDrawable = null;
-    private final LinkedList<Span> spans = new LinkedList<>();
+    private final LinkedList<Span> spans = new LinkedList<Span>();
 
     public DayViewFacade() {
         isDecorated = false;
