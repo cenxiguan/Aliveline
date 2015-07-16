@@ -39,7 +39,9 @@
                     android:src="@drawable/time_circle"
                     android:layout_width="190dp"
                     android:layout_height="190dp"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:id="@+id/timer_circle"
+                    android:layout_centerHorizontal="true"/>
                 <Chronometer
                     android:id="@+id/chronometer"
                     android:format="%s"
@@ -58,6 +60,15 @@
                     android:background="@android:color/transparent"
                     android:layout_marginTop="120dp"
                     android:layout_centerHorizontal="true"/>
+                <Button
+                    android:text="SUBMIT"
+                    android:id="@+id/submit_button"
+                    android:layout_width="75dp"
+                    android:layout_height="40dp"
+                    android:textColor="#ff0000"
+                    android:background="@drawable/timer_submit"
+                    android:layout_marginLeft="70dp"
+                    android:layout_toRightOf="@+id/timer_circle" />
             </RelativeLayout>
         </FrameLayout>
     </LinearLayout>
