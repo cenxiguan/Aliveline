@@ -1,5 +1,8 @@
+
+
 package cajac.aliveline;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -13,28 +16,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.BarChart;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * Created by Christine on 6/1/2015.
  * Fragment for the first tab: HOME
  * layout file in fragment_home.xml
  */
+
 public class HomeFragment extends Fragment{
+
     DatabaseHelper dbh;
     List<Todo> todaysList;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     TextView noTodos;
+
+    private BarChart mChart;
+
+    //this will be replaced by actual dates from the database i think
+    protected String[] mMonths = new String[] {
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
+    };
+
     private View rootView;
     long days_ids[];
+
 
 
     @Override
@@ -59,9 +77,18 @@ public class HomeFragment extends Fragment{
             public void onClick(View v) {
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 addTodo a = new addTodo();
-                a.show(ft,"addTodo");
+                a.show(ft, "addTodo");
             }
         });
+        final Intent intent1= new Intent(getActivity(), StackBarChart.class);
+        Button button = (Button)rootView.findViewById(R.id.button8);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(intent1);
+            }
+        });
+
 
 
         return rootView;
@@ -123,8 +150,8 @@ public class HomeFragment extends Fragment{
 
     public void getTodaysList(){
         todaysList = new ArrayList<Todo>();
-        String today = dbh.dateToStringFormat(new Date());
-        todaysList = dbh.getAllToDosByDay(today);
+       // todaysList = dbh.getAllToDosByDay(today);
+        todaysList = dbh.getAllToDosByDay(new Date());
     }
 
     public void showList() {
@@ -140,4 +167,9 @@ public class HomeFragment extends Fragment{
 
         super.onSaveInstanceState(savedInstanceState);
     }
+
+
+
+
+
 }

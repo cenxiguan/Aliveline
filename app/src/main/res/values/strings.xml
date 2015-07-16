@@ -11,6 +11,9 @@
 
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
+    <string name="title_activity_bargraph_landscape">BargraphLandscapeActivity</string>
+    <string name="title_activity_stack_bar_chart">StackBarChart</string>
+    <string name="title_activity_home">HomeActivity</string>
 
     <string name="set_time">Set Time</string>
 

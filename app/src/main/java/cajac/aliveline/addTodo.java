@@ -104,6 +104,7 @@ public class addTodo extends DialogFragment {
 
                     if(changed){
                         Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+
                     } else {
                         Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
                     }

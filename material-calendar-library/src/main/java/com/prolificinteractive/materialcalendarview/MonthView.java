@@ -35,8 +35,8 @@ class MonthView extends LinearLayout implements View.OnClickListener {
 
     private Callbacks callbacks;
 
-    private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
-    private final ArrayList<DayView> monthDayViews = new ArrayList<>();
+    private final ArrayList<WeekDayView> weekDayViews = new ArrayList<WeekDayView>();
+    private final ArrayList<DayView> monthDayViews = new ArrayList<DayView>();
 
     private final CalendarDay month;
     private int firstDayOfWeek;
@@ -49,7 +49,7 @@ class MonthView extends LinearLayout implements View.OnClickListener {
 
     private boolean showOtherDates = false;
 
-    private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
+    private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<DecoratorResult>();
 
 
     public MonthView(Context context, CalendarDay month, int firstDayOfWeek) {

@@ -86,7 +86,10 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onPageScrollStateChanged(int arg0) {
             }
+
+
         });
+
 
         //setting orientation
         if(isScreenLarge()) {
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements
 
         SharedPreferences sharedPreferences = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
 
     }
 

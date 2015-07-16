@@ -7,7 +7,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -17,6 +19,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".addTodo"
+            android:theme="@style/AppTheme.BehindTheme" />
+        <activity
+            android:name=".StackBarChart"
+            android:label="@string/title_activity_stack_bar_chart" >
         </activity>
     </application>
 
