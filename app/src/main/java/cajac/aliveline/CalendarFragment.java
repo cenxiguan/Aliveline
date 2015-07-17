@@ -10,6 +10,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
+
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -283,6 +287,11 @@ public class CalendarFragment extends Fragment {
         private View oldView;
         private ViewGroup container;
 
+        private DatabaseHelper dbh;
+        private RecyclerView todosRecyclerV;
+        private RecyclerView.Adapter recAdapter;
+        private List<Todo> recTodos;
+
         public CalendarDayFragment() {}
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -295,7 +304,7 @@ public class CalendarFragment extends Fragment {
             future.setTime(selectedDate);
             future.add(Calendar.DAY_OF_YEAR, 30);
 
-            List<Date> items = new ArrayList<>();
+            List<Date> items = new ArrayList<Date>();
 
             for(int i = 1; i <= 61; i++) {
                 items.add(past.getTime());
@@ -338,7 +347,28 @@ public class CalendarFragment extends Fragment {
                 }
             });
 
+            createRecyclerView();
+
             return dayView;
+        }
+
+        private void createRecyclerView(){
+            dbh = new DatabaseHelper(getActivity());
+            //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
+            recTodos = dbh.getAllToDosByDay(selectedDate);
+            todosRecyclerV = (RecyclerView)dayView.findViewById(R.id.toDoList);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+            todosRecyclerV.setLayoutManager(layoutManager);
+            recAdapter = new CardAdapter(recTodos);
+            todosRecyclerV.setAdapter(recAdapter);
+        }
+
+        public void udpdateRecyclerAdapter(){
+            //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
+            recTodos.clear();
+            recAdapter.notifyDataSetChanged();
+            recTodos.addAll(dbh.getAllToDosByDay(selectedDate));
+            recAdapter.notifyItemRangeChanged(0, recTodos.size());
         }
 
 
@@ -381,7 +411,12 @@ public class CalendarFragment extends Fragment {
                 return;
             }
             selectedDate = date;
+<<<<<<< HEAD
             oldView.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.hlv_item_unselected, null));
+=======
+            udpdateRecyclerAdapter();
+            oldView.setBackgroundColor(getResources().getColor(R.color.day_item));
+>>>>>>> master
             oldView = view;
             view.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
             selectedPosition = position;

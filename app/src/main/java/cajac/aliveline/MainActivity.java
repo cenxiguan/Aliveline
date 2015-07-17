@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(mAdapter);
+        viewPager.setOffscreenPageLimit(3);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -89,7 +90,10 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onPageScrollStateChanged(int arg0) {
             }
+
+
         });
+
 
         //setting orientation
         if(isScreenLarge()) {
@@ -101,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements
 
         SharedPreferences sharedPreferences = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
 
     }
 
