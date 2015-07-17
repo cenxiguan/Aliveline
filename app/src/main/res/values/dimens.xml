@@ -39,10 +39,10 @@
     <dimen name="small_hlv_divider">10dp</dimen>
 
     <!-- Normal calendar -->
-    <dimen name="normal_hlv_divider">20dp</dimen>
+    <dimen name="normal_hlv_divider">15dp</dimen>
 
     <!-- Large calendar -->
-    <dimen name="large_hlv_divider">30dp</dimen>
+    <dimen name="large_hlv_divider">20dp</dimen>
 
 
 

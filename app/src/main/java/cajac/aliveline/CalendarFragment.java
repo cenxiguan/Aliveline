@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -62,6 +63,7 @@ public class CalendarFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
@@ -267,9 +269,11 @@ public class CalendarFragment extends Fragment {
 
         private static final String LOG_TAG = "CalendarDay";
         private final int dayWidth = screenWidth / 4;
-        private final int day_center = screenWidth / 2 - dayWidth / 2
-                - (int) (mActivity.getResources().getDimension(R.dimen.normal_hlv_divider));
+        private final int dayCenter = screenWidth / 2 - dayWidth / 2;
 
+        private final String[] DAYS_OF_WEEK = new String[] {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+        private final String[] MONTHS_OF_YEAR = new String[] {"January", "February", "March", "April",
+                "May", "June", "July", "August", "September", "October", "November", "December" };
         private Calendar past = Calendar.getInstance();
         private Calendar future = Calendar.getInstance();
         private int head;
@@ -302,14 +306,14 @@ public class CalendarFragment extends Fragment {
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
 
-            mAdapter = new InfiniteAdapter( mActivity, R.layout.test_item_1, android.R.id.text1, items );
+            mAdapter = new InfiniteAdapter( mActivity, R.layout.hlv_item, items );
             listView.setHeaderDividersEnabled(true);
             listView.setFooterDividersEnabled(true);
             listView.setOnItemClickListener(this);
             listView.setAdapter(mAdapter);
 
             selectedPosition = todayPosition;
-            listView.setSelectionFromLeft(selectedPosition, day_center); //Zooms and aligns center
+            listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
 
             listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
@@ -377,10 +381,10 @@ public class CalendarFragment extends Fragment {
                 return;
             }
             selectedDate = date;
-            oldView.setBackgroundColor(getResources().getColor(R.color.day_item));
+            oldView.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.hlv_item_unselected, null));
             oldView = view;
-            view.setBackgroundColor(getResources().getColor(R.color.selected));
-
+            view.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+            selectedPosition = position;
 //            TextView txt = (TextView) dayView.findViewById(R.id.txt);
 //            txt.setText(formatter.format(date));
             listView.post(new ScrollRunnable(position));
@@ -401,7 +405,7 @@ public class CalendarFragment extends Fragment {
             }
 
             public void run() {
-                listView.smoothScrollToPositionFromLeft(position, day_center, milliseconds);
+                listView.smoothScrollToPositionFromLeft(position, dayCenter, milliseconds);
             }
         }
 
@@ -425,10 +429,11 @@ public class CalendarFragment extends Fragment {
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
 
-            mAdapter = new InfiniteAdapter( mActivity, R.layout.test_item_1, android.R.id.text1, items );
+            mAdapter = new InfiniteAdapter( mActivity, R.layout.hlv_item, items );
             listView.setAdapter(mAdapter);
+            selectedPosition = todayPosition;
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
-            listView.setSelectionFromLeft(selectedPosition, day_center); //Zooms and aligns center
+            listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
         }
 
         private class InfiniteAdapter extends ArrayAdapter<Date> {
@@ -442,13 +447,12 @@ public class CalendarFragment extends Fragment {
 
             Animation animation;
 
-            public InfiniteAdapter( Context context, int resourceId, int textViewResourceId, List<Date> objects ) {
-                super( context, resourceId, textViewResourceId, objects );
+            public InfiniteAdapter( Context context, int resourceId, List<Date> objects ) {
+                super( context, resourceId, objects );
                 mInflater = LayoutInflater.from( context );
                 mContext = context;
                 animation = AnimationUtils.loadAnimation(mContext, R.anim.push_up_in);
                 mResource = resourceId;
-                mTextResId = textViewResourceId;
                 mItems = objects;
             }
 
@@ -474,23 +478,42 @@ public class CalendarFragment extends Fragment {
 
                 if ( position == selectedPosition) {
                     oldView = convertView;
-                    convertView.setBackgroundColor(getResources().getColor(R.color.selected));
-                } else
-                    convertView.setBackgroundColor(getResources().getColor(R.color.day_item));
+                    convertView.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+//                    setTextColors(itemMonth, dayOfMonth, year, android.R.color.holo_orange_dark);
+                } else {
+                    convertView.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
+//                    setTextColors(itemMonth, dayOfMonth, year, R.color.selected);
+                }
 
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(getItem(position % mItems.size()));
 
-                TextView textView = (TextView) convertView.findViewById( mTextResId );
-                textView.setText( formatter.format(getItem( position%mItems.size() )) );
+                TextView dayOfWeek = (TextView) convertView.findViewById(R.id.day_of_week);
+                dayOfWeek.setText(DAYS_OF_WEEK[cal.get(Calendar.DAY_OF_WEEK) - 1]);
+
+                TextView itemMonth = (TextView) convertView.findViewById(R.id.item_month);
+                itemMonth.setText( MONTHS_OF_YEAR[cal.get(Calendar.MONTH)] );
+
+                TextView dayOfMonth = (TextView) convertView.findViewById(R.id.day_of_month);
+                dayOfMonth.setText( String.valueOf(cal.get(Calendar.DAY_OF_MONTH)) );
+
+                TextView year = (TextView) convertView.findViewById(R.id.year);
+                year.setText( String.valueOf(cal.get(Calendar.YEAR)) );
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
                 params.width = dayWidth;
 
-//                Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.push_left_in);
-//
-//                animation.setDuration(300);
+
+
                 convertView.startAnimation(animation);
 
                 return convertView;
+            }
+
+            private void setTextColors(TextView month, TextView dayOfMonth, TextView year, int color) {
+                month.setTextColor(color);
+                dayOfMonth.setTextColor(color);
+                year.setTextColor(color);
             }
 
             @Override

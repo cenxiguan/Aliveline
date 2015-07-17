@@ -4,15 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/holo_orange_light">
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:paddingTop="30dp"
+        android:paddingTop="@dimen/normal_hlv_divider"
         android:paddingBottom="@dimen/normal_hlv_divider"
         android:orientation="vertical" >
-
         <it.sephiroth.android.library.widget.HListView
             android:id="@+id/hListView1"
             android:layout_width="match_parent"
