@@ -411,17 +411,11 @@ public class CalendarFragment extends Fragment {
                 return;
             }
             selectedDate = date;
-<<<<<<< HEAD
-            oldView.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.hlv_item_unselected, null));
-=======
+            oldView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
             udpdateRecyclerAdapter();
-            oldView.setBackgroundColor(getResources().getColor(R.color.day_item));
->>>>>>> master
             oldView = view;
             view.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
             selectedPosition = position;
-//            TextView txt = (TextView) dayView.findViewById(R.id.txt);
-//            txt.setText(formatter.format(date));
             listView.post(new ScrollRunnable(position));
         }
 
@@ -538,7 +532,12 @@ public class CalendarFragment extends Fragment {
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
                 params.width = dayWidth;
 
+                if ( position == selectedPosition) {
+                    setTextColors(itemMonth, dayOfMonth, year, getResources().getColor(android.R.color.tertiary_text_light));
 
+                } else {
+                    setTextColors(itemMonth, dayOfMonth, year, getResources().getColor(android.R.color.secondary_text_light));
+                }
 
                 convertView.startAnimation(animation);
 
