@@ -6,14 +6,15 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by alexsuk on 5/30/15.
@@ -290,6 +291,22 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return day;
     }
 
+    public Set<Date> getAllDeadlines() {
+        SQLiteDatabase db = getReadableDatabase();
+        Set<Date> deadlines = new HashSet<>();
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO ;
+        Cursor c = db.rawQuery(selectQuery, null);
+        String date;
+
+        if (c.moveToFirst()){
+            do {
+                date = c.getString(c.getColumnIndex(COLUMN_DUE_DATE));
+                deadlines.add(convertStringDate(date));
+            }while (c.moveToNext());
+        }
+        return deadlines;
+    }
+
     public long createDate(Date date, String notes){
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -518,7 +535,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void deleteToDo(long todo_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TODO, KEY_ID + " = ?",
-                new String[] { String.valueOf(todo_id) });
+                new String[]{String.valueOf(todo_id)});
         String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " +
                 KEY_TODO_ID + " = " + todo_id;
         Cursor c = db.rawQuery(selectQuery, null);

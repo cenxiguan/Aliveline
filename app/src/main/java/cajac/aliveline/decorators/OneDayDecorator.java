@@ -1,4 +1,4 @@
-package com.prolificinteractive.materialcalendarview.decorators;
+package cajac.aliveline.decorators;
 
 import android.graphics.Typeface;
 import android.text.style.RelativeSizeSpan;
