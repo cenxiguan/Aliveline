@@ -81,4 +81,18 @@
         <item name="android:gravity" >center</item>
         <item name="android:textSize" >10dp</item>
     </style>
+
+    <style name="calendar_date_small">
+        <item name="android:textSize" >10sp</item>
+    </style>
+    <style name="calendar_date_normal">
+        <item name="android:textSize" >12sp</item>
+    </style>
+    <style name="calendar_date_large">
+        <item name="android:textSize" >15sp</item>
+    </style>
+    <style name="calendar_date_xlarge">
+        <item name="android:textSize" >10sp</item>
+    </style>
+
 </resources>

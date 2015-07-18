@@ -10,10 +10,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
-
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,8 +29,6 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateChangedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
-import com.prolificinteractive.materialcalendarview.decorators.Deadline;
-import com.prolificinteractive.materialcalendarview.decorators.OneDayDecorator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +37,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import cajac.aliveline.decorators.DayOutOfMonth;
+import cajac.aliveline.decorators.Deadline;
+import cajac.aliveline.decorators.OneDayDecorator;
 import it.sephiroth.android.library.widget.AbsHListView;
 import it.sephiroth.android.library.widget.AdapterView;
 import it.sephiroth.android.library.widget.HListView;
@@ -86,11 +85,11 @@ public class CalendarFragment extends Fragment {
         if (currentCal == null)
             switchFrame(new CalendarMonthFragment());
         // Needed in case the fragment disappears
-        if(currentCal instanceof CalendarDayFragment) {
-            switchFrame(new CalendarDayFragment());
-        }else {
-            switchFrame(new CalendarMonthFragment());
-        }
+//        if(currentCal instanceof CalendarDayFragment) {
+//            switchFrame(new CalendarDayFragment());
+//        }else {
+//            switchFrame(new CalendarMonthFragment());
+//        }
 
         dayOrMonth = (Switch) view.findViewById(R.id.day_month_switch);
         dayOrMonth.setChecked(false);
@@ -154,7 +153,10 @@ public class CalendarFragment extends Fragment {
         private TextView textView;
         private final DateFormat FORMATTER = SimpleDateFormat.getDateInstance();
         private final int REQUEST_DATE = 0;
+
+        private Calendar cal = Calendar.getInstance();
         private OneDayDecorator oneDayDecorator = new OneDayDecorator();
+        private DayOutOfMonth dayOutOfMonth = new DayOutOfMonth();
 
         public CalendarMonthFragment() {}
 
@@ -182,8 +184,18 @@ public class CalendarFragment extends Fragment {
                 }
             });
             int tileWidth = screenWidth / (28/3);
-            int tileLength = (int)(screenHeight * (5.0/108));
+            int tileLength = (int)(screenHeight * (5.0/105));
             calendarView.setTileSize(tileWidth, tileLength);
+
+            DatabaseHelper dbh = new DatabaseHelper(getActivity());
+            List<Todo> test = dbh.getAllToDos();
+            String dates = "";
+            for(Todo td : test) {
+                dates += td.getTitle() + ": " + td.getDueDateString() + "\n";
+            }
+
+            TextView textView = (TextView) view.findViewById(R.id.textview);
+            textView.setText(dates);
 //            int tileLength = (screenHeight / 2) * (5 / 6) / 9;
 
 //            Button save = (Button) view.findViewById(R.id.save);
@@ -200,10 +212,14 @@ public class CalendarFragment extends Fragment {
 //            });
 
             calendarView.addDecorators(
+                    dayOutOfMonth,
                     oneDayDecorator,
-                    new Deadline(tileWidth, tileLength)
+                    new Deadline(getActivity(), tileWidth, tileLength)
             );
             oneDayDecorator.setDate(selectedDate);
+            cal.setTime(selectedDate);
+            dayOutOfMonth.setMonth(cal.get(Calendar.MONTH));
+
             calendarView.invalidateDecorators();
 
             return view;
@@ -220,7 +236,10 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
-//            Toast.makeText(getActivity(), FORMATTER.format(date.getDate()), Toast.LENGTH_SHORT).show();
+            dayOutOfMonth.setMonth(date.getMonth());
+            widget.removeDecorator(dayOutOfMonth);
+            widget.addDecorator(dayOutOfMonth);
+            widget.invalidateDecorators();
         }
 
         @Override
@@ -259,7 +278,9 @@ public class CalendarFragment extends Fragment {
 
         public void resetToToday() {
             selectedDate = today;
+            cal.setTime(selectedDate);
             oneDayDecorator.setDate(selectedDate);
+//            dayOutOfMonth.setMonth(cal.get(Calendar.MONTH));
             calendarView.invalidateDecorators();
             calendarView.setSelectedDate(selectedDate);
         }
@@ -397,10 +418,6 @@ public class CalendarFragment extends Fragment {
             // Deserialize API response and then construct new objects to append to the adapter
         }
 
-        private void scrollList() {
-            listView.smoothScrollBy(1500, 300);
-        }
-
         @Override
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
             Date date = mAdapter.getItem(position);
@@ -413,7 +430,9 @@ public class CalendarFragment extends Fragment {
             selectedDate = date;
             oldView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
             udpdateRecyclerAdapter();
+            setTextColors(oldView, getResources().getColor(R.color.primary_text));
             oldView = view;
+            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
             view.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
             selectedPosition = position;
             listView.post(new ScrollRunnable(position));
@@ -461,8 +480,20 @@ public class CalendarFragment extends Fragment {
             mAdapter = new InfiniteAdapter( mActivity, R.layout.hlv_item, items );
             listView.setAdapter(mAdapter);
             selectedPosition = todayPosition;
+            udpdateRecyclerAdapter();
+            setTextColors(oldView, getResources().getColor(R.color.primary_text));
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
+            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
             listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
+        }
+
+        protected void setTextColors(View dayItem, int color) {
+            TextView itemMonth = (TextView) dayItem.findViewById(R.id.item_month);
+            TextView dayOfMonth = (TextView) dayItem.findViewById(R.id.day_of_month);
+            TextView year = (TextView) dayItem.findViewById(R.id.year);
+            itemMonth.setTextColor(color);
+            dayOfMonth.setTextColor(color);
+            year.setTextColor(color);
         }
 
         private class InfiniteAdapter extends ArrayAdapter<Date> {
@@ -471,7 +502,6 @@ public class CalendarFragment extends Fragment {
             private LayoutInflater mInflater;
             private Context mContext;
             private int mResource;
-            private int mTextResId;
             ViewGroup parent;
 
             Animation animation;
@@ -497,9 +527,7 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public View getView( int position, View convertView, ViewGroup parent ) {
-//                Log.w("getView", "Testing");
                 this.parent = parent;
-//                position%=mItems.size();
 
                 if( null == convertView ) {
                     convertView = mInflater.inflate( mResource, parent, false );
@@ -508,10 +536,8 @@ public class CalendarFragment extends Fragment {
                 if ( position == selectedPosition) {
                     oldView = convertView;
                     convertView.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
-//                    setTextColors(itemMonth, dayOfMonth, year, android.R.color.holo_orange_dark);
                 } else {
                     convertView.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
-//                    setTextColors(itemMonth, dayOfMonth, year, R.color.selected);
                 }
 
                 Calendar cal = Calendar.getInstance();
@@ -533,21 +559,14 @@ public class CalendarFragment extends Fragment {
                 params.width = dayWidth;
 
                 if ( position == selectedPosition) {
-                    setTextColors(itemMonth, dayOfMonth, year, getResources().getColor(android.R.color.tertiary_text_light));
-
+                    setTextColors(convertView, getResources().getColor(R.color.secondary_text));
                 } else {
-                    setTextColors(itemMonth, dayOfMonth, year, getResources().getColor(android.R.color.secondary_text_light));
+                    setTextColors(convertView, getResources().getColor(R.color.primary_text));
                 }
 
                 convertView.startAnimation(animation);
 
                 return convertView;
-            }
-
-            private void setTextColors(TextView month, TextView dayOfMonth, TextView year, int color) {
-                month.setTextColor(color);
-                dayOfMonth.setTextColor(color);
-                year.setTextColor(color);
             }
 
             @Override
