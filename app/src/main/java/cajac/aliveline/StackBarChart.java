@@ -22,6 +22,8 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Highlight;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by alexsuk on 6/22/15.
@@ -214,6 +216,10 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
             xVals.add(mMonths[i % mMonths.length]);
         }
 
+        Set<Integer> redBars = new HashSet<Integer>();
+        int barCounter = 1;
+        int totalValues = 0;
+
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
         float val1 = 0;
         float val2 = 0;
@@ -225,20 +231,27 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
             val2 = (float) 3;
             val3 = (float) 3;
 
-            yVals1.add(new BarEntry(new float[] {
+            yVals1.add(new BarEntry(new float[]{
                     val1, val2, val3
             }, i));
+
+            float stackTotal = val1 + val2 + val3;
+
+
+            if (stackTotal >= 24) {
+                redBars.add(barCounter);
+            }
+            barCounter = barCounter + 1;
+            totalValues = totalValues + 3;
         }
+
+
+
+
 
         BarDataSet set1 = new BarDataSet(yVals1, "Statistics Vienna 2014");
-
-        float redTest = val1 + val2 + val3;
-
-        if(redTest >= 24) {
-            set1.setColors(getRed());
-        }else {
-            set1.setColors(getColors());
-        }
+        getColors(set1, redBars, totalValues, barCounter);
+    //      getColors(set1);
         set1.setStackLabels(new String[] {
                 "Births", "Divorces", "Marriages"
         });
@@ -288,32 +301,39 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
 
     }
 
-    private int[] getColors() {
+    private void getColors(BarDataSet set, Set<Integer> redBars, int totalYBars, int totalLength) {
 
-        int stacksize = 3;
+        int barLengthCounter = 1;
 
-        // have as many colors as stack-values per entry
-        int []colors = new int[stacksize];
+        int []colors = new int[totalYBars];
 
-        for(int i = 0; i < stacksize; i++) {
-            colors[i] = ColorTemplate.VORDIPLOM_COLORS[i];
+        int colorsCounter = 0;
+
+        //set all the colors at once for the entire colors array (which is the size of the total number of bars)
+
+        for(int i = 0; i < totalLength - 1; i++) {
+            //if I am on a stack that should be red...
+            if(redBars.contains(barLengthCounter)) {
+                for(int j = 0; j < 3; j++) {
+                    colors[colorsCounter] = Color.rgb(255,0,0);
+                    colorsCounter++;
+                }
+                barLengthCounter = barLengthCounter + 1;
+            }else {
+                for(int j = 0; j < 3; j++) {
+                    colors[colorsCounter] = ColorTemplate.VORDIPLOM_COLORS[j];
+                    colorsCounter++;
+                }
+                barLengthCounter = barLengthCounter + 1;
+            }
         }
+        colorsCounter = colorsCounter - 1;
 
-        return colors;
+        set.setColors(colors);
+
     }
 
-    private int[] getRed(){
-        int stacksize = 4;
 
-        // have as many colors as stack-values per entry
-        int []colors = new int[stacksize];
-
-        for(int i = 0; i < stacksize; i++) {
-            colors[i] = Color.rgb(255, 0, 0);
-        }
-
-        return colors;
-    }
 
     public void onBackPressed() {
         super.onBackPressed();
