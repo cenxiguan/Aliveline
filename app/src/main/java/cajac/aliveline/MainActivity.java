@@ -1,13 +1,15 @@
 package cajac.aliveline;
 
 //import android.app.ActionBar;
-import android.support.v7.app.ActionBar;
-import android.app.FragmentTransaction;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
 /* may be helpful to look into sliding tabs in the future
@@ -52,10 +54,13 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(mAdapter);
+        viewPager.setOffscreenPageLimit(3);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
+//        actionBar.setBackgroundDrawable();
+        actionBar.setStackedBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dark_primary)));
 
         // Adding Tabs with Icons
         for (int i=0; i < tabs.length; i++){
@@ -98,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
+        SharedPreferences sharedPreferences = this.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
 
     }

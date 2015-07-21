@@ -104,6 +104,7 @@ public class addTodo extends DialogFragment {
 
                     if(changed){
                         Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+
                     } else {
                         Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
                     }
@@ -432,7 +433,8 @@ public class addTodo extends DialogFragment {
         }
     }
 
-    public boolean validDate(int date, int month, int year){
+    public boolean validDate(int recievedDate, int month, int year){
+        int date = recievedDate - 1;
         switch(month){
             case 1:
             case 3:

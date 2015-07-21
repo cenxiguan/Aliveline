@@ -2,7 +2,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="hlv_divider">20dp</dimen>
 
     <!-- Small addTodo -->
     <dimen name="small_image_button_dimens">50dp</dimen>
@@ -35,4 +34,16 @@
     <dimen name="xlarge_image_button_spacing">15dp</dimen>
     <dimen name="xlarge_text_spacing">32dp</dimen>
     <dimen name="xlarge_button_elevation">6dp</dimen>
+
+    <!-- Small calendar -->
+    <dimen name="small_hlv_divider">10dp</dimen>
+
+    <!-- Normal calendar -->
+    <dimen name="normal_hlv_divider">15dp</dimen>
+
+    <!-- Large calendar -->
+    <dimen name="large_hlv_divider">20dp</dimen>
+
+
+
 </resources>

@@ -1,3 +1,6 @@
+package cajac.aliveline;
+
+
 /**
  * Created by Chungyuk Takahashi on 7/6/2015.
  */
@@ -271,4 +274,5 @@ public class Distributor {
         }
         return sum;
     }
+
 }
