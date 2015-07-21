@@ -21,7 +21,7 @@
                 <TextView
                     android:text="Title Goes Here"
                     android:id="@+id/title_of_todo"
-                    android:textSize="20sp"
+                    android:textSize="25sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#FFFFFF"
@@ -30,6 +30,7 @@
                     android:layout_marginBottom="40dp"/>
                 <Button
                     android:text="START"
+                    android:textSize="18sp"
                     android:id="@+id/start_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -44,6 +45,7 @@
                     android:layout_centerHorizontal="true" />
                 <Button
                     android:text="RESET"
+                    android:textSize="18sp"
                     android:id="@+id/reset_button"
                     android:layout_toRightOf="@+id/divider_view"
                     android:layout_alignTop="@+id/start_button"
@@ -86,6 +88,7 @@
                     android:layout_centerHorizontal="true" />
                 <Button
                     android:text="EDIT TIME"
+                    android:textSize="18sp"
                     android:id="@+id/edit_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
