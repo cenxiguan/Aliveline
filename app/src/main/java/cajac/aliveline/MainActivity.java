@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
 //        actionBar.setBackgroundDrawable();
-        actionBar.setStackedBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dark_primary)));
+        actionBar.setStackedBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
 
         // Adding Tabs with Icons
         for (int i=0; i < tabs.length; i++){
