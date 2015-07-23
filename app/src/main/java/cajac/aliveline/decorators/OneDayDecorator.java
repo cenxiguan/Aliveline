@@ -31,7 +31,7 @@ public class OneDayDecorator implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
-        view.addSpan(new ForegroundColorSpan(Color.parseColor("#727272")));
+        view.addSpan(new ForegroundColorSpan(Color.parseColor("#FFFFFF")));
         view.addSpan(new StyleSpan(Typeface.BOLD));
         view.addSpan(new RelativeSizeSpan(1.4f));
     }

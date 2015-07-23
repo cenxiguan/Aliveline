@@ -9,29 +9,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="125dp"
-        android:paddingTop="@dimen/small_hlv_divider"
-        android:paddingBottom="@dimen/small_hlv_divider"
+        android:paddingTop="@dimen/normal_hlv_divider"
+        android:paddingBottom="@dimen/normal_hlv_divider"
         android:orientation="vertical" >
 
         <it.sephiroth.android.library.widget.HListView
             android:id="@+id/hListView1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/small_hlv_divider"
-            android:paddingBottom="@dimen/small_hlv_divider"
+            android:paddingTop="@dimen/normal_hlv_divider"
+            android:paddingBottom="@dimen/normal_hlv_divider"
             android:divider="@drawable/group_divider"
-            app:hlv_dividerWidth="@dimen/small_hlv_divider"
+            app:hlv_dividerWidth="@dimen/normal_hlv_divider"
             android:background="@color/hl_background" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="385dp"
-        android:paddingRight="@dimen/small_hlv_divider"
-        android:paddingEnd="@dimen/small_hlv_divider"
-        android:paddingBottom="@dimen/small_hlv_divider"
-        android:paddingLeft="@dimen/small_hlv_divider"
-        android:paddingStart="@dimen/small_hlv_divider"
+        android:paddingRight="@dimen/normal_hlv_divider"
+        android:paddingEnd="@dimen/normal_hlv_divider"
+        android:paddingBottom="@dimen/normal_hlv_divider"
+        android:paddingLeft="@dimen/normal_hlv_divider"
+        android:paddingStart="@dimen/normal_hlv_divider"
         >
 
         <android.support.v7.widget.RecyclerView

@@ -14,11 +14,10 @@
             android:id="@+id/day_of_week"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:layout_gravity="center_vertical"
             android:gravity="center_horizontal"
             android:background="@drawable/day_of_week_bar"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textColor="#FFFFFF"/>
 
     </LinearLayout>
@@ -30,7 +29,7 @@
         android:layout_below="@id/day_of_week_bar"
         android:layout_gravity="center_vertical"
         android:gravity="center_horizontal"
-        android:textSize="15dp"
+        android:textSize="15sp"
         android:paddingTop="6dp"/>
 
     <TextView
@@ -41,7 +40,7 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_horizontal"
         android:paddingTop="20dp"
-        android:textSize="55dp"/>
+        android:textSize="55sp"/>
 
 
     <TextView
@@ -51,6 +50,6 @@
         android:layout_below="@id/day_of_month"
         android:layout_gravity="center_vertical"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textSize="15sp"/>
 
 </RelativeLayout>

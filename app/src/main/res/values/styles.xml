@@ -83,16 +83,16 @@
     </style>
 
     <style name="calendar_date_small">
-        <item name="android:textSize" >10sp</item>
+        <item name="android:textSize" >5sp</item>
     </style>
     <style name="calendar_date_normal">
-        <item name="android:textSize" >12sp</item>
+        <item name="android:textSize" >10sp</item>
     </style>
     <style name="calendar_date_large">
         <item name="android:textSize" >15sp</item>
     </style>
     <style name="calendar_date_xlarge">
-        <item name="android:textSize" >10sp</item>
+        <item name="android:textSize" >20sp</item>
     </style>
 
 </resources>

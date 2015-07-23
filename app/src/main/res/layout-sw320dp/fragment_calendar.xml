@@ -27,16 +27,18 @@
             android:layout_centerVertical="true"
             android:layout_centerInParent="true"
             android:padding="10dp"
-            android:textOff="MONTH"
-            android:textOn="DAY"
+            android:textOff="M"
+            android:textOn="D"
+
+            android:textSize="12sp"
             />
 
     </RelativeLayout>
 
     <Button
         android:id="@+id/today"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
@@ -44,6 +46,7 @@
         android:layout_marginRight="6dp"
         android:background="@drawable/add_button"
         android:text="T"
+        android:textAppearance="@style/calendar_date_normal"
         android:textColor="@android:color/white"
         android:tint="@android:color/white"
         />

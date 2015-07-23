@@ -210,7 +210,7 @@ public class CalendarFragment extends Fragment {
 ////                edit.commit();
 //                }
 //            });
-
+            calendarView.removeDecorator(dayOutOfMonth);
             calendarView.addDecorators(
                     dayOutOfMonth,
                     oneDayDecorator,
@@ -268,9 +268,9 @@ public class CalendarFragment extends Fragment {
             }
 
             public void sameDate() {
-                dayOrMonth.setChecked(true);
                 CalendarDayFragment dayView = new CalendarDayFragment();
                 switchFrame(dayView);
+                dayOrMonth.setChecked(true);
             }
         }
 
@@ -422,9 +422,9 @@ public class CalendarFragment extends Fragment {
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
             Date date = mAdapter.getItem(position);
             if (selectedDate.equals(date)) {
-                dayOrMonth.setChecked(false);
                 CalendarMonthFragment monthView = new CalendarMonthFragment();
                 switchFrame(monthView);
+                dayOrMonth.setChecked(false);
                 return;
             }
             selectedDate = date;
