@@ -102,7 +102,6 @@ public class pickTime extends DialogFragment {
         int seconds = convertToInt(second.getText().toString());
 
         elapsedTime = 1000 * (seconds + (60 * minutes) + (3600 * hours));
-        Log.e("TimerFrag", "" + elapsedTime);
     }
 
     public int convertToInt(String s){

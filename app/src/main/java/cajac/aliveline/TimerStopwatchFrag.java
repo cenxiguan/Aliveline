@@ -39,12 +39,10 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
         start = ((Button) getView().findViewById(R.id.start_button));
         reset =  ((Button) getView().findViewById(R.id.reset_button));
         edit =  ((Button) getView().findViewById(R.id.edit_button));
-        submit = ((Button) getView().findViewById(R.id.submit_button));
 
         start.setOnClickListener(this);
         reset.setOnClickListener(this);
         edit.setOnClickListener(this);
-        submit.setOnClickListener(this);
     }
 
     @Override
@@ -80,8 +78,6 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
                 pickTime a = new pickTime();
                 a.show(ft, "pickTime");
                 a.setTargetFragment(this, REQUEST_INT);
-                break;
-            case R.id.submit_button:
                 break;
         }
     }

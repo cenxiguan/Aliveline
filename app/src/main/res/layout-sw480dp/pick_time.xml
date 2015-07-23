@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#FF2693FF"
+        android:layout_marginBottom="50dp"/>
+
+
+    <EditText
+        style="@style/text_style4"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/hour_field"
+        android:inputType="number"
+        android:hint="Hour"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/minute_field"
+        android:layout_centerVertical="true" />
+
+    <EditText
+        style="@style/text_style4"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/minute_field"
+        android:inputType="number"
+        android:hint="Min"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+    
+    <EditText
+        style="@style/text_style4"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_todo_edittext"
+        android:id="@+id/second_field"
+        android:inputType="number"
+        android:hint="Sec"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_toRightOf="@+id/minute_field"
+        android:layout_toEndOf="@+id/minute_field"
+        android:layout_alignTop="@+id/hour_field"
+        android:layout_centerVertical="true"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="50dp"
+        android:background="#FF2693FF"
+        android:layout_below="@id/minute_field"/>
+
+
+</RelativeLayout>
