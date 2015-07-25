@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
@@ -33,14 +34,14 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.ic_calendar,
             R.drawable.ic_timer,
             R.drawable.ic_settings};
-    /*private int[] tabLayouts = { R.layout.tab_home,
+    private int[] tabLayouts = { R.layout.tab_home,
             R.layout.tab_calendar,
             R.layout.tab_timer,
             R.layout.tab_settings};
     private int[] tabTextViews = { R.id.tab_home,
             R.id.tab_calendar,
             R.id.tab_timer,
-            R.id.tab_settings};*/
+            R.id.tab_settings};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +70,11 @@ public class MainActivity extends AppCompatActivity implements
                     .setIcon(getResources().getDrawable(icons[i]))
                     .setTabListener(this));
         }
-        /* creates custom views for ech tab, with icons on top and text on bottom
-         * layout is slightly weird, may fix in the future if there's time
-        for (int i=0; i<tabs.length; i++) {
-            createTab(actionBar, tabLayouts[i], tabTextViews[i], tabs[i]);
-        }*/
+
+        //creates custom views for ech tab, with icons on top and text on bottom
+        //for (int i=0; i<tabs.length; i++) {
+        //    createTab(actionBar, tabLayouts[i], tabTextViews[i], tabs[i]);
+        //}
 
 
         // Swiping the viewpager make respective tab selected
@@ -110,15 +111,14 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    /* creates custom view tab with image on top, text on bottom
-     * will be useful if we decide to use custom tabs
+    //creates custom view tab with image on top, text on bottom
     public void createTab(ActionBar actionbar, int view, int titleView, String title) {
         ActionBar.Tab tab = actionbar.newTab();
         tab.setTabListener(this);
         tab.setCustomView(view);
         actionbar.addTab(tab);
         ((TextView) findViewById(titleView)).setText(title);
-    }*/
+    }
 
     //getting screen information for orientation
     public boolean isScreenLarge() {

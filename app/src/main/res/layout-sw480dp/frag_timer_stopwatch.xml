@@ -27,41 +27,37 @@
         android:layout_height="wrap_content"
         android:layout_weight="7"
         android:gravity="center">
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal">
 
-                <ImageView
-                    android:src="@drawable/time_circle"
-                    android:layout_width="250dp"
-                    android:layout_height="250dp"
-                    android:padding="10dp"
-                    android:id="@+id/timer_circle"
-                    android:layout_centerHorizontal="true"/>
-                <Chronometer
-                    android:id="@+id/chronometer"
-                    android:format="%s"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="45sp"
-                    android:textColor="#FFFFFF"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true" />
-                <Button
-                    android:text="EDIT TIME"
-                    android:id="@+id/edit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:background="@android:color/transparent"
-                    android:layout_marginTop="150dp"
-                    android:layout_centerHorizontal="true"/>
-            </RelativeLayout>
-        </FrameLayout>
+            <ImageView
+                android:src="@drawable/time_circle"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:padding="10dp"
+                android:id="@+id/timer_circle"
+                android:layout_centerHorizontal="true"/>
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:format="%s"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="45sp"
+                android:textColor="#FFFFFF"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+            <Button
+                android:text="EDIT TIME"
+                android:id="@+id/edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:background="@android:color/transparent"
+                android:layout_marginTop="150dp"
+                android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
     </LinearLayout>
 
     <LinearLayout

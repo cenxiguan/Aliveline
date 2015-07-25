@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <TextView
+        style="@style/text_style2"
+        android:text="Title Goes Here"
+        android:id="@+id/todo_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        style="@style/text_style5"
+        android:text="Due Date"
+        android:id="@+id/todo_due_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/todo_title"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        style="@style/text_style1_normal"
+        android:text="Time done/total"
+        android:id="@+id/todo_time_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"/>
+</RelativeLayout>
