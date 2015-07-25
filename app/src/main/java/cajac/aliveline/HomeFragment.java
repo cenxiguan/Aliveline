@@ -41,6 +41,7 @@ public class HomeFragment extends Fragment{
 
     private BarChart mChart;
 
+
     //this array wil display all the dates that have been made for each event
     protected List<String> xDates = new ArrayList<String>();
     xDates =
