@@ -41,11 +41,12 @@ public class HomeFragment extends Fragment{
 
     private BarChart mChart;
 
-    //this will be replaced by actual dates from the database i think
-    //this attay will be the x-axis and have all the dates
-    protected String[] mMonths = new String[] {
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
-    };
+    //this array wil display all the dates that have been made for each event
+    protected List<String> xDates = new ArrayList<String>();
+    xDates =
+
+
+
 
     private View rootView;
     long days_ids[];
@@ -90,6 +91,10 @@ public class HomeFragment extends Fragment{
 
         return rootView;
     }
+
+
+
+
 
     public void createRecyclerView(){
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
