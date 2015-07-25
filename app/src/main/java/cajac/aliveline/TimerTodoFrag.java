@@ -1,10 +1,12 @@
 package cajac.aliveline;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ public class TimerTodoFrag extends Fragment {
 
     DatabaseHelper dbh;
     List<Todo> todaysList;
+    ListView list;
     View view;
 
     @Override
@@ -28,6 +31,7 @@ public class TimerTodoFrag extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_timer_todo, container, false);
         populateListView();
+        registerClickCallback();
 
         return view;
     }
@@ -41,8 +45,18 @@ public class TimerTodoFrag extends Fragment {
         //Build Adapter
         ArrayAdapter<Todo> adapter = new TodoListAdapter();
 
-        ListView list = (ListView) view.findViewById(R.id.listView1);
+        list = (ListView) view.findViewById(R.id.listView1);
         list.setAdapter(adapter);
+    }
+
+    private void registerClickCallback(){
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
+                Todo clickedTodo = todaysList.get(position);
+                String todoTitle = clickedTodo.getTitle();
+            }
+        });
     }
 
     private class TodoListAdapter extends ArrayAdapter<Todo> {
@@ -69,7 +83,7 @@ public class TimerTodoFrag extends Fragment {
 
             title.setText(currentTodo.getTitle());
             dueDate.setText("Due: " + currentTodo.getDueDateString());
-            timeDone.setText(currentTodo.getStartTime());
+            timeDone.setText("Time: " + currentTodo.getStartTime());
 
             return itemView;
         }

@@ -157,7 +157,7 @@
         android:layout_toEndOf="@id/year_field"
         android:layout_toRightOf="@id/year_field"
         android:layout_alignTop="@+id/day_field"
-        android:src="@drawable/ic_calendar"
+        android:src="@drawable/ic_calendar2"
         android:background="@drawable/time_usage_unselected"
         android:layout_above="@id/estimated_time_prompt"
         android:elevation="0.5dp"

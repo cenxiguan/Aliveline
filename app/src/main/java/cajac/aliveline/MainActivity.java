@@ -13,6 +13,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import java.util.Timer;
+
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
 
