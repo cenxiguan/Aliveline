@@ -38,6 +38,7 @@
                 android:layout_height="250dp"
                 android:padding="10dp"
                 android:id="@+id/timer_circle"
+                android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"/>
             <Chronometer
                 android:id="@+id/chronometer"
@@ -66,21 +67,17 @@
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:gravity="center|bottom">
-        <Button
-            android:text="START"
+        <ImageButton
             android:id="@+id/start_button"
+            android:background="@drawable/play"
             android:layout_marginRight="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:background="@android:color/transparent"/>
-        <Button
-            android:text="RESET"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+        <ImageButton
             android:id="@+id/reset_button"
+            android:background="@drawable/refresh"
             android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:background="@android:color/transparent"/>
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
     </LinearLayout>
 </LinearLayout>

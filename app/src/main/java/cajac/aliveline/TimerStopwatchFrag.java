@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageButton;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -21,10 +22,12 @@ import java.util.Date;
  */
 public class TimerStopwatchFrag extends Fragment implements View.OnClickListener {
 
-    Button start, reset, edit, submit;
+    Boolean running;
+    Button edit;
     private Chronometer chronometer;
+    ImageButton start, reset;
     private static final int REQUEST_INT = 2;
-    long timeWhenStopped = 0;
+    long timeWhenStopped = 0, startTimeBetweenEditTimeCancels, timeBetweenEditTimeCancels, timeUntilEditCancel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,43 +39,62 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         chronometer = (Chronometer) getView().findViewById(R.id.chronometer);
-        start = ((Button) getView().findViewById(R.id.start_button));
-        reset =  ((Button) getView().findViewById(R.id.reset_button));
+        start = ((ImageButton) getView().findViewById(R.id.start_button));
+        reset =  ((ImageButton) getView().findViewById(R.id.reset_button));
         edit =  ((Button) getView().findViewById(R.id.edit_button));
 
+        chronometer.setBase(SystemClock.elapsedRealtime());
         start.setOnClickListener(this);
         reset.setOnClickListener(this);
         edit.setOnClickListener(this);
+
+        running = false;
     }
 
     @Override
     public void onClick(View v) {
-        Button b = (Button)v;
-        String buttonText = b.getText().toString();
-
         switch(v.getId()) {
             case R.id.start_button:
-                if(buttonText.equals("START")){
+                if (!running) {
                     chronometer.setBase(SystemClock.elapsedRealtime() + timeWhenStopped);
                     chronometer.start();
-                    b.setText("STOP");
+                    running = true;
+                    startTimeBetweenEditTimeCancels = 0;
+                    timeUntilEditCancel = System.currentTimeMillis();
+                    start.setBackgroundResource(R.drawable.pause);
+
                 } else {
                     timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
                     chronometer.stop();
-                    b.setText("START");
+                    running = false;
+                    startTimeBetweenEditTimeCancels = 0;
+                    timeUntilEditCancel = System.currentTimeMillis();
+                    start.setBackgroundResource(R.drawable.play);
+
                 }
                 break;
             case R.id.reset_button:
-                chronometer.stop();
+                if (running){
+                    timeUntilEditCancel = System.currentTimeMillis();
+                    chronometer.stop();
+                    running = false;
+                    start.setBackgroundResource(R.drawable.play);
+                }
+
+                startTimeBetweenEditTimeCancels = 0;
+                timeUntilEditCancel = System.currentTimeMillis();
                 chronometer.setBase(SystemClock.elapsedRealtime());
                 timeWhenStopped = 0;
-
-                start.setText("START");
                 break;
+
             case R.id.edit_button:
-                timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
-                chronometer.stop();
-                start.setText("START");
+                if(running) {
+                    timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
+                    chronometer.stop();
+                    running = false;
+                    start.setBackgroundResource(R.drawable.play);
+                    timeUntilEditCancel = System.currentTimeMillis();
+                }
 
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 pickTime a = new pickTime();
@@ -84,11 +106,25 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Make sure fragment codes match up
-        if (requestCode == REQUEST_INT) {
+        if (resultCode == REQUEST_INT && requestCode == REQUEST_INT) {
             long timerTime = data.getLongExtra("TIMER_TIME", 0);
-            Log.e("", "Timer time: " + timerTime);
             chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
             timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
+            timeUntilEditCancel = System.currentTimeMillis();
+        } else {
+            long timeElapsed = SystemClock.elapsedRealtime() - chronometer.getBase();
+
+            if(startTimeBetweenEditTimeCancels == 0){
+                timeBetweenEditTimeCancels = System.currentTimeMillis() - timeUntilEditCancel;
+            } else {
+                timeBetweenEditTimeCancels = System.currentTimeMillis() - startTimeBetweenEditTimeCancels;
+            }
+
+            long timerTime = timeElapsed - timeBetweenEditTimeCancels;
+
+            chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
+            timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
+            startTimeBetweenEditTimeCancels = System.currentTimeMillis();
         }
     }
 }

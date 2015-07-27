@@ -66,21 +66,21 @@
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:gravity="center|bottom">
-        <Button
-            android:text="START"
+        <ImageButton
             android:id="@+id/start_button"
+            android:background="@drawable/play"
             android:layout_marginRight="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:background="@android:color/transparent"/>
-        <Button
-            android:text="RESET"
+            android:padding="10dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:textColor="#FFFFFF" />
+        <ImageButton
             android:id="@+id/reset_button"
+            android:background="@drawable/refresh"
             android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:background="@android:color/transparent"/>
+            android:padding="10dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 </LinearLayout>
