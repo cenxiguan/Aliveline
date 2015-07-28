@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
     List<Todo> todaysList;
     ListView list;
     long timeWhenStopped = 0, startTimeBetweenEditTimeCancels = 0, timeBetweenEditTimeCancels, timeUntilEditCancel;
+    TextView theTodoTitle;
     View view;
 
     @Override
@@ -56,6 +58,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         start = ((ImageButton) getView().findViewById(R.id.start_button));
         reset =  ((ImageButton) getView().findViewById(R.id.reset_button));
         edit =  ((Button) getView().findViewById(R.id.edit_button));
+        theTodoTitle = ((TextView) getView().findViewById(R.id.title_of_todo));
 
         chronometer.setBase(SystemClock.elapsedRealtime());
         start.setOnClickListener(this);
@@ -162,6 +165,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
                 Todo clickedTodo = todaysList.get(position);
                 String todoTitle = clickedTodo.getTitle();
+                theTodoTitle.setText(todoTitle);
             }
         });
     }
