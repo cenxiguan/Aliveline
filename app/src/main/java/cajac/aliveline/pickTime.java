@@ -24,7 +24,6 @@ public class pickTime extends DialogFragment {
     EditText hour, minute, second;
     long elapsedTime = 0;
     public static final int RESULT_INT = 2;
-    long time;
     View view;
 
 
@@ -47,7 +46,6 @@ public class pickTime extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         view = inflater.inflate(R.layout.pick_time, null);
         builder.setView(view);
-        time = System.currentTimeMillis();
 
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
@@ -65,6 +63,7 @@ public class pickTime extends DialogFragment {
 
         dialog = builder.create();
         dialog.setTitle("Set Timer Time");
+        dialog.setCanceledOnTouchOutside(false);
 
         setEditTexts(view);
 
@@ -88,7 +87,6 @@ public class pickTime extends DialogFragment {
         }
         Intent i = new Intent();
         i.putExtra("TIMER_TIME", elapsedTime);
-        i.putExtra("ELAPSED_DIALOG_TIME", System.currentTimeMillis() - time);
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, i);
     }
 

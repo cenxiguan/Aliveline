@@ -27,11 +27,12 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
     private Chronometer chronometer;
     ImageButton start, reset;
     private static final int REQUEST_INT = 2;
-    long timeWhenStopped = 0, startTimeBetweenEditTimeCancels, timeBetweenEditTimeCancels, timeUntilEditCancel;
+    long timeWhenStopped = 0, startTimeBetweenEditTimeCancels = 0, timeBetweenEditTimeCancels, timeUntilEditCancel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        timeUntilEditCancel = System.currentTimeMillis();
         return inflater.inflate(R.layout.frag_timer_stopwatch, container, false);
     }
 
@@ -110,6 +111,7 @@ public class TimerStopwatchFrag extends Fragment implements View.OnClickListener
             long timerTime = data.getLongExtra("TIMER_TIME", 0);
             chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
             timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
+            startTimeBetweenEditTimeCancels = 0;
             timeUntilEditCancel = System.currentTimeMillis();
         } else {
             long timeElapsed = SystemClock.elapsedRealtime() - chronometer.getBase();
