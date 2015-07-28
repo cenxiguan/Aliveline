@@ -40,15 +40,6 @@ public class HomeFragment extends Fragment{
     TextView noTodos;
 
     private BarChart mChart;
-
-
-    //this array wil display all the dates that have been made for each event
-    protected List<String> xDates = new ArrayList<String>();
-    xDates =
-
-
-
-
     private View rootView;
     long days_ids[];
 
@@ -59,8 +50,16 @@ public class HomeFragment extends Fragment{
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
         noTodos = (TextView)rootView.findViewById(R.id.empty_list);
-
         dbh = new DatabaseHelper(getActivity());
+
+        //this array wil display all the dates that have been made for each event
+        List<String> list = new ArrayList<String>();
+        list=dbh.getAllDates();
+
+        //the array will display be the x-axis
+
+
+        //i will set the X-axis to have a setting to see all the dates but have a starting limit of 7
         if (savedInstanceState != null) {
             todaysList = savedInstanceState.getParcelableArrayList("list");
         } else {
