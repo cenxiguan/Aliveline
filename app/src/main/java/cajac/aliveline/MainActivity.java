@@ -36,14 +36,14 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.ic_calendar,
             R.drawable.ic_timer,
             R.drawable.ic_settings};
-    private int[] tabLayouts = { R.layout.tab_home,
-            R.layout.tab_calendar,
-            R.layout.tab_timer,
-            R.layout.tab_settings};
-    private int[] tabTextViews = { R.id.tab_home,
-            R.id.tab_calendar,
-            R.id.tab_timer,
-            R.id.tab_settings};
+    //private int[] tabLayouts = { R.layout.tab_home,
+    //        R.layout.tab_calendar,
+    //        R.layout.tab_timer,
+    //        R.layout.tab_settings};
+    //private int[] tabTextViews = { R.id.tab_home,
+    //        R.id.tab_calendar,
+    //        R.id.tab_timer,
+    //        R.id.tab_settings};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
