@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -108,10 +109,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String firstDate = dateToStringFormat(new Date());
         //For now, first day will be the day that Todo is created
         //firstDate = getNextDay(firstDate);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(todo.getDueDate());
-        cal.add(Calendar.DATE, -1);
-        Date lastDay = cal.getTime();
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(todo.getDueDate());
+//        cal.add(Calendar.DATE, -1);
+//        Date lastDay = cal.getTime();
+        Date lastDay = todo.getDueDate();
         String lastDate = dateToStringFormat(lastDay);
         /*
         Get list of Dates and their hours
@@ -137,8 +139,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // Get sum of each day's hours and make list
         List<Double> hoursInDatabase = getAvailableDateHours(availableDates);
 
-//        Log.w("addToRemainBefore", hoursInDatabase.toString());
-//        Log.w("distributedBefore", distributedHours.toString());
+        Log.w("addToRemainBefore", hoursInDatabase.toString());
+        Log.w("distributedBefore", distributedHours.toString());
 
         // Should combine the numbers in the two lists. If there isn't enough time in a day to fit the
         // schedule for the toDo, the database takes time from the todo on that day and moves it to others
@@ -151,18 +153,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             addTodoDate(todo_id, availableDates.get(i), 1, distributedTime, "00:00");
         }
 
-//        Log.w("addToRemain", hoursInDatabase.toString());
-//        Log.w("distributed", distributedHours.toString());
+        Log.w("addToRemain", hoursInDatabase.toString());
+        Log.w("distributed", distributedHours.toString());
 
-//        while (!firstDayString.equals(lastDay)){
-//            Date firstDayDate = convertStringDate(firstDayString);
-//            long date_id = createDate(firstDayDate, null);
-//            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
-//            String timeRequired = getTimeForDay(locks, lock, todo);
-//            addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
-//            firstDayString = getNextDay(firstDayString);
-//            boolPos++;
-//        }
     }
 
     // Don't need because of Distributor class
@@ -207,12 +200,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         Cursor c = db.rawQuery(selectQuery, null);
         List<Integer> availableDateIds = new ArrayList<>();
         int dateId, lockIndex = 0;
-//        Log.w("getAvailableDates", locks);
+        Log.w("getAvailableDates", locks);
         if (c.moveToFirst()){
             do {
                 // Filtering out the days here based on the locks selected in addToDo
                 if (locks.charAt(lockIndex) == '1') {
-//                    Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
+                    Log.w("getAvailableDates ", "lockInd " + lockIndex);
+                    Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
                     dateId = c.getInt(c.getColumnIndex(KEY_ID));
                     availableDateIds.add(dateId);
                 }
