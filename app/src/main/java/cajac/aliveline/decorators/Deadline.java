@@ -1,7 +1,6 @@
 package cajac.aliveline.decorators;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 
@@ -9,11 +8,11 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
 import cajac.aliveline.DatabaseHelper;
+import cajac.aliveline.R;
 
 /**
  * Highlight Saturdays and Sundays with a background
@@ -23,7 +22,6 @@ public class Deadline implements DayViewDecorator {
     Set<Date> dateSet;
     DatabaseHelper dbh;
 
-    private final Calendar calendar = Calendar.getInstance();
     private final Drawable highlightDrawable;
     private Context context;
     private int width;
@@ -49,9 +47,9 @@ public class Deadline implements DayViewDecorator {
     }
 
     private Drawable generateBackgroundDrawable() {
-        final int color = Color.parseColor("#F44336");
-        final int selectedColor = Color.parseColor("#ff33b5e5");
-        final int unselectedColor = Color.parseColor("#FFFFFF");
+        final int color = context.getResources().getColor(R.color.deadline);
+        final int selectedColor = context.getResources().getColor(R.color.selected);
+        final int unselectedColor = context.getResources().getColor(R.color.calendar_background);
 
         CurvedTriangle selected = new CurvedTriangle(width, length, color, selectedColor);
         CurvedTriangle unselected = new CurvedTriangle(width, length, color, unselectedColor);
@@ -59,8 +57,12 @@ public class Deadline implements DayViewDecorator {
         StateListDrawable drawable = new StateListDrawable();
         drawable.addState(new int[] {android.R.attr.state_checked}, selected);
         drawable.addState(new int[] {android.R.attr.state_pressed}, selected);
-        drawable.addState(new int[] {-android.R.attr.state_enabled}, unselected);
+        drawable.addState(new int[]{-android.R.attr.state_enabled}, unselected);
 
         return drawable;
+    }
+
+    public void updateDeadlines() {
+        dateSet = dbh.getAllDeadlines();
     }
 }

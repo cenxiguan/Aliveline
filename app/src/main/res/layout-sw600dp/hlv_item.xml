@@ -2,8 +2,45 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/hlv_item_unselected"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/shadow">
+
+    <RelativeLayout
+        android:id="@+id/date_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/day_of_week_bar"
+        android:orientation="vertical"
+        android:background="@drawable/hlv_item_unselected"  >
+
+        <TextView
+            android:id="@+id/item_month"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="8sp"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/day_of_month"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="25sp"
+            android:textSize="55sp"/>
+
+        <TextView
+            android:id="@+id/year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:layout_marginTop="95sp"
+            android:textSize="15sp"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/day_of_week_bar"
@@ -21,35 +58,5 @@
             android:textColor="#FFFFFF"/>
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/item_month"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/day_of_week_bar"
-        android:layout_gravity="center_vertical"
-        android:gravity="center_horizontal"
-        android:textSize="15sp"
-        android:paddingTop="6dp"/>
-
-    <TextView
-        android:id="@+id/day_of_month"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/day_of_week_bar"
-        android:layout_gravity="center_vertical"
-        android:gravity="center_horizontal"
-        android:paddingTop="20dp"
-        android:textSize="55sp"/>
-
-
-    <TextView
-        android:id="@+id/year"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/day_of_month"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:textSize="15sp"/>
 
 </RelativeLayout>

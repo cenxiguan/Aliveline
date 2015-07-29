@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#ffffff</color>
+    <color name="calendar_background">#FFFFFF</color>
+    <color name="deadline">#F44336</color>
     <color name="selected">#2196F3</color>
     <color name="day_item">#DFF2F1</color>
     <color name="hl_background">#DEDEDE</color>

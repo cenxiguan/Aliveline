@@ -1,5 +1,7 @@
 package cajac.aliveline;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -18,8 +20,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -75,6 +81,12 @@ public class CalendarFragment extends Fragment {
     private RecyclerView.Adapter recAdapter;
     private List<Todo> recTodos;
 
+    private int shortTransition = 300;
+    private int normalTransition = 600;
+    private int longTransition = 900;
+
+    boolean something = false;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -95,7 +107,8 @@ public class CalendarFragment extends Fragment {
         fragmentManager = getFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.calendar_frame, calDayFrag, "DAY");
-        fragmentTransaction.hide(calDayFrag);
+//        fragmentTransaction.hide(calDayFrag);
+//        calDayFrag.hide();
         fragmentTransaction.add(R.id.calendar_frame, calMonthFrag, "MONTH");
         fragmentTransaction.add(R.id.list_frame, todoListFrag, "LIST");
         fragmentTransaction.commit();
@@ -148,15 +161,35 @@ public class CalendarFragment extends Fragment {
     public void switchFrame(boolean switchToMonth) {
         CalendarMonthFragment cmf = (CalendarMonthFragment) fragmentManager.findFragmentByTag("MONTH");
         CalendarDayFragment cdf = (CalendarDayFragment) fragmentManager.findFragmentByTag("DAY");
+
         if (switchToMonth) {
             currentCal = calMonthFrag;
             Log.w("switchFrame", selectedDate.toString());
             ((CalendarMonthFragment) currentCal).setSelectedDate(selectedDate);
             // Make method for animating in and out in the month and day fragments
+
+            calDayFrag.fadeOut();
+            rootView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    calMonthFrag.fadeIn();
+                }
+            }, shortTransition);
             switchFragments(cdf, cmf, true);
         } else {
+
             currentCal = calDayFrag;
             calDayFrag.setSelectedDate(selectedDate);
+
+            calMonthFrag.fadeOut();
+
+            rootView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    calDayFrag.fadeIn();
+                }
+            }, shortTransition);
+
             switchFragments(cmf, cdf, false);
         }
 
@@ -166,19 +199,19 @@ public class CalendarFragment extends Fragment {
     }
 
     private void switchFragments(Fragment frag1, Fragment frag2, boolean switchToMonth) {
-        if (frag1 != null) {
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.hide(frag1);
-            fragmentTransaction.commit();
-        }
+//        if (frag1 != null) {
+//            fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.hide(frag1);
+//            fragmentTransaction.commit();
+//        }
         // Animation
         animateSwitch(frag1, switchToMonth);
         final Fragment fragTwo = frag2;
-        if (frag2 != null) {
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.show(frag2);
-            fragmentTransaction.commit();
-        }
+//        if (frag2 != null) {
+//            fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.show(frag2);
+//            fragmentTransaction.commit();
+//        }
 //        rootView.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
@@ -195,6 +228,23 @@ public class CalendarFragment extends Fragment {
     private void animateSwitch(Fragment fragment, boolean switchToMonth) {
         Animation calendarAnim;
         Animation listAnim;
+//        v.getLayoutParams().height = 50;
+//        v.getLayoutParams().width = 200;
+//        v.requestLayout();
+//        Log.w("animate", "Helloo");
+        if (switchToMonth) {
+            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.4));
+            listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.6));
+        } else {
+            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.25));
+            listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.75));
+        }
+        calendarAnim.setDuration(normalTransition);
+        calendarAnim.setFillAfter(true);
+        listAnim.setDuration(normalTransition);
+        listAnim.setFillAfter(true);
+        calendarFrame.startAnimation(calendarAnim);
+        listFrame.startAnimation(listAnim);
 
     }
 
@@ -357,7 +407,34 @@ public class CalendarFragment extends Fragment {
             cal.setTime(selectedDate);
             oneDayDecorator.setDate(selectedDate);
             calendarView.invalidateDecorators();
+            todoListFrag.updateRecyclerAdapter(selectedDate);
             calendarView.setSelectedDate(selectedDate);
+        }
+
+        public void fadeIn() {
+            fadeIn(shortTransition);
+        }
+
+        public void fadeIn(int milliseconds) {
+            childView.animate().alpha(1f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    childView.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        public void fadeOut() {
+            fadeOut(shortTransition);
+        }
+
+        public void fadeOut(int milliseconds) {
+            childView.animate().alpha(0f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    childView.setVisibility(View.GONE);
+                }
+            });
         }
 
     }
@@ -437,7 +514,6 @@ public class CalendarFragment extends Fragment {
             });
 
 //            createRecyclerView(dayView);
-
             return dayView;
         }
 
@@ -510,7 +586,35 @@ public class CalendarFragment extends Fragment {
         public View getOldView() { return oldView; }
 
         public void resetToToday() {
-            setSelectedDate(CalendarDay.today().getDate());
+            fadeOut(shortTransition);
+            dayView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setSelectedDate(CalendarDay.today().getDate());
+                    fadeIn(shortTransition);
+                    Log.w("resetToToday", "GOOD");
+                }
+            }, shortTransition);
+//            int fadeInDuration = 500; // Configure time values here
+//            int timeBetween = 300;
+//            int fadeOutDuration = 300;
+//            Animation fadeIn = new AlphaAnimation(0, 1);
+//            fadeIn.setInterpolator(new DecelerateInterpolator()); // add this
+//            fadeIn.setDuration(fadeInDuration);
+//
+//            Animation fadeOut = new AlphaAnimation(1, 0);
+//            fadeOut.setInterpolator(new AccelerateInterpolator()); // and this
+//            fadeOut.setStartOffset(fadeInDuration + timeBetween);
+//            fadeOut.setDuration(fadeOutDuration);
+//
+//            AnimationSet animation = new AnimationSet(false); // change to false
+//            animation.addAnimation(fadeIn);
+////            animation.addAnimation(fadeOut);
+//            animation.setRepeatCount(1);
+//            dayView.setAnimation(animation);
+//            dayView.startAnimation(animation);
+//            setSelectedDate(CalendarDay.today().getDate());
+
         }
 
         public void setSelectedDate(Date date) {
@@ -539,6 +643,7 @@ public class CalendarFragment extends Fragment {
             setTextColors(oldView, getResources().getColor(R.color.primary_text));
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
             setTextColors(oldView, getResources().getColor(R.color.secondary_text));
+
             listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
         }
 
@@ -551,6 +656,31 @@ public class CalendarFragment extends Fragment {
             year.setTextColor(color);
         }
 
+        public void fadeIn() {
+            fadeIn(shortTransition);
+        }
+
+        public void fadeIn(int milliseconds) {
+            dayView.animate().alpha(1f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    dayView.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        public void fadeOut() {
+            fadeOut(shortTransition);
+        }
+
+        public void fadeOut(int milliseconds) {
+            dayView.animate().alpha(0f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    dayView.setVisibility(View.GONE);
+                }
+            });
+        }
 
         private class InfiniteAdapter extends ArrayAdapter<Date> {
 
@@ -616,7 +746,7 @@ public class CalendarFragment extends Fragment {
                 } else {
                     setTextColors(convertView, getResources().getColor(R.color.primary_text));
                 }
-                convertView.findViewById(R.id.date_info).startAnimation(animation);
+//                convertView.findViewById(R.id.date_info).startAnimation(animation);
 
                 return convertView;
             }
