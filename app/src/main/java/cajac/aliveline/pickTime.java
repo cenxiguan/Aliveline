@@ -5,12 +5,14 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Chronometer;
 import android.widget.EditText;
 
 /**
@@ -21,7 +23,7 @@ public class pickTime extends DialogFragment {
     private AlertDialog dialog;
     EditText hour, minute, second;
     long elapsedTime = 0;
-    public static final int RESULT_INT = 1;
+    public static final int RESULT_INT = 2;
     View view;
 
 
@@ -48,6 +50,7 @@ public class pickTime extends DialogFragment {
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                sendResult(0);
             }
         });
 
@@ -60,6 +63,7 @@ public class pickTime extends DialogFragment {
 
         dialog = builder.create();
         dialog.setTitle("Set Timer Time");
+        dialog.setCanceledOnTouchOutside(false);
 
         setEditTexts(view);
 
