@@ -7,37 +7,12 @@
     android:background="@android:color/white"
     android:visibility="gone">
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="220dp"-->
-        <!--android:paddingTop="@dimen/large_hlv_divider"-->
-        <!--android:paddingBottom="@dimen/large_hlv_divider"-->
-        <!--android:orientation="vertical" >-->
-        <it.sephiroth.android.library.widget.HListView
-            android:id="@+id/hListView1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@drawable/group_divider"
-            app:hlv_dividerWidth="0dp"
-            android:background="@color/hl_background" />
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="0dip"-->
-        <!--android:layout_weight=".75"-->
-        <!--android:paddingRight="20dp"-->
-        <!--android:paddingBottom="@dimen/large_hlv_divider"-->
-        <!--android:paddingLeft="20dp">-->
-
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:id="@+id/toDoList"-->
-            <!--android:layout_alignParentTop="true"-->
-            <!--android:layout_centerHorizontal="true" />-->
-
-    <!--</LinearLayout>-->
-
+    <it.sephiroth.android.library.widget.HListView
+        android:id="@+id/hListView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/group_divider"
+        app:hlv_dividerWidth="0dp"
+        android:background="@color/hl_background" />
 
 </LinearLayout>
