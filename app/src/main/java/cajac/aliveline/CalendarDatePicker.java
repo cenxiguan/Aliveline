@@ -3,6 +3,7 @@ package cajac.aliveline;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
@@ -35,16 +37,11 @@ public class CalendarDatePicker extends DialogFragment {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         mDate = CalendarDay.today().getDate();
 
-        DateSettings dateSettings = new DateSettings(getActivity()) {
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
-                sendResult(RESULT_DATE);
-            }
-        };
-        //DatePickerDialog dialog = new DatePickerDialog(getActivity(), dateSettings, year, month, day);
-        //dialog.setTitle("Pick Date");
-        //dialog.getDatePicker().setCalendarViewShown(false);
-        //dialog.getDatePicker().setSpinnersShown(true);
-        //dialog.setCanceledOnTouchOutside(true);
+        //DateSettings dateSettings = new DateSettings(getActivity()) {
+        //   public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
+        //      sendResult(RESULT_DATE);
+        //  }
+        //};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -63,6 +60,20 @@ public class CalendarDatePicker extends DialogFragment {
                 // Update argument to preserve selected value on rotation
             }
         });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        builder.setPositiveButton(R.string.submit, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                sendResult(RESULT_DATE);
+            }
+        });
+
         dialog = builder.create();
         dialog.setTitle("Pick Date");
         dialog.setCanceledOnTouchOutside(true);
