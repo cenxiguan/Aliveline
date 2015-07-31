@@ -60,7 +60,8 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         edit =  ((Button) getView().findViewById(R.id.edit_button));
         theTodoTitle = ((TextView) getView().findViewById(R.id.title_of_todo));
 
-        chronometer.setBase(SystemClock.elapsedRealtime());
+        setUpTimer();
+
         start.setOnClickListener(this);
         reset.setOnClickListener(this);
         edit.setOnClickListener(this);
@@ -170,6 +171,11 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    private void setUpTimer(){
+        chronometer.setBase(SystemClock.elapsedRealtime() - todaysList.get(0).getTimeCompleted());
+        theTodoTitle.setText(todaysList.get(0).getTitle());
+    }
+
     private class TodoListAdapter extends ArrayAdapter<Todo> {
         public TodoListAdapter(){
             super(getActivity(),R.layout.todo_list_item,todaysList);
@@ -194,9 +200,19 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
 
             title.setText(currentTodo.getTitle());
             dueDate.setText("Due: " + currentTodo.getDueDateString());
-            timeDone.setText("Time: " + currentTodo.getStartTime());
+            timeDone.setText("Time: " + convertToHoursAndMinutes(currentTodo.getTimeCompleted()) + "/" + convertToHoursAndMinutes(currentTodo.getTimeRequired()));
 
             return itemView;
+        }
+
+        public String convertToHoursAndMinutes(int timeInMin){
+            int hours = timeInMin / 60;
+            int minutes = timeInMin % 60;
+            if(minutes < 10){
+                return "" + hours + ":0" + minutes;
+            } else {
+                return "" + hours + ":" + minutes;
+            }
         }
     }
 }

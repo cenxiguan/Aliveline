@@ -458,6 +458,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 String timeCompleted = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
                 Todo td = getTodo(todo_id);
                 String timeLeftToday = getTimeLeftforToday(timeRequired, timeCompleted);
+                td.setTimeRequired(timeInMinutes(timeRequired));
+                td.setTimeCompleted(timeInMinutes(timeCompleted));
                 td.setTodaysTimeLeft(timeLeftToday);
                 todos.add(td);
             } while (c.moveToNext());
