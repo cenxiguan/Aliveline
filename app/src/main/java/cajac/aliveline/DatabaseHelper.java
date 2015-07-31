@@ -109,12 +109,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String firstDate = dateToStringFormat(new Date());
         //For now, first day will be the day that Todo is created
         //firstDate = getNextDay(firstDate);
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(todo.getDueDate());
-//        cal.add(Calendar.DATE, -1);
-//        Date lastDay = cal.getTime();
-        Date lastDay = todo.getDueDate();
-        String lastDate = dateToStringFormat(lastDay);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(todo.getDueDate());
+        cal.add(Calendar.DATE, -1);
+        String secondToLastDate = dateToStringFormat(cal.getTime());
+        String lastDate = dateToStringFormat(todo.getDueDate());
         /*
         Get list of Dates and their hours
         May need to sort the Dates before getting hours though
@@ -129,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // Go through dates table and select dates that are in the range and are not locked
         // availableDates are the ids, not the dates themselves
         // SELECT where between first and last AND where locked is 1
-        List<Integer> availableDates = getAvailableDates(firstDate, lastDate, todo.getLocks());
+        List<Integer> availableDates = getAvailableDates(firstDate, secondToLastDate, todo.getLocks());
         double estimatedTime = minToHours(timeInMinutes(todo.getRemainingTime()));
 
         //Should distribute time
@@ -185,13 +184,22 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             firstDate = lastDate;
             lastDate = temp;
         }
+        Date firstDayDate;
+        lastDate = getNextDay(lastDate);
         while(!firstDate.equals(lastDate)) {
-            Date firstDayDate = convertStringDate(firstDate);
+            firstDayDate = convertStringDate(firstDate);
             createDate(firstDayDate, null);
             firstDate = getNextDay(firstDate);
         }
     }
 
+    /**
+     * returns a list of ids of the dates between the inputted two dates (inclusive)
+     * @param firstDate Today's date or the first day of work
+     * @param lastDate The last day of work (default is the day before due date)
+     * @param locks String of 0s and 1s that indicate lock status (length is equal to number of days from first to last inclusive)
+     * @return list of ids of dates
+     */
     public List<Integer> getAvailableDates(String firstDate, String lastDate, String locks) {
         SQLiteDatabase db = getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_DATES + " WHERE "
