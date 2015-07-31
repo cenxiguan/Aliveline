@@ -314,7 +314,7 @@ public class CalendarFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                    CalendarDatePicker cdp = new CalendarDatePicker();
+                    CalendarDatePicker cdp = new CalendarDatePicker(selectedDate);
                     cdp.setTargetFragment(CalendarMonthFragment.this, REQUEST_DATE);
                     cdp.show(ft, "CalendarDatePicker");
                 }
@@ -355,6 +355,8 @@ public class CalendarFragment extends Fragment {
                 Date date = (Date) data.getSerializableExtra(CalendarDatePicker.DATE);
                 selectedDate = date;
                 calendarView.setSelectedDate(selectedDate);
+                oneDayDecorator.setDate(selectedDate);
+                calendarView.invalidateDecorators();
             }
         }
 
