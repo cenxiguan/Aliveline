@@ -586,6 +586,27 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return todoDates;
     }
 
+    public String getTodoDate(Todo todo, Date date){
+        int todo_id = todo.getId();
+        int date_id = getDateID(date);
+
+        SQLiteDatabase db = getReadableDatabase();
+        String todoDate = "";
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_DATES_ID + " = " + date_id + " AND " +  KEY_TODO_ID + " = " + todo_id;
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c.moveToFirst()){
+            int id = c.getInt(c.getColumnIndex(KEY_ID));
+            String timeRequired = c.getString(c.getColumnIndex(COLUMN_TIME_REQUIRED));
+            String timeComp = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
+            int lock = c.getInt(c.getColumnIndex(LOCK));
+            todoDate = KEY_ID + " " + id + " date_id " + date_id + " todo_id " + todo_id
+                    + " Time required " + timeRequired + " Time compl. " + timeComp + " lock " + lock;
+        }
+
+        return todoDate;
+    }
+
     public long updateTodoDate(long id, long todo_id, long date_id, int lock, String timeRequired, String timeCompleted){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();

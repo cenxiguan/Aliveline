@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
     ListView list;
     long timeWhenStopped = 0, startTimeBetweenEditTimeCancels = 0, timeBetweenEditTimeCancels, timeUntilEditCancel;
     TextView theTodoTitle;
+    Todo clickedTodo, previousTodo;
     View view;
 
     @Override
@@ -60,7 +62,9 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         edit =  ((Button) getView().findViewById(R.id.edit_button));
         theTodoTitle = ((TextView) getView().findViewById(R.id.title_of_todo));
 
-        setUpTimer();
+        if(todaysList.size() > 0) {
+            setUpTimer();
+        }
 
         start.setOnClickListener(this);
         reset.setOnClickListener(this);
@@ -164,9 +168,39 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Todo clickedTodo = todaysList.get(position);
+                clickedTodo = todaysList.get(position);
                 String todoTitle = clickedTodo.getTitle();
                 theTodoTitle.setText(todoTitle);
+
+                //Stop timer running
+                chronometer.stop();
+                running = false;
+                start.setBackgroundResource(R.drawable.play);
+
+                //send time in timer to database
+                String todoDate = dbh.getTodoDate(previousTodo, new Date());
+                String[] toUpdate = todoDate.split("\\s+");
+                long todoDateId = convertToInt(toUpdate[1]);
+                long todoId = (long) previousTodo.getId();
+                long dateId = dbh.getDateID(new Date());
+                int lock = convertToInt(toUpdate[13]);
+                String theRequiredTime = toUpdate[8];
+                String theCompletedTime = convertToHoursAndMinutes((SystemClock.elapsedRealtime() - chronometer.getBase())/ (60000));
+                dbh.updateTodoDate(todoDateId, todoId, dateId, lock, theRequiredTime, theCompletedTime);
+
+
+                //set timer base to 2do's completed time
+                long timerTime = (long) (clickedTodo.getTimeCompleted()) * 60000;
+                chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
+                timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
+                startTimeBetweenEditTimeCancels = 0;
+                timeUntilEditCancel = System.currentTimeMillis();
+
+                //repopulate list view
+                populateListView();
+
+                //change previous 2do for next time
+                previousTodo = clickedTodo;
             }
         });
     }
@@ -174,6 +208,28 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
     private void setUpTimer(){
         chronometer.setBase(SystemClock.elapsedRealtime() - todaysList.get(0).getTimeCompleted());
         theTodoTitle.setText(todaysList.get(0).getTitle());
+        previousTodo = todaysList.get(0);
+    }
+
+    public int convertToInt(String s){
+        int i;
+        try{
+            i = Integer.parseInt(s);
+        } catch(NumberFormatException nfe) {
+            return 0;
+        }
+
+        return i;
+    }
+
+    public String convertToHoursAndMinutes(long timeInMin){
+        int hours = (int) timeInMin / 60;
+        int minutes = (int) timeInMin % 60;
+        if(minutes < 10){
+            return "" + hours + ":0" + minutes;
+        } else {
+            return "" + hours + ":" + minutes;
+        }
     }
 
     private class TodoListAdapter extends ArrayAdapter<Todo> {
