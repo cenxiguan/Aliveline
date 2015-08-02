@@ -85,6 +85,10 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                     timeUntilEditCancel = System.currentTimeMillis();
                     start.setBackgroundResource(R.drawable.pause);
 
+                    //record the time and update the visuals
+                    sendTimeToDatabase();
+                    populateListView();
+
                 } else {
                     timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
                     chronometer.stop();
@@ -93,6 +97,9 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                     timeUntilEditCancel = System.currentTimeMillis();
                     start.setBackgroundResource(R.drawable.play);
 
+                    //record the time and update the visuals
+                    sendTimeToDatabase();
+                    populateListView();
                 }
                 break;
             case R.id.reset_button:
@@ -107,6 +114,10 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 timeUntilEditCancel = System.currentTimeMillis();
                 chronometer.setBase(SystemClock.elapsedRealtime());
                 timeWhenStopped = 0;
+
+                //record the time and update the visuals
+                sendTimeToDatabase();
+                populateListView();
                 break;
 
             case R.id.edit_button:
@@ -134,6 +145,10 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
             timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
             startTimeBetweenEditTimeCancels = 0;
             timeUntilEditCancel = System.currentTimeMillis();
+
+            //record the time and update the visuals
+            sendTimeToDatabase();
+            populateListView();
         } else {
             long timeElapsed = SystemClock.elapsedRealtime() - chronometer.getBase();
 
@@ -148,6 +163,10 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
             chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
             timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
             startTimeBetweenEditTimeCancels = System.currentTimeMillis();
+
+            //record the time and update the visuals
+            sendTimeToDatabase();
+            populateListView();
         }
     }
 
@@ -178,16 +197,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 start.setBackgroundResource(R.drawable.play);
 
                 //send time in timer to database
-                String todoDate = dbh.getTodoDate(previousTodo, new Date());
-                String[] toUpdate = todoDate.split("\\s+");
-                long todoDateId = convertToInt(toUpdate[1]);
-                long todoId = (long) previousTodo.getId();
-                long dateId = dbh.getDateID(new Date());
-                int lock = convertToInt(toUpdate[13]);
-                String theRequiredTime = toUpdate[8];
-                String theCompletedTime = convertToHoursAndMinutes((SystemClock.elapsedRealtime() - chronometer.getBase())/ (60000));
-                dbh.updateTodoDate(todoDateId, todoId, dateId, lock, theRequiredTime, theCompletedTime);
-
+                sendTimeToDatabase();
 
                 //set timer base to 2do's completed time
                 long timerTime = (long) (clickedTodo.getTimeCompleted()) * 60000;
@@ -230,6 +240,19 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         } else {
             return "" + hours + ":" + minutes;
         }
+    }
+
+    public void sendTimeToDatabase(){
+        //send time in timer to database
+        String todoDate = dbh.getTodoDate(previousTodo, new Date());
+        String[] toUpdate = todoDate.split("\\s+");
+        long todoDateId = convertToInt(toUpdate[1]);
+        long todoId = (long) previousTodo.getId();
+        long dateId = dbh.getDateID(new Date());
+        int lock = convertToInt(toUpdate[13]);
+        String theRequiredTime = toUpdate[8];
+        String theCompletedTime = convertToHoursAndMinutes((SystemClock.elapsedRealtime() - chronometer.getBase())/ (60000));
+        dbh.updateTodoDate(todoDateId, todoId, dateId, lock, theRequiredTime, theCompletedTime);
     }
 
     private class TodoListAdapter extends ArrayAdapter<Todo> {
