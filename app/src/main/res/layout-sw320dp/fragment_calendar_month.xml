@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:mcv_showOtherDates="true"
-        app:mcv_dateTextAppearance="@style/calendar_date_large"
+        app:mcv_dateTextAppearance="@style/calendar_date_normal"
         />
 
     <TextView

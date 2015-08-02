@@ -1,5 +1,7 @@
 package cajac.aliveline;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,21 +11,25 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
-
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -31,8 +37,6 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateChangedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
-import com.prolificinteractive.materialcalendarview.decorators.Deadline;
-import com.prolificinteractive.materialcalendarview.decorators.OneDayDecorator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +45,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import cajac.aliveline.decorators.DayOutOfMonth;
+import cajac.aliveline.decorators.Deadline;
+import cajac.aliveline.decorators.OneDayDecorator;
 import it.sephiroth.android.library.widget.AbsHListView;
 import it.sephiroth.android.library.widget.AdapterView;
 import it.sephiroth.android.library.widget.HListView;
@@ -49,8 +56,9 @@ import it.sephiroth.android.library.widget.HListView;
  * Created by Chungyuk Takahashi on 6/5/2015.
  */
 public class CalendarFragment extends Fragment {
-    private View view;
+    private View rootView;
     private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
     protected FragmentActivity mActivity;
 
     private int screenWidth;
@@ -59,17 +67,31 @@ public class CalendarFragment extends Fragment {
     private Fragment currentCal;
     private CalendarMonthFragment calMonthFrag;
     private CalendarDayFragment calDayFrag;
+    private TodoListFragment todoListFrag;
+    private FrameLayout calendarFrame;
+    private FrameLayout listFrame;
     private Date selectedDate;
     final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
     private static final Date today = CalendarDay.today().getDate();
     private Switch dayOrMonth;
     private Button goToToday;
 
+    private DatabaseHelper dbh;
+    private RecyclerView todosRecyclerV;
+    private RecyclerView.Adapter recAdapter;
+    private List<Todo> recTodos;
+
+    private int shortTransition = 300;
+    private int normalTransition = 600;
+    private int longTransition = 900;
+
+    boolean something = false;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
 
-        view = inflater.inflate(R.layout.fragment_calendar, container, false);
+        rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
 
 //        Calendar cal = Calendar.getInstance();
 //        cal.clear(Calendar.HOUR_OF_DAY);
@@ -81,18 +103,28 @@ public class CalendarFragment extends Fragment {
 //        selectedDate = cal.getTime();
         calMonthFrag = new CalendarMonthFragment();
         calDayFrag = new CalendarDayFragment();
+        todoListFrag = new TodoListFragment();
+        fragmentManager = getFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.calendar_frame, calDayFrag, "DAY");
+//        fragmentTransaction.hide(calDayFrag);
+//        calDayFrag.hide();
+        fragmentTransaction.add(R.id.calendar_frame, calMonthFrag, "MONTH");
+        fragmentTransaction.add(R.id.list_frame, todoListFrag, "LIST");
+        fragmentTransaction.commit();
+
+        calendarFrame = (FrameLayout) rootView.findViewById(R.id.calendar_frame);
+        listFrame = (FrameLayout) rootView.findViewById(R.id.list_frame);
+        calendarFrame.getLayoutParams().height = (int) (screenHeight * 0.4);
+        calendarFrame.requestLayout();
+        listFrame.getLayoutParams().height = (int) (screenHeight * 0.6);
+        listFrame.requestLayout();
+
+//        if (currentCal == null)
+//            switchFrame(new CalendarMonthFragment());
+
         selectedDate = CalendarDay.today().getDate();
-
-        if (currentCal == null)
-            switchFrame(new CalendarMonthFragment());
-        // Needed in case the fragment disappears
-        if(currentCal instanceof CalendarDayFragment) {
-            switchFrame(new CalendarDayFragment());
-        }else {
-            switchFrame(new CalendarMonthFragment());
-        }
-
-        dayOrMonth = (Switch) view.findViewById(R.id.day_month_switch);
+        dayOrMonth = (Switch) rootView.findViewById(R.id.day_month_switch);
         dayOrMonth.setChecked(false);
         dayOrMonth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -100,36 +132,120 @@ public class CalendarFragment extends Fragment {
                 Log.w("Switch", selectedDate.toString());
                 if (isChecked) {
 //                    calMonthFrag = (CalendarMonthFragment) currentCal;
-//                    switchFrame(calDayFrag);
-                    switchFrame(new CalendarDayFragment());
+                    switchFrame(false);
+//                    switchFrame(new CalendarDayFragment());
                 } else {
 //                    calDayFrag = (CalendarDayFragment) currentCal;
-//                    calMonthFrag.getCalendarView().setSelectedDate(selectedDate);
-//                    Log.w("Switch", calMonthFrag.getCalendarView().getSelectedDate().toString());
-                    switchFrame(new CalendarMonthFragment());
-//                    switchFrame(calMonthFrag);
+                    Log.w("Switch", calMonthFrag.getCalendarView().getSelectedDate().toString());
+                    switchFrame(true);
+//                    switchFrame(new CalendarMonthFragment());
                 }
             }
         });
 
-        goToToday = (Button) view.findViewById(R.id.today);
+        goToToday = (Button) rootView.findViewById(R.id.today);
         goToToday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (currentCal == null)
-                    switchFrame(new CalendarMonthFragment());
+//                    switchFrame(new CalendarMonthFragment());
+                    switchFrame(true);
                 else
                     ((CalendarResetter) currentCal).resetToToday();
             }
         });
 
-        return view;
+        return rootView;
     }
 
-    public void switchFrame(Fragment fragment) {
-        currentCal = fragment;
-        fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.calendar_frame, fragment).commit();
+    public void switchFrame(boolean switchToMonth) {
+        CalendarMonthFragment cmf = (CalendarMonthFragment) fragmentManager.findFragmentByTag("MONTH");
+        CalendarDayFragment cdf = (CalendarDayFragment) fragmentManager.findFragmentByTag("DAY");
+
+        if (switchToMonth) {
+            currentCal = calMonthFrag;
+            Log.w("switchFrame", selectedDate.toString());
+            ((CalendarMonthFragment) currentCal).setSelectedDate(selectedDate);
+            // Make method for animating in and out in the month and day fragments
+
+            calDayFrag.fadeOut();
+            rootView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    calMonthFrag.fadeIn();
+                }
+            }, shortTransition);
+            switchFragments(cdf, cmf, true);
+        } else {
+
+            currentCal = calDayFrag;
+            calDayFrag.setSelectedDate(selectedDate);
+
+            calMonthFrag.fadeOut();
+
+            rootView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    calDayFrag.fadeIn();
+                }
+            }, shortTransition);
+
+            switchFragments(cmf, cdf, false);
+        }
+
+//        currentCal = fragment;
+//        fragmentTransaction.replace(R.id.calendar_frame, fragment).commit();
+
+    }
+
+    private void switchFragments(Fragment frag1, Fragment frag2, boolean switchToMonth) {
+//        if (frag1 != null) {
+//            fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.hide(frag1);
+//            fragmentTransaction.commit();
+//        }
+        // Animation
+        animateSwitch(frag1, switchToMonth);
+        final Fragment fragTwo = frag2;
+//        if (frag2 != null) {
+//            fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.show(frag2);
+//            fragmentTransaction.commit();
+//        }
+//        rootView.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (fragTwo != null) {
+//                    fragmentTransaction = fragmentManager.beginTransaction();
+//                    fragmentTransaction.show(fragTwo);
+//                    fragmentTransaction.commit();
+//                }
+//            }
+//        }, 800);
+
+    }
+
+    private void animateSwitch(Fragment fragment, boolean switchToMonth) {
+        Animation calendarAnim;
+        Animation listAnim;
+//        v.getLayoutParams().height = 50;
+//        v.getLayoutParams().width = 200;
+//        v.requestLayout();
+//        Log.w("animate", "Helloo");
+        if (switchToMonth) {
+            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.4));
+            listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.6));
+        } else {
+            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.25));
+            listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.75));
+        }
+        calendarAnim.setDuration(normalTransition);
+        calendarAnim.setFillAfter(true);
+        listAnim.setDuration(normalTransition);
+        listAnim.setFillAfter(true);
+        calendarFrame.startAnimation(calendarAnim);
+        listFrame.startAnimation(listAnim);
+
     }
 
     @Override
@@ -138,6 +254,26 @@ public class CalendarFragment extends Fragment {
         mActivity = (FragmentActivity) activity;
         screenWidth = mActivity.getResources().getDisplayMetrics().widthPixels;
         screenHeight = mActivity.getResources().getDisplayMetrics().heightPixels;
+    }
+
+    private void createRecyclerView(View view){
+        dbh = new DatabaseHelper(getActivity());
+        //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
+        recTodos = dbh.getAllToDosByDay(selectedDate);
+        todosRecyclerV = (RecyclerView) view.findViewById(R.id.toDoList);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        todosRecyclerV.setLayoutManager(layoutManager);
+        recAdapter = new CardAdapter(recTodos);
+        todosRecyclerV.setAdapter(recAdapter);
+        dbh.close();
+    }
+
+    public void updateRecyclerAdapter(){
+        //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
+        recTodos.clear();
+        recAdapter.notifyDataSetChanged();
+        recTodos.addAll(dbh.getAllToDosByDay(selectedDate));
+        recAdapter.notifyItemRangeChanged(0, recTodos.size());
     }
 
     public Fragment getCurrentCal() {
@@ -149,64 +285,68 @@ public class CalendarFragment extends Fragment {
     }
 
     private class CalendarMonthFragment extends Fragment implements OnMonthChangedListener, CalendarResetter {
-        private View view;
+        private View childView;
         private MaterialCalendarView calendarView;
         private TextView textView;
         private final DateFormat FORMATTER = SimpleDateFormat.getDateInstance();
         private final int REQUEST_DATE = 0;
+
+        private Calendar cal = Calendar.getInstance();
         private OneDayDecorator oneDayDecorator = new OneDayDecorator();
+        private DayOutOfMonth dayOutOfMonth = new DayOutOfMonth();
 
         public CalendarMonthFragment() {}
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            view = inflater.inflate(R.layout.fragment_calendar_month, container, false);
+            childView = inflater.inflate(R.layout.fragment_calendar_month, container, false);
 
-            textView = (TextView) view.findViewById(R.id.textview);
-            calendarView = (MaterialCalendarView) view.findViewById(R.id.calendarView);
+            textView = (TextView) childView.findViewById(R.id.textview);
+            calendarView = (MaterialCalendarView) childView.findViewById(R.id.calendarView);
             calendarView.setOnDateChangedListener(new OnDateClickListener());
             calendarView.setOnMonthChangedListener(this);
             calendarView.clearSelection();
             calendarView.setSelectedDate(selectedDate);
             calendarView.setCurrentDate(selectedDate);
-            Log.w("OnCreateView", calendarView.getSelectedDate().toString());
 
             calendarView.setSelectionColor(getActivity().getResources().getColor(R.color.selected));
             calendarView.setTitleOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                    CalendarDatePicker cdp = new CalendarDatePicker();
+                    CalendarDatePicker cdp = new CalendarDatePicker(selectedDate);
                     cdp.setTargetFragment(CalendarMonthFragment.this, REQUEST_DATE);
                     cdp.show(ft, "CalendarDatePicker");
                 }
             });
             int tileWidth = screenWidth / (28/3);
-            int tileLength = (int)(screenHeight * (5.0/108));
+            int tileLength = (int)(screenHeight * (5.0/105));
             calendarView.setTileSize(tileWidth, tileLength);
+
+//            DatabaseHelper dbh = new DatabaseHelper(getActivity());
+//            List<Todo> test = dbh.getAllToDos();
+//            String dates = "";
+//            for(Todo td : test) {
+//                dates += td.getTitle() + ": " + td.getDueDateString() + "\n";
+//            }
+//            TextView textView = (TextView) rootView.findViewById(R.id.textview);
+//            textView.setText(dates);
 //            int tileLength = (screenHeight / 2) * (5 / 6) / 9;
 
-//            Button save = (Button) view.findViewById(R.id.save);
-//            save.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-////                EditText input = (EditText) view.findViewById(R.id.edit);
-////                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-////                SharedPreferences.Editor edit = sharedPref.edit();
-////
-////                edit.putString(formattedSelectDate, input.getText().toString());
-////                edit.commit();
-//                }
-//            });
-
+            calendarView.removeDecorator(dayOutOfMonth);
             calendarView.addDecorators(
+                    dayOutOfMonth,
                     oneDayDecorator,
-                    new Deadline(tileWidth, tileLength)
+                    new Deadline(getActivity(), tileWidth, tileLength)
             );
             oneDayDecorator.setDate(selectedDate);
+            cal.setTime(selectedDate);
+            dayOutOfMonth.setMonth(cal.get(Calendar.MONTH));
             calendarView.invalidateDecorators();
 
-            return view;
+//            createRecyclerView(rootView);
+
+            return childView;
         }
 
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -215,23 +355,23 @@ public class CalendarFragment extends Fragment {
                 Date date = (Date) data.getSerializableExtra(CalendarDatePicker.DATE);
                 selectedDate = date;
                 calendarView.setSelectedDate(selectedDate);
+                oneDayDecorator.setDate(selectedDate);
+                calendarView.invalidateDecorators();
             }
         }
 
         @Override
         public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
-//            Toast.makeText(getActivity(), FORMATTER.format(date.getDate()), Toast.LENGTH_SHORT).show();
+            dayOutOfMonth.setMonth(date.getMonth());
+            widget.removeDecorator(oneDayDecorator);
+            widget.addDecorator(oneDayDecorator);
+            widget.invalidateDecorators();
         }
 
         @Override
         public void onSaveInstanceState(Bundle outState) {
             // TODO Auto-generated method stub
             super.onSaveInstanceState(outState);
-
-//            if (calendarView != null) {
-//                calendarView.onSaveInstanceState();
-//            }
-
         }
 
         private class OnDateClickListener implements OnDateChangedListener {
@@ -245,23 +385,58 @@ public class CalendarFragment extends Fragment {
                     selectedDate = convertDate;
                     oneDayDecorator.setDate(convertDate);
                     widget.invalidateDecorators();
+                    todoListFrag.updateRecyclerAdapter(selectedDate);
+//                    updateRecyclerAdapter();
                 }
             }
 
             public void sameDate() {
+                switchFrame(false);
                 dayOrMonth.setChecked(true);
-                CalendarDayFragment dayView = new CalendarDayFragment();
-                switchFrame(dayView);
             }
         }
 
         public MaterialCalendarView getCalendarView() { return calendarView; }
 
+        public void setSelectedDate(Date date) {
+            calendarView.setSelectedDate(date);
+            oneDayDecorator.setDate(date);
+            calendarView.invalidateDecorators();
+        }
+
         public void resetToToday() {
             selectedDate = today;
+            cal.setTime(selectedDate);
             oneDayDecorator.setDate(selectedDate);
             calendarView.invalidateDecorators();
+            todoListFrag.updateRecyclerAdapter(selectedDate);
             calendarView.setSelectedDate(selectedDate);
+        }
+
+        public void fadeIn() {
+            fadeIn(shortTransition);
+        }
+
+        public void fadeIn(int milliseconds) {
+            childView.animate().alpha(1f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    childView.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        public void fadeOut() {
+            fadeOut(shortTransition);
+        }
+
+        public void fadeOut(int milliseconds) {
+            childView.animate().alpha(0f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    childView.setVisibility(View.GONE);
+                }
+            });
         }
 
     }
@@ -272,7 +447,7 @@ public class CalendarFragment extends Fragment {
         private InfiniteAdapter mAdapter;
 
         private static final String LOG_TAG = "CalendarDay";
-        private final int dayWidth = screenWidth / 4;
+        private final int dayWidth = (int) (screenWidth / 3.5);
         private final int dayCenter = screenWidth / 2 - dayWidth / 2;
 
         private final String[] DAYS_OF_WEEK = new String[] {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
@@ -286,11 +461,6 @@ public class CalendarFragment extends Fragment {
         private int selectedPosition;
         private View oldView;
         private ViewGroup container;
-
-        private DatabaseHelper dbh;
-        private RecyclerView todosRecyclerV;
-        private RecyclerView.Adapter recAdapter;
-        private List<Todo> recTodos;
 
         public CalendarDayFragment() {}
 
@@ -328,10 +498,8 @@ public class CalendarFragment extends Fragment {
             listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
                 @Override
                 public void onLoadMore(boolean direction) {
-                    if (direction)
-                        addFuture();
-                    else
-                        addPast();
+                    if (direction)  addFuture();
+                    else            addPast();
                 }
 
                 public void onScrollStateChanged(AbsHListView View, int scrollState) {
@@ -341,36 +509,15 @@ public class CalendarFragment extends Fragment {
             listView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View p_v, MotionEvent p_event) {
-                    // this will disallow the touch request for parent scroll on touch of child view
+                    // this will disallow the touch request for parent scroll on touch of child rootView
                     p_v.getParent().requestDisallowInterceptTouchEvent(true);
                     return false;
                 }
             });
 
-            createRecyclerView();
-
+//            createRecyclerView(dayView);
             return dayView;
         }
-
-        private void createRecyclerView(){
-            dbh = new DatabaseHelper(getActivity());
-            //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
-            recTodos = dbh.getAllToDosByDay(selectedDate);
-            todosRecyclerV = (RecyclerView)dayView.findViewById(R.id.toDoList);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-            todosRecyclerV.setLayoutManager(layoutManager);
-            recAdapter = new CardAdapter(recTodos);
-            todosRecyclerV.setAdapter(recAdapter);
-        }
-
-        public void udpdateRecyclerAdapter(){
-            //String selectedDateStr = dbh.dateToStringFormat(selectedDate);
-            recTodos.clear();
-            recAdapter.notifyDataSetChanged();
-            recTodos.addAll(dbh.getAllToDosByDay(selectedDate));
-            recAdapter.notifyItemRangeChanged(0, recTodos.size());
-        }
-
 
         private void addPast() {
             for (int i = 0; i < 7; i++) {
@@ -397,24 +544,24 @@ public class CalendarFragment extends Fragment {
             // Deserialize API response and then construct new objects to append to the adapter
         }
 
-        private void scrollList() {
-            listView.smoothScrollBy(1500, 300);
-        }
-
         @Override
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
             Date date = mAdapter.getItem(position);
             if (selectedDate.equals(date)) {
-                dayOrMonth.setChecked(false);
                 CalendarMonthFragment monthView = new CalendarMonthFragment();
-                switchFrame(monthView);
+//                switchFrame(monthView);
+                switchFrame(true);
+                dayOrMonth.setChecked(false);
                 return;
             }
             selectedDate = date;
-            oldView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
-            udpdateRecyclerAdapter();
+            oldView.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
+            todoListFrag.updateRecyclerAdapter(selectedDate);
+//            updateRecyclerAdapter();
+            setTextColors(oldView, getResources().getColor(R.color.primary_text));
             oldView = view;
-            view.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
+            view.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
             selectedPosition = position;
             listView.post(new ScrollRunnable(position));
         }
@@ -441,7 +588,39 @@ public class CalendarFragment extends Fragment {
         public View getOldView() { return oldView; }
 
         public void resetToToday() {
-            selectedDate = CalendarDay.today().getDate();
+            fadeOut(shortTransition);
+            dayView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setSelectedDate(CalendarDay.today().getDate());
+                    fadeIn(shortTransition);
+                    Log.w("resetToToday", "GOOD");
+                }
+            }, shortTransition);
+//            int fadeInDuration = 500; // Configure time values here
+//            int timeBetween = 300;
+//            int fadeOutDuration = 300;
+//            Animation fadeIn = new AlphaAnimation(0, 1);
+//            fadeIn.setInterpolator(new DecelerateInterpolator()); // add this
+//            fadeIn.setDuration(fadeInDuration);
+//
+//            Animation fadeOut = new AlphaAnimation(1, 0);
+//            fadeOut.setInterpolator(new AccelerateInterpolator()); // and this
+//            fadeOut.setStartOffset(fadeInDuration + timeBetween);
+//            fadeOut.setDuration(fadeOutDuration);
+//
+//            AnimationSet animation = new AnimationSet(false); // change to false
+//            animation.addAnimation(fadeIn);
+////            animation.addAnimation(fadeOut);
+//            animation.setRepeatCount(1);
+//            dayView.setAnimation(animation);
+//            dayView.startAnimation(animation);
+//            setSelectedDate(CalendarDay.today().getDate());
+
+        }
+
+        public void setSelectedDate(Date date) {
+            selectedDate = date;
             past.setTime(selectedDate);
             past.add(Calendar.DAY_OF_YEAR, -30);
             future.setTime(selectedDate);
@@ -461,8 +640,48 @@ public class CalendarFragment extends Fragment {
             mAdapter = new InfiniteAdapter( mActivity, R.layout.hlv_item, items );
             listView.setAdapter(mAdapter);
             selectedPosition = todayPosition;
+            todoListFrag.updateRecyclerAdapter(selectedDate);
+//            updateRecyclerAdapter();
+            setTextColors(oldView, getResources().getColor(R.color.primary_text));
             oldView = listView.getAdapter().getView(selectedPosition, null, container);
+            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
+
             listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
+        }
+
+        protected void setTextColors(View dayItem, int color) {
+            TextView itemMonth = (TextView) dayItem.findViewById(R.id.item_month);
+            TextView dayOfMonth = (TextView) dayItem.findViewById(R.id.day_of_month);
+            TextView year = (TextView) dayItem.findViewById(R.id.year);
+            itemMonth.setTextColor(color);
+            dayOfMonth.setTextColor(color);
+            year.setTextColor(color);
+        }
+
+        public void fadeIn() {
+            fadeIn(shortTransition);
+        }
+
+        public void fadeIn(int milliseconds) {
+            dayView.animate().alpha(1f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    dayView.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        public void fadeOut() {
+            fadeOut(shortTransition);
+        }
+
+        public void fadeOut(int milliseconds) {
+            dayView.animate().alpha(0f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    dayView.setVisibility(View.GONE);
+                }
+            });
         }
 
         private class InfiniteAdapter extends ArrayAdapter<Date> {
@@ -471,10 +690,7 @@ public class CalendarFragment extends Fragment {
             private LayoutInflater mInflater;
             private Context mContext;
             private int mResource;
-            private int mTextResId;
-            ViewGroup parent;
-
-            Animation animation;
+            private Animation animation;
 
             public InfiniteAdapter( Context context, int resourceId, List<Date> objects ) {
                 super( context, resourceId, objects );
@@ -497,21 +713,15 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public View getView( int position, View convertView, ViewGroup parent ) {
-//                Log.w("getView", "Testing");
-                this.parent = parent;
-//                position%=mItems.size();
-
                 if( null == convertView ) {
                     convertView = mInflater.inflate( mResource, parent, false );
                 }
 
                 if ( position == selectedPosition) {
                     oldView = convertView;
-                    convertView.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
-//                    setTextColors(itemMonth, dayOfMonth, year, android.R.color.holo_orange_dark);
+                    convertView.findViewById(R.id.date_info).setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
                 } else {
-                    convertView.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
-//                    setTextColors(itemMonth, dayOfMonth, year, R.color.selected);
+                    convertView.findViewById(R.id.date_info).setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
                 }
 
                 Calendar cal = Calendar.getInstance();
@@ -531,23 +741,16 @@ public class CalendarFragment extends Fragment {
 
                 ViewGroup.LayoutParams params = convertView.getLayoutParams();
                 params.width = dayWidth;
+                params.height = (int) (screenHeight * 0.22);
 
                 if ( position == selectedPosition) {
-                    setTextColors(itemMonth, dayOfMonth, year, getResources().getColor(android.R.color.tertiary_text_light));
-
+                    setTextColors(convertView, getResources().getColor(R.color.secondary_text));
                 } else {
-                    setTextColors(itemMonth, dayOfMonth, year, getResources().getColor(android.R.color.secondary_text_light));
+                    setTextColors(convertView, getResources().getColor(R.color.primary_text));
                 }
-
-                convertView.startAnimation(animation);
+//                convertView.findViewById(R.id.date_info).startAnimation(animation);
 
                 return convertView;
-            }
-
-            private void setTextColors(TextView month, TextView dayOfMonth, TextView year, int color) {
-                month.setTextColor(color);
-                dayOfMonth.setTextColor(color);
-                year.setTextColor(color);
             }
 
             @Override
@@ -576,7 +779,6 @@ public class CalendarFragment extends Fragment {
                 head = (head + (size - 1)) % size;
                 tail = (tail + (size - 1)) % size;
             }
-
         }
 
     }

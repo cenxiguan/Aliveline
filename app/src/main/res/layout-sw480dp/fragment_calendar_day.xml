@@ -4,41 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF">
+    android:background="@android:color/white"
+    android:visibility="gone">
 
-    <LinearLayout
+    <it.sephiroth.android.library.widget.HListView
+        android:id="@+id/hListView1"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight=".25"
-        android:orientation="vertical" >
-
-        <it.sephiroth.android.library.widget.HListView
-            android:id="@+id/hListView1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="20dip"
-            android:paddingBottom="20dip"
-            android:divider="@drawable/group_divider"
-            app:hlv_dividerWidth="@dimen/normal_hlv_divider"
-            android:background="@color/hl_background" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight=".75"
-        android:paddingRight="20dp"
-        android:paddingBottom="@dimen/normal_hlv_divider"
-        android:paddingLeft="20dp">
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/toDoList"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
-
-    </LinearLayout>
-
+        android:layout_height="match_parent"
+        android:divider="@drawable/group_divider"
+        app:hlv_dividerWidth="0dp"
+        android:background="@color/hl_background" />
 
 </LinearLayout>

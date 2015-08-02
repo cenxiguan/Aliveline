@@ -23,6 +23,7 @@ public class Todo implements Parcelable {
     public HashMap<String, String> relationalValues;
     public String todaysTimeLeft;
     String dueDateString;
+    public int timeRequired, timeCompleted;
 
 
     public Todo(){
@@ -153,4 +154,12 @@ public class Todo implements Parcelable {
     private Todo(Parcel in){
         mData = in.readInt();
     }
+
+    public void setTimeRequired(int timeRequired){this.timeRequired = timeRequired;}
+
+    public int getTimeRequired(){return timeRequired;}
+
+    public void setTimeCompleted(int timeCompleted){ this.timeCompleted = timeCompleted;}
+
+    public int getTimeCompleted(){return timeCompleted;}
 }

@@ -9,7 +9,15 @@
     <FrameLayout
         android:id="@+id/calendar_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="300dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"/>
+
+    <FrameLayout
+        android:id="@+id/list_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/calendar_frame"/>
 
     <RelativeLayout
         android:id="@+id/switch_layout"

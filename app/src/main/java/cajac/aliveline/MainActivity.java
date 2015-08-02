@@ -36,14 +36,14 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.ic_calendar,
             R.drawable.ic_timer,
             R.drawable.ic_settings};
-    //private int[] tabLayouts = { R.layout.tab_home,
-    //        R.layout.tab_calendar,
-    //        R.layout.tab_timer,
-    //        R.layout.tab_settings};
-    //private int[] tabTextViews = { R.id.tab_home,
-    //        R.id.tab_calendar,
-    //        R.id.tab_timer,
-    //        R.id.tab_settings};
+    private int[] tabLayouts = { R.layout.tab_home,
+            R.layout.tab_calendar,
+            R.layout.tab_timer,
+            R.layout.tab_settings};
+    private int[] tabTextViews = { R.id.tab_home,
+            R.id.tab_calendar,
+            R.id.tab_timer,
+            R.id.tab_settings};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +67,25 @@ public class MainActivity extends AppCompatActivity implements
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
 
         // Adding Tabs with Icons
-        for (int i=0; i < tabs.length; i++){
-            actionBar.addTab(actionBar.newTab().setText(tabs[i])
-                    .setIcon(getResources().getDrawable(icons[i]))
-                    .setTabListener(this));
-        }
-
-        //creates custom views for ech tab, with icons on top and text on bottom
-        //for (int i=0; i<tabs.length; i++) {
-        //    createTab(actionBar, tabLayouts[i], tabTextViews[i], tabs[i]);
+        //for (int i=0; i < tabs.length; i++){
+        //    actionBar.addTab(actionBar.newTab().setText(tabs[i])
+        //            .setIcon(getResources().getDrawable(icons[i]))
+        //            .setTabListener(this));
         //}
+
+        if(isScreenNormal()) {
+            //creates custom views for ech tab, with icons on top and text on bottom
+            for (int i = 0; i < tabs.length; i++) {
+                createTab(actionBar, tabLayouts[i], tabTextViews[i], tabs[i]);
+            }
+        } else {
+            // Adding Tabs with Icons
+            for (int i=0; i < tabs.length; i++){
+                actionBar.addTab(actionBar.newTab().setText(tabs[i])
+                        .setIcon(getResources().getDrawable(icons[i]))
+                        .setTabListener(this));
+            }
+        }
 
 
         // Swiping the viewpager make respective tab selected
@@ -127,6 +136,12 @@ public class MainActivity extends AppCompatActivity implements
         final int screenSize = getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK;
         return screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    public boolean isScreenNormal() {
+        final int screenSize = getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK;
+        return screenSize == Configuration.SCREENLAYOUT_SIZE_NORMAL;
     }
 
     @Override

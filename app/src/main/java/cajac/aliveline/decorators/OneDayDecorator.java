@@ -1,6 +1,8 @@
-package com.prolificinteractive.materialcalendarview.decorators;
+package cajac.aliveline.decorators;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 
@@ -29,6 +31,7 @@ public class OneDayDecorator implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
+        view.addSpan(new ForegroundColorSpan(Color.parseColor("#FFFFFF")));
         view.addSpan(new StyleSpan(Typeface.BOLD));
         view.addSpan(new RelativeSizeSpan(1.4f));
     }
