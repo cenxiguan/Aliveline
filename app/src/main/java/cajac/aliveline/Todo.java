@@ -17,7 +17,7 @@ public class Todo implements Parcelable {
     public int timeUsage;
     int id;
     public String startTime;
-    public String remainingTime;
+    public String remainingTime = estimatedTime;
     public String locks;
     public int mData;
     public HashMap<String, String> relationalValues;
