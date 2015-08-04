@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,13 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
@@ -48,9 +43,6 @@ import java.util.List;
 import cajac.aliveline.decorators.DayOutOfMonth;
 import cajac.aliveline.decorators.Deadline;
 import cajac.aliveline.decorators.OneDayDecorator;
-import it.sephiroth.android.library.widget.AbsHListView;
-import it.sephiroth.android.library.widget.AdapterView;
-import it.sephiroth.android.library.widget.HListView;
 
 /**
  * Created by Chungyuk Takahashi on 6/5/2015.
@@ -228,10 +220,6 @@ public class CalendarFragment extends Fragment {
     private void animateSwitch(Fragment fragment, boolean switchToMonth) {
         Animation calendarAnim;
         Animation listAnim;
-//        v.getLayoutParams().height = 50;
-//        v.getLayoutParams().width = 200;
-//        v.requestLayout();
-//        Log.w("animate", "Helloo");
         if (switchToMonth) {
             calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.4));
             listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.6));
@@ -441,72 +429,74 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private class CalendarDayFragment extends Fragment implements AdapterView.OnItemClickListener, CalendarResetter {
+    protected class CalendarDayFragment extends Fragment implements  CalendarResetter {
         private View dayView;
-        private HListView listView;
-        private InfiniteAdapter mAdapter;
+        private RecyclerView recyclerView;
+        private RecyclerAdapter mAdapter;
 
         private static final String LOG_TAG = "CalendarDay";
         private final int dayWidth = (int) (screenWidth / 3.5);
         private final int dayCenter = screenWidth / 2 - dayWidth / 2;
+        private final int listSize = 61;
 
-        private final String[] DAYS_OF_WEEK = new String[] {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-        private final String[] MONTHS_OF_YEAR = new String[] {"January", "February", "March", "April",
-                "May", "June", "July", "August", "September", "October", "November", "December" };
+        private final String[] DAYS_OF_WEEK = new String[]{"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+        private final String[] MONTHS_OF_YEAR = new String[]{"January", "February", "March", "April",
+                "May", "June", "July", "August", "September", "October", "November", "December"};
         private Calendar past = Calendar.getInstance();
         private Calendar future = Calendar.getInstance();
         private int head;
         private int tail;
-        private int todayPosition = Integer.MAX_VALUE / 2 + 32;
+        private int todayPosition = Integer.MAX_VALUE / 2 + (listSize/2 + 2);
         private int selectedPosition;
         private View oldView;
-        private ViewGroup container;
 
-        public CalendarDayFragment() {}
+        public CalendarDayFragment() {
+        }
 
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState){
-            this.container = container;
+                                 Bundle savedInstanceState) {
             dayView = inflater.inflate(R.layout.fragment_calendar_day, container, false);
-            listView = (HListView) dayView.findViewById( R.id.hListView1 );
-            past.setTime(selectedDate);
-            past.add(Calendar.DAY_OF_YEAR, -30);
-            future.setTime(selectedDate);
-            future.add(Calendar.DAY_OF_YEAR, 30);
+            recyclerView = (RecyclerView) dayView.findViewById(R.id.hListView);
+            recyclerView.setHasFixedSize(true);
+            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+            llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+            llm.offsetChildrenHorizontal(dayCenter);
 
-            List<Date> items = new ArrayList<Date>();
-
-            for(int i = 1; i <= 61; i++) {
-                items.add(past.getTime());
-                past.add(Calendar.DAY_OF_YEAR, 1);
-            }
-            head = 0;
-            tail = items.size() - 1;
-            past.setTime(selectedDate);
-            past.add(Calendar.DAY_OF_YEAR, -30);
-
-            mAdapter = new InfiniteAdapter( mActivity, R.layout.hlv_item, items );
-            listView.setHeaderDividersEnabled(true);
-            listView.setFooterDividersEnabled(true);
-            listView.setOnItemClickListener(this);
-            listView.setAdapter(mAdapter);
 
             selectedPosition = todayPosition;
-            listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
-            oldView = listView.getAdapter().getView(selectedPosition, null, container);
+            recyclerView.setLayoutManager(llm);
+            setSelectedDate(selectedDate);
 
-            listView.setOnScrollListener(new EndlessScrollListener(items.size()) {
+            recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(),
+                            new RecyclerItemClickListener.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(View view, int position) {
+                                    Date date = mAdapter.getItem(position);
+                                    if (selectedDate.equals(date)) {
+                                        switchFrame(true);
+                                        dayOrMonth.setChecked(false);
+                                        return;
+                                    }
+                                    selectedDate = date;
+                                    oldView.findViewById(R.id.date_info).setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
+                                    todoListFrag.updateRecyclerAdapter(selectedDate);
+                                    setTextColors(oldView, getResources().getColor(R.color.primary_text));
+                                    oldView = view;
+                                    setTextColors(oldView, getResources().getColor(R.color.secondary_text));
+                                    view.findViewById(R.id.date_info).setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+                                    selectedPosition = position;
+                                    scrollToCenter(view);
+                                }
+                            })
+            );
+            recyclerView.addOnScrollListener(new EndlessScrollListener((LinearLayoutManager) recyclerView.getLayoutManager(), listSize) {
                 @Override
                 public void onLoadMore(boolean direction) {
-                    if (direction)  addFuture();
-                    else            addPast();
-                }
-
-                public void onScrollStateChanged(AbsHListView View, int scrollState) {
+                    if (direction) addFuture();
+                    else addPast();
                 }
             });
-
-            listView.setOnTouchListener(new View.OnTouchListener() {
+            recyclerView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View p_v, MotionEvent p_event) {
                     // this will disallow the touch request for parent scroll on touch of child rootView
@@ -515,7 +505,6 @@ public class CalendarFragment extends Fragment {
                 }
             });
 
-//            createRecyclerView(dayView);
             return dayView;
         }
 
@@ -544,48 +533,17 @@ public class CalendarFragment extends Fragment {
             // Deserialize API response and then construct new objects to append to the adapter
         }
 
-        @Override
-        public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
-            Date date = mAdapter.getItem(position);
-            if (selectedDate.equals(date)) {
-                CalendarMonthFragment monthView = new CalendarMonthFragment();
-//                switchFrame(monthView);
-                switchFrame(true);
-                dayOrMonth.setChecked(false);
-                return;
-            }
-            selectedDate = date;
-            oldView.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
-            todoListFrag.updateRecyclerAdapter(selectedDate);
-//            updateRecyclerAdapter();
-            setTextColors(oldView, getResources().getColor(R.color.primary_text));
-            oldView = view;
-            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
-            view.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
-            selectedPosition = position;
-            listView.post(new ScrollRunnable(position));
-        }
+        private class ScrollRunnable implements Runnable {
+            private int dX;
 
-        private class ScrollRunnable implements Runnable{
-            private int position;
-            private int milliseconds;
-
-            public ScrollRunnable(int position) {
-                this.position = position;
-                this.milliseconds = 750;
-            }
-
-            public ScrollRunnable(int position, int milliseconds) {
-                this.position = position;
-                this.milliseconds = milliseconds;
+            public ScrollRunnable(int dX) {
+                this.dX = dX;
             }
 
             public void run() {
-                listView.smoothScrollToPositionFromLeft(position, dayCenter, milliseconds);
+                recyclerView.smoothScrollBy(dX - dayCenter, 0);
             }
         }
-
-        public View getOldView() { return oldView; }
 
         public void resetToToday() {
             fadeOut(shortTransition);
@@ -593,60 +551,35 @@ public class CalendarFragment extends Fragment {
                 @Override
                 public void run() {
                     setSelectedDate(CalendarDay.today().getDate());
+                    todoListFrag.updateRecyclerAdapter(selectedDate);
                     fadeIn(shortTransition);
-                    Log.w("resetToToday", "GOOD");
                 }
             }, shortTransition);
-//            int fadeInDuration = 500; // Configure time values here
-//            int timeBetween = 300;
-//            int fadeOutDuration = 300;
-//            Animation fadeIn = new AlphaAnimation(0, 1);
-//            fadeIn.setInterpolator(new DecelerateInterpolator()); // add this
-//            fadeIn.setDuration(fadeInDuration);
-//
-//            Animation fadeOut = new AlphaAnimation(1, 0);
-//            fadeOut.setInterpolator(new AccelerateInterpolator()); // and this
-//            fadeOut.setStartOffset(fadeInDuration + timeBetween);
-//            fadeOut.setDuration(fadeOutDuration);
-//
-//            AnimationSet animation = new AnimationSet(false); // change to false
-//            animation.addAnimation(fadeIn);
-////            animation.addAnimation(fadeOut);
-//            animation.setRepeatCount(1);
-//            dayView.setAnimation(animation);
-//            dayView.startAnimation(animation);
-//            setSelectedDate(CalendarDay.today().getDate());
 
         }
 
         public void setSelectedDate(Date date) {
             selectedDate = date;
             past.setTime(selectedDate);
-            past.add(Calendar.DAY_OF_YEAR, -30);
+            past.add(Calendar.DAY_OF_YEAR, -listSize / 2);
             future.setTime(selectedDate);
-            future.add(Calendar.DAY_OF_YEAR, 30);
+            future.add(Calendar.DAY_OF_YEAR, listSize / 2);
 
             List<Date> items = new ArrayList<>();
 
-            for(int i = 1; i <= 61; i++) {
+            for (int i = 1; i <= listSize; i++) {
                 items.add(past.getTime());
                 past.add(Calendar.DAY_OF_YEAR, 1);
             }
             head = 0;
             tail = items.size() - 1;
             past.setTime(selectedDate);
-            past.add(Calendar.DAY_OF_YEAR, -30);
+            past.add(Calendar.DAY_OF_YEAR, -listSize / 2);
 
-            mAdapter = new InfiniteAdapter( mActivity, R.layout.hlv_item, items );
-            listView.setAdapter(mAdapter);
+            mAdapter = new RecyclerAdapter(mActivity, R.layout.hlv_item, items);
+            recyclerView.setAdapter(mAdapter);
             selectedPosition = todayPosition;
-            todoListFrag.updateRecyclerAdapter(selectedDate);
-//            updateRecyclerAdapter();
-            setTextColors(oldView, getResources().getColor(R.color.primary_text));
-            oldView = listView.getAdapter().getView(selectedPosition, null, container);
-            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
-
-            listView.setSelectionFromLeft(selectedPosition, dayCenter); //Zooms and aligns center
+            ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(selectedPosition, dayCenter);
         }
 
         protected void setTextColors(View dayItem, int color) {
@@ -656,6 +589,11 @@ public class CalendarFragment extends Fragment {
             itemMonth.setTextColor(color);
             dayOfMonth.setTextColor(color);
             year.setTextColor(color);
+        }
+
+        public void scrollToCenter(View view) {
+            int dX = (int) view.getX();
+            recyclerView.post(new ScrollRunnable(dX));
         }
 
         public void fadeIn() {
@@ -684,86 +622,58 @@ public class CalendarFragment extends Fragment {
             });
         }
 
-        private class InfiniteAdapter extends ArrayAdapter<Date> {
-
+        protected class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerViewHolder> {
             private List<Date> mItems;
             private LayoutInflater mInflater;
             private Context mContext;
             private int mResource;
-            private Animation animation;
 
-            public InfiniteAdapter( Context context, int resourceId, List<Date> objects ) {
-                super( context, resourceId, objects );
-                mInflater = LayoutInflater.from( context );
+            public RecyclerAdapter(Context context, int resourceId, List<Date> objects) {
+//                super( context, resourceId, objects );
+                mInflater = LayoutInflater.from(context);
                 mContext = context;
-                animation = AnimationUtils.loadAnimation(mContext, R.anim.push_up_in);
                 mResource = resourceId;
                 mItems = objects;
             }
 
             @Override
-            public boolean hasStableIds() {
-                return true;
+            public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = mInflater.inflate(mResource, parent, false);
+
+                return new RecyclerViewHolder(view);
             }
 
             @Override
-            public long getItemId( int position ) {
-                return getItem( position ).hashCode();
-            }
-
-            @Override
-            public View getView( int position, View convertView, ViewGroup parent ) {
-                if( null == convertView ) {
-                    convertView = mInflater.inflate( mResource, parent, false );
-                }
-
-                if ( position == selectedPosition) {
-                    oldView = convertView;
-                    convertView.findViewById(R.id.date_info).setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+            public void onBindViewHolder(RecyclerViewHolder viewHolder, int position) {
+                if (position == selectedPosition) {
+                    oldView = viewHolder.getItemView();
+                    viewHolder.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+                    setTextColors(viewHolder.getItemView(), getResources().getColor(R.color.secondary_text));
                 } else {
-                    convertView.findViewById(R.id.date_info).setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
+                    viewHolder.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
+                    setTextColors(viewHolder.getItemView(), getResources().getColor(R.color.primary_text));
                 }
-
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(getItem(position % mItems.size()));
+                cal.setTime(getItem(position));
 
-                TextView dayOfWeek = (TextView) convertView.findViewById(R.id.day_of_week);
-                dayOfWeek.setText(DAYS_OF_WEEK[cal.get(Calendar.DAY_OF_WEEK) - 1]);
+                viewHolder.setDayOfWeek(DAYS_OF_WEEK[cal.get(Calendar.DAY_OF_WEEK) - 1]);
+                viewHolder.setItemMonth(MONTHS_OF_YEAR[cal.get(Calendar.MONTH)]);
+                viewHolder.setDayOfMonth(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+                viewHolder.setYear(String.valueOf(cal.get(Calendar.YEAR)));
 
-                TextView itemMonth = (TextView) convertView.findViewById(R.id.item_month);
-                itemMonth.setText( MONTHS_OF_YEAR[cal.get(Calendar.MONTH)] );
 
-                TextView dayOfMonth = (TextView) convertView.findViewById(R.id.day_of_month);
-                dayOfMonth.setText( String.valueOf(cal.get(Calendar.DAY_OF_MONTH)) );
-
-                TextView year = (TextView) convertView.findViewById(R.id.year);
-                year.setText( String.valueOf(cal.get(Calendar.YEAR)) );
-
-                ViewGroup.LayoutParams params = convertView.getLayoutParams();
-                params.width = dayWidth;
-                params.height = (int) (screenHeight * 0.22);
-
-                if ( position == selectedPosition) {
-                    setTextColors(convertView, getResources().getColor(R.color.secondary_text));
-                } else {
-                    setTextColors(convertView, getResources().getColor(R.color.primary_text));
-                }
-//                convertView.findViewById(R.id.date_info).startAnimation(animation);
-
-                return convertView;
             }
 
             @Override
-            public int getCount() {
+            public int getItemCount() {
                 return Integer.MAX_VALUE;
             }
 
-            @Override
             public Date getItem(int position) {
-                if ( mItems.size()==0 ) {
+                if (mItems.size() == 0 || position == 1) {
                     return null;
                 }
-                return mItems.get( position%mItems.size() );
+                return mItems.get(position % mItems.size());
             }
 
             public void addFuture(Date date) {
@@ -779,10 +689,52 @@ public class CalendarFragment extends Fragment {
                 head = (head + (size - 1)) % size;
                 tail = (tail + (size - 1)) % size;
             }
+
+            public class RecyclerViewHolder extends RecyclerView.ViewHolder {
+                private View itemView;
+
+                private TextView dayOfWeek;
+                private TextView itemMonth;
+                private TextView dayOfMonth;
+                private TextView year;
+
+                public RecyclerViewHolder(View itemView) {
+                    super(itemView);
+                    this.itemView = itemView;
+                    dayOfWeek = (TextView) itemView.findViewById(R.id.day_of_week);
+                    itemMonth = (TextView) itemView.findViewById(R.id.item_month);
+                    dayOfMonth = (TextView) itemView.findViewById(R.id.day_of_month);
+                    year = (TextView) itemView.findViewById(R.id.year);
+                    ViewGroup.LayoutParams params = itemView.getLayoutParams();
+                    params.width = dayWidth;
+                    params.height = (int) (screenHeight * 0.22);
+                }
+
+                public void setBackgroundDrawable(Drawable drawable) {
+                    itemView.findViewById(R.id.date_info).setBackgroundDrawable(drawable);
+                }
+
+                public View getItemView() {
+                    return itemView;
+                }
+
+                public void setDayOfWeek(String dayOfWeek) {
+                    this.dayOfWeek.setText(dayOfWeek);
+                }
+
+                public void setItemMonth(String itemMonth) {
+                    this.itemMonth.setText(itemMonth);
+                }
+
+                public void setDayOfMonth(String dayOfMonth) {
+                    this.dayOfMonth.setText(dayOfMonth);
+                }
+
+                public void setYear(String year) {
+                    this.year.setText(year);
+                }
+            }
+
         }
-
     }
-
-
-
 }
