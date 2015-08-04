@@ -7,12 +7,10 @@
     android:background="@android:color/white"
     android:visibility="gone">
 
-    <it.sephiroth.android.library.widget.HListView
-        android:id="@+id/hListView1"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/hListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@drawable/group_divider"
-        app:hlv_dividerWidth="0dp"
         android:background="@color/hl_background" />
 
 </LinearLayout>
