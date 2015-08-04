@@ -286,12 +286,14 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
 
             //a forLoop that will add all the hours from the todoActivites from stackItem to yVals1
             for(int j = 0; j < stackItem.size() - 1; j++ ) {
-                String timeInStrings= stackItem.get(j).getRemainingTime();
-                int timeInMinutes = dbh.timeInMinutes(timeInStrings);
-                float timeInHours = getHours(timeInMinutes);
+                int minsRequired = stackItem.get(j).getTimeRequired();
+                int minsCompleted= stackItem.get(j).getTimeCompleted();
+                int timeDisplayed = minsCompleted - minsRequired;
+                float timeInHours = getHours(timeDisplayed);
                 newEntries[j] = timeInHours;
                 stackTotal += timeInHours;
             }
+
             yVals1.add(new BarEntry(newEntries,i));
             //a forLoop that will go through the stackItems and see if they are greater than 24hours in a day
 
@@ -368,6 +370,8 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         hours += (minutes % 60) / 60.0;
         return hours;
     }
+
+
 
 
     @Override

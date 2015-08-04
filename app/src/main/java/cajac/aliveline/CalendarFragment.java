@@ -561,7 +561,7 @@ public class CalendarFragment extends Fragment {
             setTextColors(oldView, getResources().getColor(R.color.primary_text));
             oldView = view;
             setTextColors(oldView, getResources().getColor(R.color.secondary_text));
-            view.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+            vigw.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
             selectedPosition = position;
             listView.post(new ScrollRunnable(position));
         }
