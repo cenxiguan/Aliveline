@@ -3,6 +3,9 @@ package cajac.aliveline;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -62,6 +65,15 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         mProgressBar.setProgress(0);
         populateListView();
         registerClickCallback();
+
+
+        //AlarmManager mgr=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        //Intent i=new Intent(this, AlarmReceiver.class);
+        //PendingIntent pi=PendingIntent.getBroadcast(this, 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        //mgr.cancel(pi);
+        //long MINUTE=AlarmManager.INTERVAL_HOUR/60;
+        //long TIMER=MINUTE*minutes;
+        //mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), TIMER, pi);
 
         return view;
     }
