@@ -1,1 +1,1 @@
-include ':app', ':material-calendar-library'
+include ':app', ':material-calendar-library', ':holo-circular-progress-bar'

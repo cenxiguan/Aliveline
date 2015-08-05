@@ -27,6 +27,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile project(':material-calendar-library')
+    compile project(':holo-circular-progress-bar')
     compile 'com.android.support:cardview-v7:21.0.+'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
     compile 'com.android.support:recyclerview-v7:22.2.+'
