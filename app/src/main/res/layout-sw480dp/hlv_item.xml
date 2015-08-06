@@ -1,39 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/text_background_selector"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="10dp">
+    android:background="@drawable/shadow"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/day_of_week"
+    <RelativeLayout
+        android:id="@+id/date_info"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:layout_height="match_parent"
+        android:layout_below="@id/day_of_week_bar"
+        android:orientation="vertical"
+        android:background="@drawable/hlv_item_unselected"  >
 
-    <TextView
-        android:id="@+id/item_month"
+        <TextView
+            android:id="@+id/item_month"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="2sp"
+            android:textSize="10sp"/>
+
+        <TextView
+            android:id="@+id/day_of_month"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="10sp"
+            android:textSize="30sp"/>
+
+        <TextView
+            android:id="@+id/year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:textSize="9sp"
+            android:layout_marginTop="40sp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/day_of_week_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/day_of_month"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        <TextView
+            android:id="@+id/day_of_week"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:background="@drawable/day_of_week_bar"
+            android:textSize="12sp"
+            android:textColor="@color/white"            />
+    </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/year"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-</LinearLayout>
+</RelativeLayout>

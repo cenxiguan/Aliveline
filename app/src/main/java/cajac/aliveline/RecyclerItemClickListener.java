@@ -5,7 +5,6 @@ package cajac.aliveline;
  */
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,8 +31,13 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     @Override public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-            mListener.onItemClick(childView, view.getChildPosition(childView));
-            return true;
+            if (view.getChildAdapterPosition(childView) == -1) {
+                view.scrollBy(1, 0);
+                onInterceptTouchEvent(view, e);
+            } else {
+                mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
+                return true;
+            }
         }
         return false;
     }

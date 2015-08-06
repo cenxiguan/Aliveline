@@ -36,14 +36,15 @@
     <dimen name="xlarge_button_elevation">6dp</dimen>
 
     <!-- Small calendar -->
-    <dimen name="small_hlv_divider">10dp</dimen>
+    <dimen name="small_hlv_divider">5dp</dimen>
 
     <!-- Normal calendar -->
-    <dimen name="normal_hlv_divider">15dp</dimen>
+    <dimen name="normal_hlv_divider">10dp</dimen>
 
     <!-- Large calendar -->
-    <dimen name="large_hlv_divider">20dp</dimen>
+    <dimen name="large_hlv_divider">15dp</dimen>
 
-
+    <!-- X-large calendar -->
+    <dimen name="xlarge_hlv_divider">20dp</dimen>
 
 </resources>

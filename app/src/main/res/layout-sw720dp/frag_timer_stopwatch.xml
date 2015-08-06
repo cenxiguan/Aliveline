@@ -3,96 +3,129 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:background="@drawable/timerbg4">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
         android:layout_weight="1"
-        android:layout_gravity="center">
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-            <RelativeLayout
+        android:background="@drawable/timerbg4">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center">
+            <FrameLayout
                 android:layout_width="fill_parent"
-                android:layout_height="match_parent"
-                android:gravity="center">
-                <TextView
-                    android:text="Title Goes Here"
-                    android:id="@+id/title_of_todo"
-                    android:textSize="25sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:layout_centerHorizontal="true"
-                    android:layout_above="@+id/divider_view"
-                    android:layout_marginBottom="40dp"/>
-                <ImageButton
-                    android:id="@+id/start_button"
-                    android:background="@drawable/play"
-                    android:layout_marginRight="20dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_toLeftOf="@+id/divider_view" />
-                <TextView
-                    android:id="@+id/divider_view"
-                    android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true" />
-                <ImageButton
-                    android:id="@+id/reset_button"
-                    android:background="@drawable/refresh"
-                    android:layout_toRightOf="@+id/divider_view"
-                    android:layout_alignTop="@+id/start_button"
-                    android:layout_marginLeft="20dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"/>
-            </RelativeLayout>
-        </FrameLayout>
+                android:layout_height="fill_parent">
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+                    <TextView
+                        android:text="Title Goes Here"
+                        android:id="@+id/title_of_todo"
+                        android:textSize="25sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:layout_centerHorizontal="true"
+                        android:layout_above="@+id/divider_view"
+                        android:layout_marginBottom="40dp"/>
+                    <ImageButton
+                        android:id="@+id/start_button"
+                        android:background="@drawable/play"
+                        android:layout_marginRight="20dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_toLeftOf="@+id/divider_view" />
+                    <TextView
+                        android:id="@+id/divider_view"
+                        android:text=""
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true" />
+                    <ImageButton
+                        android:id="@+id/reset_button"
+                        android:background="@drawable/refresh"
+                        android:layout_toRightOf="@+id/divider_view"
+                        android:layout_alignTop="@+id/start_button"
+                        android:layout_marginLeft="20dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"/>
+                </RelativeLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal">
+
+                    <!--<ImageView-->
+                        <!--android:src="@drawable/time_circle"-->
+                        <!--android:layout_width="275dp"-->
+                        <!--android:layout_height="275dp"-->
+                        <!--android:padding="10dp"-->
+                        <!--android:id="@+id/timer_circle"-->
+                        <!--android:layout_centerHorizontal="true"/>-->
+                    <com.pascalwelsch.holocircularprogressbar.HoloCircularProgressBar
+                        android:id="@+id/timer_circle"
+                        android:layout_width="275dp"
+                        android:layout_height="275dp"
+                        android:padding="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"/>
+                    <Chronometer
+                        android:id="@+id/chronometer"
+                        android:format="%s"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="45sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true" />
+                    <Button
+                        android:text="EDIT TIME"
+                        android:textSize="18sp"
+                        android:id="@+id/edit_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:background="@android:color/transparent"
+                        android:layout_marginTop="200dp"
+                        android:layout_centerHorizontal="true"/>
+                </RelativeLayout>
+            </FrameLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_gravity="center">
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal">
+        android:orientation="vertical"
+        android:background="#FFFFFF">
 
-                <ImageView
-                    android:src="@drawable/time_circle"
-                    android:layout_width="275dp"
-                    android:layout_height="275dp"
-                    android:padding="10dp"
-                    android:id="@+id/timer_circle"
-                    android:layout_centerHorizontal="true"/>
-                <Chronometer
-                    android:id="@+id/chronometer"
-                    android:format="%s"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="45sp"
-                    android:textColor="#FFFFFF"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true" />
-                <Button
-                    android:text="EDIT TIME"
-                    android:textSize="18sp"
-                    android:id="@+id/edit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:background="@android:color/transparent"
-                    android:layout_marginTop="200dp"
-                    android:layout_centerHorizontal="true"/>
-            </RelativeLayout>
-        </FrameLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#555555"/>
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 </LinearLayout>

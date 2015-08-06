@@ -13,7 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by alexsuk on 5/30/15.
@@ -110,8 +112,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         Calendar cal = Calendar.getInstance();
         cal.setTime(todo.getDueDate());
         cal.add(Calendar.DATE, -1);
-        Date lastDay = cal.getTime();
-        String lastDate = dateToStringFormat(lastDay);
+        String secondToLastDate = dateToStringFormat(cal.getTime());
+        String lastDate = dateToStringFormat(todo.getDueDate());
         /*
         Get list of Dates and their hours
         May need to sort the Dates before getting hours though
@@ -126,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // Go through dates table and select dates that are in the range and are not locked
         // availableDates are the ids, not the dates themselves
         // SELECT where between first and last AND where locked is 1
-        List<Integer> availableDates = getAvailableDates(firstDate, lastDate, todo.getLocks());
+        List<Integer> availableDates = getAvailableDates(firstDate, secondToLastDate, todo.getLocks());
         double estimatedTime = minToHours(timeInMinutes(todo.getRemainingTime()));
 
         //Should distribute time
@@ -136,8 +138,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // Get sum of each day's hours and make list
         List<Double> hoursInDatabase = getAvailableDateHours(availableDates);
 
-//        Log.w("addToRemainBefore", hoursInDatabase.toString());
-//        Log.w("distributedBefore", distributedHours.toString());
+        Log.w("addToRemainBefore", hoursInDatabase.toString());
+        Log.w("distributedBefore", distributedHours.toString());
 
         // Should combine the numbers in the two lists. If there isn't enough time in a day to fit the
         // schedule for the toDo, the database takes time from the todo on that day and moves it to others
@@ -150,18 +152,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             addTodoDate(todo_id, availableDates.get(i), 1, distributedTime, "00:00");
         }
 
-//        Log.w("addToRemain", hoursInDatabase.toString());
-//        Log.w("distributed", distributedHours.toString());
+        Log.w("addToRemain", hoursInDatabase.toString());
+        Log.w("distributed", distributedHours.toString());
 
-//        while (!firstDayString.equals(lastDay)){
-//            Date firstDayDate = convertStringDate(firstDayString);
-//            long date_id = createDate(firstDayDate, null);
-//            int lock = Integer.parseInt(locks.substring(boolPos, boolPos + 1));
-//            String timeRequired = getTimeForDay(locks, lock, todo);
-//            addTodoDate(todo_id, date_id, lock, timeRequired, "00:00");
-//            firstDayString = getNextDay(firstDayString);
-//            boolPos++;
-//        }
     }
 
     // Don't need because of Distributor class
@@ -191,13 +184,22 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             firstDate = lastDate;
             lastDate = temp;
         }
+        Date firstDayDate;
+        lastDate = getNextDay(lastDate);
         while(!firstDate.equals(lastDate)) {
-            Date firstDayDate = convertStringDate(firstDate);
+            firstDayDate = convertStringDate(firstDate);
             createDate(firstDayDate, null);
             firstDate = getNextDay(firstDate);
         }
     }
 
+    /**
+     * returns a list of ids of the dates between the inputted two dates (inclusive)
+     * @param firstDate Today's date or the first day of work
+     * @param lastDate The last day of work (default is the day before due date)
+     * @param locks String of 0s and 1s that indicate lock status (length is equal to number of days from first to last inclusive)
+     * @return list of ids of dates
+     */
     public List<Integer> getAvailableDates(String firstDate, String lastDate, String locks) {
         SQLiteDatabase db = getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_DATES + " WHERE "
@@ -206,12 +208,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         Cursor c = db.rawQuery(selectQuery, null);
         List<Integer> availableDateIds = new ArrayList<>();
         int dateId, lockIndex = 0;
-//        Log.w("getAvailableDates", locks);
+        Log.w("getAvailableDates", locks);
         if (c.moveToFirst()){
             do {
                 // Filtering out the days here based on the locks selected in addToDo
                 if (locks.charAt(lockIndex) == '1') {
-//                    Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
+                    Log.w("getAvailableDates ", "lockInd " + lockIndex);
+                    Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
                     dateId = c.getInt(c.getColumnIndex(KEY_ID));
                     availableDateIds.add(dateId);
                 }
@@ -288,6 +291,22 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         c.add(Calendar.DATE, 1);
         day = sdf.format(c.getTime());
         return day;
+    }
+
+    public Set<Date> getAllDeadlines() {
+        SQLiteDatabase db = getReadableDatabase();
+        Set<Date> deadlines = new HashSet<>();
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO ;
+        Cursor c = db.rawQuery(selectQuery, null);
+        String date;
+
+        if (c.moveToFirst()){
+            do {
+                date = c.getString(c.getColumnIndex(COLUMN_DUE_DATE));
+                deadlines.add(convertStringDate(date));
+            }while (c.moveToNext());
+        }
+        return deadlines;
     }
 
     public long createDate(Date date, String notes){
@@ -448,6 +467,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 String timeCompleted = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
                 Todo td = getTodo(todo_id);
                 String timeLeftToday = getTimeLeftforToday(timeRequired, timeCompleted);
+                td.setTimeRequired(timeInMinutes(timeRequired));
+                td.setTimeCompleted(timeInMinutes(timeCompleted));
                 td.setTodaysTimeLeft(timeLeftToday);
                 todos.add(td);
             } while (c.moveToNext());
@@ -541,7 +562,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void deleteToDo(long todo_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TODO, KEY_ID + " = ?",
-                new String[] { String.valueOf(todo_id) });
+                new String[]{String.valueOf(todo_id)});
         String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " +
                 KEY_TODO_ID + " = " + todo_id;
         Cursor c = db.rawQuery(selectQuery, null);
@@ -586,6 +607,27 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             }while (c.moveToNext());
         }
         return todoDates;
+    }
+
+    public String getTodoDate(Todo todo, Date date){
+        int todo_id = todo.getId();
+        int date_id = getDateID(date);
+
+        SQLiteDatabase db = getReadableDatabase();
+        String todoDate = "";
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_DATES_ID + " = " + date_id + " AND " +  KEY_TODO_ID + " = " + todo_id;
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c.moveToFirst()){
+            int id = c.getInt(c.getColumnIndex(KEY_ID));
+            String timeRequired = c.getString(c.getColumnIndex(COLUMN_TIME_REQUIRED));
+            String timeComp = c.getString(c.getColumnIndex(COLUMN_TIME_COMPLETED));
+            int lock = c.getInt(c.getColumnIndex(LOCK));
+            todoDate = KEY_ID + " " + id + " date_id " + date_id + " todo_id " + todo_id
+                    + " Time required " + timeRequired + " Time compl. " + timeComp + " lock " + lock;
+        }
+
+        return todoDate;
     }
 
     public long updateTodoDate(long id, long todo_id, long date_id, int lock, String timeRequired, String timeCompleted){
