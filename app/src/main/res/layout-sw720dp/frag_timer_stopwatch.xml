@@ -72,13 +72,20 @@
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal">
 
-                    <ImageView
-                        android:src="@drawable/time_circle"
+                    <!--<ImageView-->
+                        <!--android:src="@drawable/time_circle"-->
+                        <!--android:layout_width="275dp"-->
+                        <!--android:layout_height="275dp"-->
+                        <!--android:padding="10dp"-->
+                        <!--android:id="@+id/timer_circle"-->
+                        <!--android:layout_centerHorizontal="true"/>-->
+                    <com.pascalwelsch.holocircularprogressbar.HoloCircularProgressBar
+                        android:id="@+id/timer_circle"
                         android:layout_width="275dp"
                         android:layout_height="275dp"
                         android:padding="10dp"
-                        android:id="@+id/timer_circle"
-                        android:layout_centerHorizontal="true"/>
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"/>
                     <Chronometer
                         android:id="@+id/chronometer"
                         android:format="%s"
