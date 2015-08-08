@@ -5,12 +5,15 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +29,7 @@ import android.widget.TextView;
 import com.pascalwelsch.holocircularprogressbar.HoloCircularProgressBar;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -36,15 +40,19 @@ import java.util.List;
  */
 public class TimerFragment extends Fragment implements View.OnClickListener {
 
+    AlarmManager mgr;
     Boolean running;
     Button edit;
+    Calendar calendar;
     private Chronometer chronometer;
     DatabaseHelper dbh;
     ImageButton start, reset;
     private static final int REQUEST_INT = 2;
+    Intent i;
     List<Todo> todaysList;
     ListView list;
     long timeWhenStopped = 0, startTimeBetweenEditTimeCancels = 0, timeBetweenEditTimeCancels, timeUntilEditCancel;
+    PendingIntent pi;
     TextView theTodoTitle;
     Todo clickedTodo, previousTodo;
     View view;
@@ -65,15 +73,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         mProgressBar.setProgress(0);
         populateListView();
         registerClickCallback();
-
-
-        //AlarmManager mgr=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        //Intent i=new Intent(this, AlarmReceiver.class);
-        //PendingIntent pi=PendingIntent.getBroadcast(this, 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        //mgr.cancel(pi);
-        //long MINUTE=AlarmManager.INTERVAL_HOUR/60;
-        //long TIMER=MINUTE*minutes;
-        //mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), TIMER, pi);
+        setUpAlarmManager();
 
         return view;
     }
@@ -269,6 +269,20 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    private void setUpAlarmManager(){
+        calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+
+        mgr=(AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        i=new Intent(getActivity(), AlarmReceiver.class);
+        pi=PendingIntent.getBroadcast(getActivity(), 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        mgr.cancel(pi);
+        mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+    }
+
     private void setUpTimer(){
         chronometer.setBase(SystemClock.elapsedRealtime() - todaysList.get(0).getTimeCompleted());
         theTodoTitle.setText(todaysList.get(0).getTitle());
@@ -391,6 +405,23 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         String theRequiredTime = toUpdate[8];
         String theCompletedTime = convertToHoursAndMinutes((SystemClock.elapsedRealtime() - chronometer.getBase())/ (60000));
         dbh.updateTodoDate(todoDateId, todoId, dateId, lock, theRequiredTime, theCompletedTime);
+    }
+
+    public class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent){
+            timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
+            chronometer.stop();
+            running = false;
+            startTimeBetweenEditTimeCancels = 0;
+            timeUntilEditCancel = System.currentTimeMillis();
+            start.setBackgroundResource(R.drawable.play);
+
+            //record the time and update the visuals
+            sendTimeToDatabase();
+            populateListView();
+        }
     }
 
     private class TodoListAdapter extends ArrayAdapter<Todo> {
