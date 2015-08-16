@@ -10,8 +10,7 @@
         android:id="@+id/calendar_frame"
         android:layout_width="match_parent"
         android:layout_height="600dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp" />
+        android:paddingTop="15dp" />
 
     <FrameLayout
         android:id="@+id/list_frame"

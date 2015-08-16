@@ -107,9 +107,9 @@ public class CalendarFragment extends Fragment {
 
         calendarFrame = (FrameLayout) rootView.findViewById(R.id.calendar_frame);
         listFrame = (FrameLayout) rootView.findViewById(R.id.list_frame);
-        calendarFrame.getLayoutParams().height = (int) (screenHeight * 0.4);
+        calendarFrame.getLayoutParams().height = (int) (screenHeight * 0.43);
         calendarFrame.requestLayout();
-        listFrame.getLayoutParams().height = (int) (screenHeight * 0.6);
+        listFrame.getLayoutParams().height = (int) (screenHeight * 0.57);
         listFrame.requestLayout();
 
 //        if (currentCal == null)
@@ -221,10 +221,10 @@ public class CalendarFragment extends Fragment {
         Animation calendarAnim;
         Animation listAnim;
         if (switchToMonth) {
-            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.4));
-            listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.6));
+            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.43));
+            listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.57));
         } else {
-            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.25));
+            calendarAnim = new ResizeAnimation(calendarFrame, (int) (screenHeight * 0.23));
             listAnim = new ResizeAnimation(listFrame, (int) (screenHeight * 0.75));
         }
         calendarAnim.setDuration(normalTransition);
@@ -707,7 +707,7 @@ public class CalendarFragment extends Fragment {
                     year = (TextView) itemView.findViewById(R.id.year);
                     ViewGroup.LayoutParams params = itemView.getLayoutParams();
                     params.width = dayWidth;
-                    params.height = (int) (screenHeight * 0.22);
+                    params.height = (int) (screenHeight * 0.20);
                 }
 
                 public void setBackgroundDrawable(Drawable drawable) {
