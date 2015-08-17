@@ -237,10 +237,10 @@ public class HoloCircularProgressBar extends View {
         if (attributes != null) {
             try {
                 setProgressColor(attributes
-                        .getColor(R.styleable.HoloCircularProgressBar_progress_color, Color.CYAN));
+                        .getColor(R.styleable.HoloCircularProgressBar_progress_color, Color.BLUE));
                 setProgressBackgroundColor(attributes
                         .getColor(R.styleable.HoloCircularProgressBar_progress_background_color,
-                                Color.GREEN));
+                                Color.RED));
                 setProgress(
                         attributes.getFloat(R.styleable.HoloCircularProgressBar_progress, 0.0f));
                 setMarkerProgress(
