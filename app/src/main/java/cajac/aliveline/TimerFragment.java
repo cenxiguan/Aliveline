@@ -8,13 +8,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,9 +55,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
     View view;
 
     private HoloCircularProgressBar mProgressBar;
-//    private ObjectAnimator mProgressBarAnimator;
-    private float mAnimationProgress = 2f / 60f;
-    ObjectAnimator progressBarAnimator = ObjectAnimator.ofFloat(mProgressBar, "progress", mAnimationProgress);
+    private ObjectAnimator progressBarAnimator = ObjectAnimator.ofFloat(mProgressBar, "progress", 0);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,7 +89,6 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         start.setOnClickListener(this);
         reset.setOnClickListener(this);
         edit.setOnClickListener(this);
-
         running = false;
     }
 
@@ -105,30 +99,22 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 if (!running) {
                     chronometer.setBase(SystemClock.elapsedRealtime() + timeWhenStopped);
                     chronometer.start();
-//                    animate(mProgressBar, null, 1f, 57500);
-                    animate(mAnimationProgress,mProgressBar, new Animator.AnimatorListener() {
+                    animate(mProgressBar, new Animator.AnimatorListener() {
 
                         @Override
-                        public void onAnimationCancel(final Animator animation) {
-                        }
+                        public void onAnimationCancel(final Animator animation) {}
 
                         @Override
                         public void onAnimationEnd(final Animator animation) {
-                            if(mAnimationProgress > 1) {
-                                mAnimationProgress = 2f / 60f;
-                                mProgressBar.setProgress(0f);
-                            }
-                            animate(mAnimationProgress, mProgressBar, this);
-
+                            if (running)
+                                animate(mProgressBar, this);
                         }
 
                         @Override
-                        public void onAnimationRepeat(final Animator animation) {
-                        }
+                        public void onAnimationRepeat(final Animator animation) {}
 
                         @Override
-                        public void onAnimationStart(final Animator animation) {
-                        }
+                        public void onAnimationStart(final Animator animation) {}
                     });
                     running = true;
                     startTimeBetweenEditTimeCancels = 0;
@@ -142,7 +128,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 } else {
                     timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
                     chronometer.stop();
-                    progressBarAnimator.pause();
+                    progressBarAnimator.cancel();
                     running = false;
                     startTimeBetweenEditTimeCancels = 0;
                     timeUntilEditCancel = System.currentTimeMillis();
@@ -157,7 +143,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 if (running){
                     timeUntilEditCancel = System.currentTimeMillis();
                     chronometer.stop();
-                    progressBarAnimator.pause();
+                    progressBarAnimator.cancel();
                     running = false;
                     start.setBackgroundResource(R.drawable.play);
                 }
@@ -165,8 +151,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 startTimeBetweenEditTimeCancels = 0;
                 timeUntilEditCancel = System.currentTimeMillis();
                 chronometer.setBase(SystemClock.elapsedRealtime());
-                mProgressBar.setProgress(0);
-                mAnimationProgress = 2f / 60f;
+                animate(mProgressBar, null);
                 timeWhenStopped = 0;
 
                 //record the time and update the visuals
@@ -289,17 +274,16 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         previousTodo = todaysList.get(0);
     }
 
-    private void animate(float progressPercentage, final HoloCircularProgressBar progressBar, final Animator.AnimatorListener listener) {
-        final float progress = progressPercentage;
-        Log.i("Progress", progress + "");
+    private void animate(final HoloCircularProgressBar progressBar, final Animator.AnimatorListener listener) {
+        final float progress = ( Math.max(SystemClock.elapsedRealtime() - chronometer.getBase() - 700, 0)
+                / 60000f) % 1f;
+
         progressBarAnimator = ObjectAnimator.ofFloat(progressBar, "progress", progress);
-        progressBarAnimator.setDuration(1000);
+        progressBarAnimator.setDuration(1);
 
         progressBarAnimator.addListener(new Animator.AnimatorListener() {
-
             @Override
-            public void onAnimationCancel(final Animator animation) {
-            }
+            public void onAnimationCancel(final Animator animation) {}
 
             @Override
             public void onAnimationEnd(final Animator animation) {
@@ -307,15 +291,13 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onAnimationRepeat(final Animator animation) {
-            }
+            public void onAnimationRepeat(final Animator animation) {}
 
             @Override
-            public void onAnimationStart(final Animator animation) {
-            }
+            public void onAnimationStart(final Animator animation) {}
         });
-        progressBarAnimator.addListener(listener);
-        progressBarAnimator.reverse();
+        if (listener != null)
+            progressBarAnimator.addListener(listener);
         progressBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
             @Override
@@ -323,55 +305,8 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 progressBar.setProgress((Float) animation.getAnimatedValue());
             }
         });
-//        progressBar.setMarkerProgress(progress);
         progressBarAnimator.start();
-        this.mAnimationProgress = this.mAnimationProgress + (1f / 60f);
     }
-
-//    private void animate(final HoloCircularProgressBar progressBar, final Animator.AnimatorListener listener,
-//                         final float progress, final int duration) {
-//
-//        mProgressBarAnimator = ObjectAnimator.ofFloat(progressBar, "progress", progress);
-//        mProgressBarAnimator.setDuration(duration);
-//
-//        mProgressBarAnimator.addListener(new Animator.AnimatorListener() {
-//
-//            @Override
-//            public void onAnimationCancel(final Animator animation) {
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(final Animator animation) {
-////                if (mAnimationProgress < 1f) {
-////                    Log.w("animate", "mAni " + mAnimationProgress);
-//                    progressBar.setProgress(progress);
-////                    mAnimationProgress += progress;
-////                    animate(mProgressBar, null, progress, 1000);
-////                }
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(final Animator animation) {
-//            }
-//
-//            @Override
-//            public void onAnimationStart(final Animator animation) {
-//            }
-//        });
-//        if (listener != null) {
-//            mProgressBarAnimator.addListener(listener);
-//        }
-//        mProgressBarAnimator.reverse();
-//        mProgressBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//
-//            @Override
-//            public void onAnimationUpdate(final ValueAnimator animation) {
-//                progressBar.setProgress((Float) animation.getAnimatedValue());
-//            }
-//        });
-////        progressBar.setMarkerProgress(progress);
-//        mProgressBarAnimator.start();
-//    }
 
     public int convertToInt(String s){
         int i;

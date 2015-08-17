@@ -289,7 +289,6 @@ public class CalendarFragment extends Fragment {
                                  Bundle savedInstanceState) {
             childView = inflater.inflate(R.layout.fragment_calendar_month, container, false);
 
-            textView = (TextView) childView.findViewById(R.id.textview);
             calendarView = (MaterialCalendarView) childView.findViewById(R.id.calendarView);
             calendarView.setOnDateChangedListener(new OnDateClickListener());
             calendarView.setOnMonthChangedListener(this);
