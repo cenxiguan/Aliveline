@@ -40,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String COLUMN_TIME_USAGE = "time_usage";
     public static final String COLUMN_START_TIME = "start_time";
     public static final String COLUMN_REMAINING_TIME = "time_remaining";
+    public static final String COLUMN_COLOR = "color";
     //Column names for Dates table
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_NOTES = "notes";
@@ -55,7 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
-    + " TEXT, " + LOCKS + " TEXT" +  ")";
+    + " TEXT, " + LOCKS + " TEXT," + COLUMN_COLOR +  "TEXT)";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DATE + " DATETIME UNIQUE, " + COLUMN_NOTES + " TEXT" + ")";
@@ -213,6 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             do {
                 // Filtering out the days here based on the locks selected in addToDo
                 if (locks.charAt(lockIndex) == '1') {
+                    Log.v("", " " + c.getCount());
                     Log.w("getAvailableDates ", "lockInd " + lockIndex);
                     Log.w("getAvailableDates ", c.getString(c.getColumnIndex(COLUMN_DATE)));
                     dateId = c.getInt(c.getColumnIndex(KEY_ID));
@@ -377,6 +379,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         if (c.moveToFirst()){
             date_id = c.getInt(c.getColumnIndex(KEY_ID));
         }
+        Log.e("", "" + date_id);
         return date_id;
     }
 
@@ -483,11 +486,25 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         int updated = db.update(TABLE_TODO, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(todo.getId()) });
         // updating row
-        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_TODO_ID + " = "
-                + todo.getId();
+        String selectQuery = "SELECT  * FROM " + TABLE_TODO_DATES + " WHERE " + KEY_TODO_ID +  " = '"
+                + todo.getId() + "'";
         String startDay = dateToStringFormat(new Date());
-        startDay = getNextDay(startDay);
+        //Todos for now will start on the day they were created, for testing purposes
+       // startDay = getNextDay(startDay);
         String lastDay = dateToStringFormat(todo.getDueDate());
+        //Distributor methods
+        checkDates(startDay, lastDay);
+        List<Integer> availableDates = getAvailableDates(startDay, lastDay, todo.getLocks());
+        double estimatedTime = minToHours(timeInMinutes(todo.getRemainingTime()));
+
+        Distributor dist = new Distributor(estimatedTime, availableDates.size(), maxHours, todo.getTimeUsage());
+        List<Double> distributedHours = dist.distribute();
+
+        List<Double> hoursInDatabase = getAvailableDateHours(availableDates);
+        dist.addTimes(hoursInDatabase, distributedHours);
+
+        String distributedTime;
+
         Cursor c = db.rawQuery(selectQuery, null);
         int lock_ind = 0;
         String locks = todo.getLocks();
@@ -498,30 +515,39 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 Date firstDayDate = convertStringDate(startDay);
                 long date_id = createDate(firstDayDate, null);
                 int lock = Integer.parseInt(locks.substring(lock_ind, lock_ind + 1));
-                String timeRequired = getTimeForDay(locks, lock, todo);
-                updateTodoDate(id, todo_id, date_id, lock, timeRequired, "00:00");
+                //String timeRequired = getTimeForDay(locks, lock, todo);
+                if (lock == 1) {
+                    distributedTime = timeInHours((int) (distributedHours.get(lock_ind) * 60));
+                    updateTodoDate(id, todo_id, date_id, lock, distributedTime, "00:00");
+                    lock_ind++;
+                }
                 startDay = getNextDay(startDay);
-                lock_ind++;
             } while(c.moveToNext() && !startDay.equals(lastDay));
         }
         if (!c.moveToNext() && !startDay.equals(lastDay)){
-            addMoreRows(todo, lock_ind, startDay, lastDay);
+            addMoreRows(todo, lock_ind, startDay, lastDay, distributedHours, availableDates);
         }else if (startDay.equals(lastDay)){
             removeExtraRows(c);
         }
         return updated;
     }
 
-    public void addMoreRows(Todo todo, int lock_ind, String startDay, String lastDay){
+    public void addMoreRows(Todo todo, int lock_ind, String startDay, String lastDay, List<Double> distributedHours, List<Integer> availableDates){
+        String distributedTime;
         while (!startDay.equals(lastDay)){
             Date firstDayDate = convertStringDate(startDay);
             String locks = todo.getLocks();
             long date_id = createDate(firstDayDate, null);
             int lock = Integer.parseInt(locks.substring(lock_ind, lock_ind + 1));
-            String timeRequired = getTimeForDay(locks, lock, todo);
-            addTodoDate(todo.getId(), date_id, lock, timeRequired, "00:00");
+//            String timeRequired = getTimeForDay(locks, lock, todo);
+//            addTodoDate(todo.getId(), date_id, lock, timeRequired, "00:00");
             startDay = getNextDay(startDay);
+            if (lock == 1) {
+                distributedTime = timeInHours((int) (distributedHours.get(lock_ind) * 60));
+                addTodoDate(todo.getId(), availableDates.get(lock_ind), 1, distributedTime, "00:00");
+            }
             lock_ind++;
+
         }
     }
 
@@ -648,6 +674,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         values.put(COLUMN_DUE_DATE, dateToStringFormat(todo.getDueDate()));
         values.put(COLUMN_START_TIME, todo.getStartTime());
         values.put(COLUMN_REMAINING_TIME, todo.getRemainingTime());
+        values.put(COLUMN_COLOR, todo.getColor());
         return values;
     }
 

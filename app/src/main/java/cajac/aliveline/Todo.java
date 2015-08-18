@@ -24,6 +24,7 @@ public class Todo implements Parcelable {
     public String todaysTimeLeft;
     String dueDateString;
     public int timeRequired, timeCompleted;
+    public String color;
 
 
     public Todo(){
@@ -162,4 +163,11 @@ public class Todo implements Parcelable {
     public void setTimeCompleted(int timeCompleted){ this.timeCompleted = timeCompleted;}
 
     public int getTimeCompleted(){return timeCompleted;}
+
+    public void setColor(String color){
+        this.color = color;
+    }
+    public String getColor(){
+        return color;
+    }
 }

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -120,8 +121,10 @@ public class addTodo extends DialogFragment {
         setButtons(view);
         setOnClickListeners(view);
         setEditTexts(view);
-
+//        Fragment frag = getFragmentManager().findFragmentById(R.layout.fragment_home);
+//        setTargetFragment(frag, 0);
         return dialog;
+
     }
 
     @Override
@@ -484,6 +487,7 @@ public class addTodo extends DialogFragment {
     public String makeLocks(String startDay, String endDay, DatabaseHelper dh){
         Calendar cal = Calendar.getInstance();
         int dayOfWeek =cal.get(Calendar.DAY_OF_WEEK);
+        endDay = dh.getNextDay(endDay);
         String selected = getSelectedDays();
         String locks = "";
         while (!startDay.equals(endDay)){
