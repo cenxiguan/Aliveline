@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
+<merger version="3"><dataSet config="debug"><source path="/Users/alexsuk/Downloads/locationGit/Aliveline/holo-circular-progress-bar/build/intermediates/bundles/debug/assets"/></dataSet><dataSet config="main"><source path="/Users/alexsuk/Downloads/locationGit/Aliveline/holo-circular-progress-bar/src/androidTest/assets"/></dataSet></merger>
+=======
 <merger version="3"><dataSet config="debug"><source path="C:\Users\Amauris\Documents\GitHub\Aliveline\holo-circular-progress-bar\build\intermediates\bundles\debug\assets"/></dataSet><dataSet config="main"><source path="C:\Users\Amauris\Documents\GitHub\Aliveline\holo-circular-progress-bar\src\androidTest\assets"/></dataSet></merger>
+>>>>>>> 5d72cb02cf165b72e9fef9705166e2f50eee6895
