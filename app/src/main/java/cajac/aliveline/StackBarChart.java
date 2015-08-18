@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -22,7 +21,9 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Highlight;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,16 +31,8 @@ import java.util.Set;
  */
 public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBarChangeListener,
         OnChartValueSelectedListener {
-    protected String[] mMonths = new String[] {
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
-    };
 
-    protected String[] mParties = new String[] {
-            "Party A", "Party B", "Party C", "Party D", "Party E", "Party F", "Party G", "Party H",
-            "Party I", "Party J", "Party K", "Party L", "Party M", "Party N", "Party O", "Party P",
-            "Party Q", "Party R", "Party S", "Party T", "Party U", "Party V", "Party W", "Party X",
-            "Party Y", "Party Z"
-    };
+    DatabaseHelper dbh;
 
     private BarChart mChart;
     private SeekBar mSeekBarX; //mSeekBarY;
@@ -47,12 +40,13 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_barchart);
-
+        dbh = new DatabaseHelper(this);
 
         tvX = (TextView) findViewById(R.id.tvXMax);
    //     tvY = (TextView) findViewById(R.id.tvYMax);
@@ -97,8 +91,12 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
         // mChart.setDrawXLabels(false);
         // mChart.setDrawYLabels(false);
 
+        List<String> datesXAxis= new ArrayList<String>();
+        datesXAxis = dbh.getAllDates();
+        int maxDataX = datesXAxis.size();
         // setting data
-        mSeekBarX.setProgress(12);
+        //setProgress is +1 from what you put in the parenthesis
+        mSeekBarX.setProgress(maxDataX);
      //   mSeekBarY.setProgress(100);
 
         Legend l = mChart.getLegend();
@@ -208,34 +206,41 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-        tvX.setText("" + (mSeekBarX.getProgress() + 1));
-      //  tvY.setText("" + (mSeekBarY.getProgress()));
-
-        ArrayList<String> xVals = new ArrayList<String>();
-        for (int i = 0; i < mSeekBarX.getProgress() + 1; i++) {
-            xVals.add(mMonths[i % mMonths.length]);
-        }
+        //for each date, get the date and add it to the xVals array
+        List<String> xVals = new ArrayList<String>();
+        xVals=dbh.getAllDates();
 
         Set<Integer> redBars = new HashSet<Integer>();
         int barCounter = 1;
         int totalValues = 0;
-
+        int stackLength = 0;
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
-        float val1 = 0;
-        float val2 = 0;
-        float val3 = 0;
 
-        for (int i = 0; i < mSeekBarX.getProgress() + 1; i++) {
-            //float mult = (mSeekBarY.getProgress() + 1);
-            val1 = (float) (Math.random() * 24);
-            val2 = (float) 3;
-            val3 = (float) 3;
 
-            yVals1.add(new BarEntry(new float[]{
-                    val1, val2, val3
-            }, i));
+        //adds all todoActivities that are for each date (like a stack)
+        for (int i = 0; i < mSeekBarX.getProgress(); i++) {
+            //for each date, I will have to go through all the todoActivities that correlate with each date
+            List<Todo> stackItem;
+            Date newDate = dbh.convertStringDate(xVals.get(i));
+            //stackItem contains all the toDos for each date. Now the hours for each todoActivity must be gotten
+            stackItem = dbh.getAllToDosByDay(new Date());
+            float[]  newEntries= new float[stackItem.size()];
+            float stackTotal = 0;
+            stackLength = stackItem.size();
 
-            float stackTotal = val1 + val2 + val3;
+            //a forLoop that will add all the hours from the todoActivites from stackItem to yVals1
+            for(int j = 0; j < stackItem.size(); j++ ) {
+                int minsRequired = stackItem.get(j).getTimeRequired();
+                int minsCompleted= stackItem.get(j).getTimeCompleted();
+                int timeDisplayed = minsRequired - minsCompleted;
+                float timeInHours = getHours(timeDisplayed);
+                newEntries[j] = timeInHours;
+                stackTotal += timeInHours;
+            }
+
+            yVals1.add(new BarEntry(newEntries,i));
+            //a forLoop that will go through the stackItems and see if they are greater than 24hours in a day
+
 
 
             if (stackTotal >= 24) {
@@ -246,15 +251,9 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
         }
 
 
-
-
-
-        BarDataSet set1 = new BarDataSet(yVals1, "Statistics Vienna 2014");
-        getColors(set1, redBars, totalValues, barCounter);
-    //      getColors(set1);
-        set1.setStackLabels(new String[] {
-                "Births", "Divorces", "Marriages"
-        });
+        BarDataSet set1 = new BarDataSet(yVals1, "AliveLine");
+        getColors(set1, redBars, totalValues, barCounter, stackLength);
+        //      getColors(set1);
 
 
         ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
@@ -285,14 +284,22 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
-    //    BarEntry entry = (BarEntry) e;
-    //    Log.i("VAL SELECTED",
-    //            "Value: " + entry.getVals()[h.getStackIndex()]);
-
-
-        FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
+  /*      FragmentTransaction ft = this.getSupportFragmentManager().beginTransaction();
         addTodo a = new addTodo();
-        a.show(ft, "addTodo");
+
+        //send data to the dialog
+        String theTitle = ((CardAdapter) mAdapter).getTitle(position);
+        String theDay = ((CardAdapter) mAdapter).getDay(position);
+        String theMonth = ((CardAdapter) mAdapter).getMonth(position);
+        String theYear = ((CardAdapter) mAdapter).getYear(position);
+        String theEstTime = ((CardAdapter) mAdapter).getEstTime(position);
+        String theWorkDays = ((CardAdapter) mAdapter).getWorkDays(position);
+        int theTimeUsage = ((CardAdapter) mAdapter).getTimeUsage(position);
+        int theId = ((CardAdapter) mAdapter).getId(position);
+        a.setInitialValues(theTitle, theDay, theMonth, theYear, theEstTime, theWorkDays, theTimeUsage, theId);
+
+        //open the dialog
+        a.show(ft, "addTodo");*/
     }
 
     @Override
@@ -301,7 +308,7 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
 
     }
 
-    private void getColors(BarDataSet set, Set<Integer> redBars, int totalYBars, int totalLength) {
+    private void getColors(BarDataSet set, Set<Integer> redBars, int totalYBars, int totalLength, int stackLength) {
 
         int barLengthCounter = 1;
 
@@ -314,13 +321,13 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
         for(int i = 0; i < totalLength - 1; i++) {
             //if I am on a stack that should be red...
             if(redBars.contains(barLengthCounter)) {
-                for(int j = 0; j < 3; j++) {
-                    colors[colorsCounter] = Color.rgb(255,0,0);
+                for(int j = 0; j < stackLength; j++) {
+                    colors[colorsCounter] = Color.rgb(255, 0, 0);
                     colorsCounter++;
                 }
                 barLengthCounter = barLengthCounter + 1;
             }else {
-                for(int j = 0; j < 3; j++) {
+                for(int j = 0; j < stackLength; j++) {
                     colors[colorsCounter] = ColorTemplate.VORDIPLOM_COLORS[j];
                     colorsCounter++;
                 }
@@ -338,5 +345,11 @@ public class StackBarChart extends FragmentActivity implements SeekBar.OnSeekBar
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
+    }
+
+    private float getHours(int minutes) {
+        float hours = minutes / 60;
+        hours += (minutes % 60) / 60.0;
+        return hours;
     }
 }

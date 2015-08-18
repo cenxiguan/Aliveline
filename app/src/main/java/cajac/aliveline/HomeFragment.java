@@ -94,6 +94,7 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
                 a.show(ft, "addTodo");
             }
         });
+
         final Intent intent1= new Intent(getActivity(), StackBarChart.class);
         Button button = (Button)rootView.findViewById(R.id.button8);
 
@@ -191,10 +192,10 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
 
     public void createChart() {
 
-        Intent intent = getActivity().getIntent();
+   //     Intent intent = getActivity().getIntent();
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getActivity().setContentView(R.layout.activity_barchart);
+     //   getActivity().setContentView(R.layout.fragment_home);
 
 
         tvX = (TextView)rootView.findViewById(R.id.tvXMax);
@@ -245,9 +246,14 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         int maxDataX = datesXAxis.size();
 
 
+
         // setting data
         //setProgress is +1 from what you put in the parenthesis
         mSeekBarX.setProgress(maxDataX);
+
+        //setting the scale
+        float scale = scaleSetter(maxDataX);
+        mChart.setScaleMinima(scale, 1f);
 
 
         Legend l = mChart.getLegend();
@@ -255,6 +261,9 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         l.setFormSize(8f);
         l.setFormToTextSpace(4f);
         l.setXEntrySpace(6f);
+
+        l.setEnabled(false);
+
 
         // mChart.setDrawLegend(false);
     }
@@ -280,24 +289,24 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
             Date newDate = dbh.convertStringDate(xVals.get(i));
             //stackItem contains all the toDos for each date. Now the hours for each todoActivity must be gotten
             stackItem = dbh.getAllToDosByDay(new Date());
-            float[]  newEntries= new float[stackItem.size()-1];
+            float[]  newEntries= new float[stackItem.size()];
             float stackTotal = 0;
             stackLength = stackItem.size();
 
             //a forLoop that will add all the hours from the todoActivites from stackItem to yVals1
-            for(int j = 0; j < stackItem.size() - 1; j++ ) {
+            for(int j = 0; j < newEntries.length; j++ ) {
                 int minsRequired = stackItem.get(j).getTimeRequired();
                 int minsCompleted= stackItem.get(j).getTimeCompleted();
-                int timeDisplayed = minsCompleted - minsRequired;
+                int timeDisplayed = minsRequired - minsCompleted;
                 float timeInHours = getHours(timeDisplayed);
                 newEntries[j] = timeInHours;
                 stackTotal += timeInHours;
             }
 
             yVals1.add(new BarEntry(newEntries,i));
+
+
             //a forLoop that will go through the stackItems and see if they are greater than 24hours in a day
-
-
 
             if (stackTotal >= 24) {
                 redBars.add(barCounter);
@@ -371,6 +380,11 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         return hours;
     }
 
+    public float scaleSetter(int maxData) {
+
+        float scale = maxData/(float) 7;
+        return scale;
+    }
 
 
 

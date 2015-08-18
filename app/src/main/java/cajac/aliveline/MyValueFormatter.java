@@ -18,7 +18,7 @@ public class MyValueFormatter implements ValueFormatter {
 
     @Override
     public String getFormattedValue(float value) {
-        return mFormat.format(value) + " $";
+        return mFormat.format(value);
     }
 
 }
