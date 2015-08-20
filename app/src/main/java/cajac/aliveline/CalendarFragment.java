@@ -533,8 +533,36 @@ public class CalendarFragment extends Fragment {
             // Deserialize API response and then construct new objects to append to the adapter
         }
 
+
+ /*       @Override
+        public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
+            Date date = mAdapter.getItem(position);
+            if (selectedDate.equals(date)) {
+                CalendarMonthFragment monthView = new CalendarMonthFragment();
+//                switchFrame(monthView);
+                switchFrame(true);
+                dayOrMonth.setChecked(false);
+                return;
+            }
+            selectedDate = date;
+            oldView.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_unselected, null));
+            todoListFrag.updateRecyclerAdapter(selectedDate);
+//            updateRecyclerAdapter();
+            setTextColors(oldView, getResources().getColor(R.color.primary_text));
+            oldView = view;
+            setTextColors(oldView, getResources().getColor(R.color.secondary_text));
+            vigw.findViewById(R.id.date_info).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.hlv_item_selected, null));
+            selectedPosition = position;
+            listView.post(new ScrollRunnable(position));
+        }
+
+        private class ScrollRunnable implements Runnable{
+            private int position;
+            private int milliseconds; */
+
         private class ScrollRunnable implements Runnable {
             private int dX;
+
 
             public ScrollRunnable(int dX) {
                 this.dX = dX;
