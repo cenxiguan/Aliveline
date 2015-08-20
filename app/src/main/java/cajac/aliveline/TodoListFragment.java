@@ -1,5 +1,7 @@
 package cajac.aliveline;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -57,6 +59,24 @@ public class TodoListFragment extends Fragment {
         recAdapter.notifyDataSetChanged();
         recTodos.addAll(dbh.getAllToDosByDay(selectedDate));
         recAdapter.notifyItemRangeChanged(0, recTodos.size());
+    }
+
+    public void fadeIn(int milliseconds) {
+        view.animate().alpha(1f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    public void fadeOut(int milliseconds) {
+        view.animate().alpha(0f).setDuration(milliseconds).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.setVisibility(View.GONE);
+            }
+        });
     }
 
 }
