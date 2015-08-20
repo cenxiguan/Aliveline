@@ -1,5 +1,6 @@
 package cajac.aliveline;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -51,6 +52,7 @@ public class addTodo extends DialogFragment {
     private static final int REQUEST_DATE = 1;
     String providedTitle = "", providedDay = "", providedMonth = "", providedYear = "", providedEstTime = "", providedWorkDays = "";
     View view;
+    OnTodoAdditionListener mCallback;
 
     TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -65,6 +67,20 @@ public class addTodo extends DialogFragment {
             checkIfChangesSaved();
         }
     };
+
+    public interface OnTodoAdditionListener{
+        public void OnAddedTodo();
+    }
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        try {
+            mCallback = (OnTodoAdditionListener)activity;
+        } catch (ClassCastException e ){
+            throw new ClassCastException((activity).toString() + " must implement OnTodoAdditionListener");
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
@@ -115,6 +131,7 @@ public class addTodo extends DialogFragment {
                 }
             }
         });
+        mCallback.OnAddedTodo();
         dialog = builder.create();
         dialog.setTitle("Todo Settings");
 

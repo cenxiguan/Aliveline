@@ -56,7 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String CREATE_TODO_TABLE = "CREATE TABLE " +  TABLE_TODO + "(" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TITLE + " TEXT, " +
         COLUMN_DUE_DATE + " DATETIME, " + COLUMN_ESTIMATED_TIME + " TEXT, " + COLUMN_TIME_USAGE + " TEXT, " + COLUMN_START_TIME + " TEXT, " + COLUMN_REMAINING_TIME
-    + " TEXT, " + LOCKS + " TEXT," + COLUMN_COLOR +  "TEXT)";
+    + " TEXT, " + LOCKS + " TEXT," + COLUMN_COLOR +  " TEXT)";
 
     public static final String CREATE_DATE_TABLE = "CREATE TABLE " + TABLE_DATES + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DATE + " DATETIME UNIQUE, " + COLUMN_NOTES + " TEXT" + ")";

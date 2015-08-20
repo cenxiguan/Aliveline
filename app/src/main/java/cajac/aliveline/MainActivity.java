@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,7 @@ import java.util.Timer;
 
  */
 public class MainActivity extends AppCompatActivity implements
-        ActionBar.TabListener {
+        ActionBar.TabListener, addTodo.OnTodoAdditionListener {
 
 
 
@@ -157,5 +158,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onTabReselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction ft) {
 
+    }
+
+    @Override
+    public void OnAddedTodo() {
+    //    Fragment homeFragment = (Fragment)getSupportFragmentManager().find
     }
 }
