@@ -9,6 +9,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
@@ -23,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -67,6 +73,20 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         timeUntilEditCancel = System.currentTimeMillis();
         view = inflater.inflate(R.layout.frag_timer_stopwatch, container, false);
+
+        /*
+        if(isScreenNormal()){
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            String imageUri = "drawable://" + R.drawable.timerbg4;
+            Bitmap bgBitmap = BitmapFactory.decodeFile(imageUri, options);
+            BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(),bgBitmap);
+            ImageView iv = (ImageView) view.findViewById(R.id.timer_top_half);
+            iv.setBackgroundDrawable(bitmapDrawable);
+        }
+        */
+
+
         mProgressBar = (HoloCircularProgressBar) view.findViewById(R.id.timer_circle);
 //        mProgressBar.setProgressBackgroundColor(R.color.white);
         mProgressBar.setProgressColor(R.color.selected);
@@ -178,6 +198,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 if(running) {
                     timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
                     chronometer.stop();
+                    progressBarAnimator.pause();
                     running = false;
                     start.setBackgroundResource(R.drawable.play);
                     timeUntilEditCancel = System.currentTimeMillis();
@@ -247,6 +268,9 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
 
                 //Stop timer running
                 chronometer.stop();
+                progressBarAnimator.pause();
+                mProgressBar.setProgress(0);
+                mAnimationProgress = 2f / 60f;
                 running = false;
                 start.setBackgroundResource(R.drawable.play);
 
@@ -394,6 +418,12 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    public boolean isScreenNormal() {
+        final int screenSize = getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK;
+        return screenSize == Configuration.SCREENLAYOUT_SIZE_NORMAL;
+    }
+
     public void sendTimeToDatabase(){
         //send time in timer to database
         String todoDate = dbh.getTodoDate(previousTodo, new Date());
@@ -413,6 +443,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         public void onReceive(Context context, Intent intent){
             timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
             chronometer.stop();
+            progressBarAnimator.pause();
             running = false;
             startTimeBetweenEditTimeCancels = 0;
             timeUntilEditCancel = System.currentTimeMillis();
