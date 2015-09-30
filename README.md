@@ -43,8 +43,8 @@ Currently we do not have any settings, but there are ideas on possible settings 
 </>
 
 <h3>Special Thanks<h3>
-Icons by [Icons8](https://icons8.com/)
-Material CalendarView (https://github.com/prolificinteractive/material-calendarview)
-HoloCircularProgressBar (https://github.com/passsy/android-HoloCircularProgressBar)
-MPAndroidChart (https://github.com/PhilJay/MPAndroidChart)
-Stack Overflow 
+<p>Icons by [Icons8](https://icons8.com/)</p>
+<p>Material CalendarView (https://github.com/prolificinteractive/material-calendarview)</p>
+<p>HoloCircularProgressBar (https://github.com/passsy/android-HoloCircularProgressBar)</p>
+<p>MPAndroidChart (https://github.com/PhilJay/MPAndroidChart)</p>
+<p>Stack Overflow </p>
