@@ -42,7 +42,7 @@ The Settings allow users to change certain parts of the application.
 Currently we do not have any settings, but there are ideas on possible settings such as maximum hours of work per day, the app color theme, or which calendar view will be default when the app is opened.
 </>
 
-<h3>Special Thanks<h3>
+<h3>Special Thanks</h3>
 <p>Icons by [Icons8](https://icons8.com/)</p>
 <p>Material CalendarView (https://github.com/prolificinteractive/material-calendarview)</p>
 <p>HoloCircularProgressBar (https://github.com/passsy/android-HoloCircularProgressBar)</p>
