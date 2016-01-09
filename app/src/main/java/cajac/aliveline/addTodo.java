@@ -138,8 +138,6 @@ public class addTodo extends DialogFragment {
         setButtons(view);
         setOnClickListeners(view);
         setEditTexts(view);
-//        Fragment frag = getFragmentManager().findFragmentById(R.layout.fragment_home);
-//        setTargetFragment(frag, 0);
         return dialog;
 
     }
@@ -453,34 +451,34 @@ public class addTodo extends DialogFragment {
         }
     }
 
-    public boolean validDate(int recievedDate, int month, int year){
-        int date = recievedDate - 1;
+    public boolean validDate(int theDate, int month, int year){
+        int date = theDate - 1;
         switch(month){
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12:
-                if (date > 0 && date < 32){
-                    return true;
-                } else {
-                    return false;
-                }
+            case 0:
+            case 2:
             case 4:
             case 6:
+            case 7:
             case 9:
             case 11:
-                if (date > 0 && date < 31){
+                if (date > -1 && date < 31){
                     return true;
                 } else {
                     return false;
                 }
-            case 2:
-                if(date > 0 && date < 29 && year % 4 != 0){
+            case 3:
+            case 5:
+            case 8:
+            case 10:
+                if (date > -1 && date < 30){
                     return true;
-                } else if (date > 0 && date < 30 && year % 4 == 0){
+                } else {
+                    return false;
+                }
+            case 1:
+                if(date > -1 && date < 28 && year % 4 != 0){
+                    return true;
+                } else if (date > 0 && date < 29 && year % 4 == 0){
                     return true;
                 } else {
                     return false;
