@@ -119,7 +119,7 @@ class DayView extends CheckedTextView {
     protected void setupSelection(boolean showOtherDates, boolean inRange, boolean inMonth) {
         boolean enabled = inRange;
         setEnabled(enabled);
-        setVisibility(enabled || showOtherDates ? View.VISIBLE : View.INVISIBLE);
+        setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     private final Rect tempRect = new Rect();

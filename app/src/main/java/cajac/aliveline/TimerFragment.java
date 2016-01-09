@@ -232,6 +232,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
 
                 //Stop timer running
                 chronometer.stop();
+                progressBarAnimator.cancel();
                 running = false;
                 start.setBackgroundResource(R.drawable.play);
 
@@ -241,6 +242,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
                 //set timer base to 2do's completed time
                 long timerTime = (long) (clickedTodo.getTimeCompleted()) * 60000;
                 chronometer.setBase(SystemClock.elapsedRealtime() - timerTime);
+                animate(mProgressBar, null);
                 timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
                 startTimeBetweenEditTimeCancels = 0;
                 timeUntilEditCancel = System.currentTimeMillis();
@@ -275,7 +277,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
     }
 
     private void animate(final HoloCircularProgressBar progressBar, final Animator.AnimatorListener listener) {
-        final float progress = ( Math.max(SystemClock.elapsedRealtime() - chronometer.getBase() - 700, 0)
+        final float progress = ( Math.max(SystemClock.elapsedRealtime() - chronometer.getBase(), 0)
                 / 60000f) % 1f;
 
         progressBarAnimator = ObjectAnimator.ofFloat(progressBar, "progress", progress);

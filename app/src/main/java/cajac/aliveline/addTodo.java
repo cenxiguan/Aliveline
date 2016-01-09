@@ -3,38 +3,24 @@ package cajac.aliveline;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.CharArrayReader;
-import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
+import java.util.List;
 
 /**
  * Created by Jonathan Maeda on 5/31/2015.
@@ -42,15 +28,18 @@ import java.util.Random;
 public class addTodo extends DialogFragment {
 
     //Initialize Variables
+    private Activity mActivity;
     private AlertDialog dialog;
-    Boolean changed = false, updated = false;
-    Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
-    Date today, enteredDate;
-    EditText title, dueDay, dueMonth, dueYear, estTime;
-    ImageButton cal,up,flat,down;
+    private Boolean changed = false, updated = false;
+    private Button sun,mon,tue,wed,thu,fri,sat,buttonPos;
+    private Date today, enteredDate;
+    private EditText title, dueDay, dueMonth, dueYear, estTime;
+    private ImageButton cal,up,flat,down;
     int providedTimeUsage = 0, providedId;
     private static final int REQUEST_DATE = 1;
-    String providedTitle = "", providedDay = "", providedMonth = "", providedYear = "", providedEstTime = "", providedWorkDays = "";
+    private static final int REQUEST_OVERTIME_DIALOG = 2;
+    public static final int RESULT_OVERTIME_PICKER = 2;
+    private String providedTitle = "", providedDay = "", providedMonth = "", providedYear = "", providedEstTime = "", providedWorkDays = "";
     View view;
     OnTodoAdditionListener mCallback;
 
@@ -115,19 +104,27 @@ public class addTodo extends DialogFragment {
                 todo.setTimeUsage(getSelectedCurve());
                 todo.setLocks(makeLocks(dh.dateToStringFormat(today), dh.dateToStringFormat(enteredDate), dh));
 
-                if(updated){
+                if (updated) {
                     todo.setId(providedId);
                     dh.updateToDo(todo);
 
-                    if(changed){
-                        Toast.makeText(getActivity(),"Changes Saved", Toast.LENGTH_LONG).show();
+                    if (changed) {
+                        Toast.makeText(getActivity(), "Changes Saved", Toast.LENGTH_LONG).show();
 
                     } else {
-                        Toast.makeText(getActivity(),"No Changes Made", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "No Changes Made", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     //sending 2do to database
-                    dh.createToDo(todo);
+                    List<Double> overtime = dh.createToDo(todo);
+                    if (overtime.get(overtime.size() - 1) < 0) {
+                        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        OvertimeDialog oD = new OvertimeDialog(overtime);
+                        oD.setTargetFragment(addTodo.this, REQUEST_OVERTIME_DIALOG);
+                        oD.show(ft, "OvertimeDialog");
+                    }
+
+
                 }
             }
         });
@@ -346,14 +343,39 @@ public class addTodo extends DialogFragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Make sure fragment codes match up
-        if (requestCode == CalendarDialogFragment.RESULT_DATE) {
+        if (requestCode == addTodo.REQUEST_DATE && resultCode == CalendarDialogFragment.RESULT_DATE) {
             Date date = (Date) data.getSerializableExtra(CalendarDialogFragment.SELECTED_DATE);
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             dueMonth.setText(String.valueOf(cal.get(Calendar.MONTH) + 1));
             dueDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
             dueYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
+        } else if (requestCode == addTodo.REQUEST_OVERTIME_DIALOG ) {
+            if (resultCode == 0) {
+                Log.w("onActivityRes", "OvertimeGoBack");
+                sendResult(0, null);
+            } else if (resultCode == OvertimeDialog.RESULT_OVERTIME ) {
+                sendResult(RESULT_OVERTIME_PICKER, data.getDoubleArrayExtra("OVERTIME"));
+            }
         }
+    }
+
+    public void sendResult(int resultCode, double[] overtime) {
+        if (getTargetFragment() == null) {
+            Log.e("addTodo", "TargetFragment is null");
+            return;
+        }
+        Log.w("addTodo", "sendResult");
+        Intent i = new Intent();
+        i.putExtra("TITLE", title.getText().toString());
+        i.putExtra("DAY", dueDay.getText().toString());
+        i.putExtra("MONTH", dueMonth.getText().toString());
+        i.putExtra("YEAR", dueYear.getText().toString());
+        i.putExtra("EST_TIME", estTime.getText().toString());
+        i.putExtra("WORK_DAYS", getSelectedDays());
+        i.putExtra("TIME_USAGE", getSelectedCurve());
+        i.putExtra("OVERTIME", overtime);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, i);
     }
 
     public int getSelectedCurve(){
@@ -371,6 +393,7 @@ public class addTodo extends DialogFragment {
     public String getSelectedDays(){
         String days = checkButton(sun) + checkButton(mon) + checkButton(tue) + checkButton(wed)
                 + checkButton(thu) + checkButton(fri) + checkButton(sat);
+        Log.w("getSelectedDays", days);
         return days;
     }
 
@@ -552,4 +575,9 @@ public class addTodo extends DialogFragment {
             changed = true;
         }
     }
+
+    public void setUpdated(boolean updated) {
+        this.updated = updated;
+    }
+
 }

@@ -10,6 +10,7 @@
 *.iml
 .idea
 .idea/*
+/holo-circular-progress-bar/build/intermediates
 .idea/misc.xml
 app/app.iml
 

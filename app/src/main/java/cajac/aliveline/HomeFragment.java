@@ -60,6 +60,8 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
     private TextView tvX;
     private BarChart mChart;
     private View rootView;
+    private static final int REQUEST_ADDTODO = 1;
+    private static final int REQUEST_OVERTIME_PICKER = 2;
 
     long days_ids[];
 
@@ -91,6 +93,7 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
             public void onClick(View v) {
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 addTodo a = new addTodo();
+                a.setTargetFragment(HomeFragment.this, REQUEST_ADDTODO);
                 a.show(ft, "addTodo");
             }
         });
@@ -109,8 +112,26 @@ public class HomeFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
         return rootView;
     }
 
-
-
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ADDTODO) {
+            if (resultCode == 0) {
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                addTodo a = new addTodo();
+                a.setTargetFragment(HomeFragment.this, REQUEST_ADDTODO);
+                a.setInitialValues(data.getStringExtra("TITLE"), data.getStringExtra("DAY"),
+                        data.getStringExtra("MONTH"), data.getStringExtra("YEAR"),
+                        data.getStringExtra("EST_TIME"), data.getStringExtra("WORK_DAYS"),
+                        data.getIntExtra("TIME_USAGE", 2), -1);
+                a.setUpdated(false);
+                a.show(ft, "addTodo");
+            } else if (resultCode == addTodo.RESULT_OVERTIME_PICKER) {
+                android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                OvertimePicker oP = new OvertimePicker(data.getDoubleArrayExtra("OVERTIME"), data);
+                oP.setTargetFragment(HomeFragment.this, REQUEST_OVERTIME_PICKER);
+                oP.show(ft, "addTodo");
+            }
+        }
+    }
 
     public void createRecyclerView(){
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);

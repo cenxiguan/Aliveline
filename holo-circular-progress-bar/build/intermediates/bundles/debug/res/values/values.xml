@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
-    <!-- From: file:/Users/alexsuk/Downloads/locationGit/Aliveline/holo-circular-progress-bar/res/values/attrs.xml -->
+    <!-- From: file:/C:/Users/Tadachika/Documents/Aliveline/holo-circular-progress-bar/res/values/attrs.xml -->
     <eat-comment/>
     <attr format="reference" name="circularProgressBarStyle"/>
     <declare-styleable name="HoloCircularProgressBar"><attr format="dimension" name="stroke_width"/><attr format="float" name="progress"/><attr format="float" name="marker_progress"/><attr format="color" name="progress_color"/><attr format="color" name="progress_background_color"/><attr format="boolean" name="thumb_visible"/><attr format="boolean" name="marker_visible"/><attr name="android:gravity"/></declare-styleable>
-    <!-- From: file:/Users/alexsuk/Downloads/locationGit/Aliveline/holo-circular-progress-bar/res/values/styles.xml -->
-=======
-    <!-- From: file:/C:/Users/Amauris/Documents/GitHub/Aliveline/holo-circular-progress-bar/res/values/attrs.xml -->
-    <eat-comment/>
-    <attr format="reference" name="circularProgressBarStyle"/>
-    <declare-styleable name="HoloCircularProgressBar"><attr format="dimension" name="stroke_width"/><attr format="float" name="progress"/><attr format="float" name="marker_progress"/><attr format="color" name="progress_color"/><attr format="color" name="progress_background_color"/><attr format="boolean" name="thumb_visible"/><attr format="boolean" name="marker_visible"/><attr name="android:gravity"/></declare-styleable>
-    <!-- From: file:/C:/Users/Amauris/Documents/GitHub/Aliveline/holo-circular-progress-bar/res/values/styles.xml -->
->>>>>>> 5d72cb02cf165b72e9fef9705166e2f50eee6895
+    <!-- From: file:/C:/Users/Tadachika/Documents/Aliveline/holo-circular-progress-bar/res/values/styles.xml -->
     <eat-comment/>
     <style name="CircularProgressBar">
         <item name="android:layout_height">wrap_content</item>

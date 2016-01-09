@@ -45,15 +45,19 @@ public class Distributor {
         double lastDayTime = calcLastDayTime();
         distributedTime = new ArrayList<>(Collections.nCopies(numOfDays, 0.0));
 
-        if (maxHours < (estimatedTime * 1.0 / numOfDays) ) {
-            /*
-            Make dialog pop up, which will ask for whether or not user would like to work overtime
-             or go back and change settings.
-             */
-            // Temporary
-            // Log.e(LOG_TAG, "Not enough time to work");
-            return null;
-        }
+//        if (maxHours < (estimatedTime / numOfDays) ) {
+//            /*
+//            Make dialog pop up, which will ask for whether or not user would like to work overtime
+//             or go back and change settings.
+//             */
+//            // Temporary
+//            Log.e(LOG_TAG, "Not enough time to work");
+//            for (int i = 0; i < numOfDays; i++) {
+//                distributedTime.set(i, maxHours * 1.0);
+//            }
+//            distributedTime.add(distributedTime.size(), -1.0 * (estimatedTime - numOfDays * maxHours) );
+//            return distributedTime;
+//        }
 
         if (timeUsage == neutralSlope)
             evenDistribution();
@@ -104,129 +108,129 @@ public class Distributor {
     }
 
     public void dealWithExtra(double extraTime) {
-        boolean success;
+        double overtime;
         if (extraTime < 0) {
             extraTime *= -1;
             if (timeUsage == positiveSlope)
-                removeExtraPos(distributedTime, extraTime);
+                overtime = removeExtraPos(distributedTime, extraTime);
             else
-                removeExtraNeg(distributedTime, extraTime);
+                overtime = removeExtraNeg(distributedTime, extraTime);
         }else {
             if (timeUsage == positiveSlope)
-                distributeExtraPos(distributedTime, extraTime);
+                overtime = distributeExtraPos(distributedTime, extraTime);
             else
-                distributeExtraNeg(distributedTime, extraTime);
+                overtime = distributeExtraNeg(distributedTime, extraTime);
         }
+        if (overtime > 0)
+            distributedTime.add(distributedTime.size(), -1.0 * overtime);
 
     }
 
-    public boolean removeExtraPos(List<Double> list, double extra) {
+    public double removeExtraPos(List<Double> list, double extra) {
         double counter = extra / increment;
         int stopCounter = 0, index = 0, distributionSize = list.size(), head;
         while (counter > 0 && stopCounter <= list.size()) {
             head = index % distributionSize;
             stopCounter++;
             if (list.get(head) >= increment) {
-                list.set(head, list.get(head) - increment);
+                list.set(head, list.get(head) - Math.min(increment, counter));
                 counter--;
                 stopCounter = 0;
             }
             index++;
         }
-        if (stopCounter > list.size())	return false;
-        else return true;
+        if (stopCounter > list.size())	return counter * increment;
+        else return 0.0;
     }
 
-    public boolean removeExtraNeg(List<Double> list, double extra) {
+    public double removeExtraNeg(List<Double> list, double extra) {
         double counter = extra / increment;
         int stopCounter = 0, index = 0, distributionSize = list.size(), tail;
         while (counter > 0 && stopCounter <= list.size()) {
             tail = distributionSize - (index % distributionSize) - 1;
             stopCounter++;
             if (list.get(tail) >= increment) {
-                list.set(tail, list.get(tail) - increment);
+                list.set(tail, list.get(tail) - Math.min(increment, counter));
                 counter--;
                 stopCounter = 0;
             }
             index++;
         }
-        if (stopCounter > list.size())	return false;
-        else return true;
+        if (stopCounter > list.size())	return counter * increment;
+        else return 0.0;
 
     }
 
-    public boolean distributeExtraPos(List<Double> list, double extra) {
+    public double distributeExtraPos(List<Double> list, double extra) {
         double counter = extra / increment;
         int stopCounter = 0, index = 0, distributionSize = list.size(), tail;
         while (counter > 0 && stopCounter <= list.size()) {
             tail = distributionSize - index % distributionSize - 1;
             stopCounter++;
             if (list.get(tail) < maxHours) {
-                list.set(tail, list.get(tail) + increment);
+                list.set(tail, list.get(tail) + Math.min(increment, counter));
                 counter--;
                 stopCounter = 0;
             }
             index++;
         }
-        if (stopCounter > list.size())	return false;
-        else return true;
+        if (stopCounter > list.size())	return counter * increment;
+        else return 0.0;
     }
 
-    public boolean distributeExtraPos(List<Double> list, List<Double> other, double extra) {
-        if (list.size() != other.size()) return false;
+    public double distributeExtraPos(List<Double> list, List<Double> other, double extra) {
         double counter = extra / increment;
         int stopCounter = 0, index = 0, distributionSize = list.size(), tail;
         while (counter > 0 && stopCounter <= list.size()) {
             tail = distributionSize - index % distributionSize - 1;
             stopCounter++;
             if (list.get(tail) < maxHours && other.get(tail) < maxHours) {
-                list.set(tail, list.get(tail) + increment);
-                other.set(tail, other.get(tail) + increment);
+                list.set(tail, list.get(tail) + Math.min(increment, counter));
+                other.set(tail, other.get(tail) + Math.min(increment, counter));
                 counter--;
                 stopCounter = 0;
             }
             index++;
         }
-        if (stopCounter > list.size())	return false;
-        else return true;
+        if (stopCounter > list.size())	return counter * increment;
+        else return 0.0;
     }
 
-    public boolean distributeExtraNeg(List<Double> list, double extra) {
+    public double distributeExtraNeg(List<Double> list, double extra) {
         double counter = extra / increment;
         int stopCounter = 0, index = 0, distributionSize = list.size(), head;
         while (counter > 0 && stopCounter <= list.size()) {
             head = index % distributionSize;
             stopCounter++;
             if (list.get(head) < maxHours) {
-                list.set(head, list.get(head) + increment);
+                list.set(head, list.get(head) + Math.min(increment, counter));
                 counter--;
                 stopCounter = 0;
             }
             index++;
         }
-        if (stopCounter > list.size())	return false;
-        else return true;
+        if (stopCounter > list.size())	return counter * increment;
+        else return 0.0;
         // Will bring up dialog which asks user to either work overtime or go back to change settings
 
     }
 
-    public boolean distributeExtraNeg(List<Double> list, List<Double> other, double extra) {
-        if (list.size() != other.size()) return false;
+    public double distributeExtraNeg(List<Double> list, List<Double> other, double extra) {
         double counter = extra / increment;
         int stopCounter = 0, index = 0, distributionSize = list.size(), head;
         while (counter > 0 && stopCounter <= list.size()) {
             head = index % distributionSize;
             stopCounter++;
             if (list.get(head) < maxHours && other.get(head) < maxHours) {
-                list.set(head, list.get(head) + increment);
-                other.set(head, other.get(head) + increment);
+                list.set(head, list.get(head) + Math.min(increment, counter));
+                other.set(head, other.get(head) + Math.min(increment, counter));
                 counter--;
                 stopCounter = 0;
             }
             index++;
         }
-        if (stopCounter > list.size())	return false;
-        else return true;
+        if (stopCounter > list.size())	return counter * increment;
+        else return 0.0;
     }
 
     public static double round(double value, double increment) {
@@ -260,10 +264,13 @@ public class Distributor {
             }
         }
         if (leftovers > 0) {
+            double overtime;
             if (timeUsage == positiveSlope)
-                distributeExtraPos(database, todoHours, leftovers);
+                overtime = distributeExtraPos(database, todoHours, leftovers);
             else
-                distributeExtraNeg(database, todoHours, leftovers);
+                overtime = distributeExtraNeg(database, todoHours, leftovers);
+
+            if (overtime > 0) todoHours.add(distributedTime.size(), -1.0 * overtime);
         }
     }
 
@@ -274,5 +281,7 @@ public class Distributor {
         }
         return sum;
     }
+
+
 
 }
