@@ -84,11 +84,18 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
 
         if(todaysList.size() > 0) {
             setUpTimer();
+            start.setOnClickListener(this);
+            reset.setOnClickListener(this);
+            edit.setOnClickListener(this);
+        } else {
+            start.setOnClickListener(this);
+            start.setEnabled(false);
+            reset.setOnClickListener(this);
+            reset.setEnabled(false);
+            edit.setOnClickListener(this);
+            edit.setEnabled(false);
         }
 
-        start.setOnClickListener(this);
-        reset.setOnClickListener(this);
-        edit.setOnClickListener(this);
         running = false;
     }
 
@@ -209,11 +216,17 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void populateListView(){
-        //get list of todos
+    private List<Todo> getListTodos(){
         dbh = new DatabaseHelper(getActivity());
         todaysList = new ArrayList<Todo>();
         todaysList = dbh.getAllToDosByDay(new Date());
+        return todaysList;
+    }
+
+    private void populateListView(){
+        //get list of todos
+        todaysList = new ArrayList<Todo>();
+        todaysList = getListTodos();
 
         //Build Adapter
         ArrayAdapter<Todo> adapter = new TodoListAdapter();
