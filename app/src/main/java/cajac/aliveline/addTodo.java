@@ -11,6 +11,7 @@ import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -129,9 +130,11 @@ public class addTodo extends DialogFragment {
                     //sending 2do to database
                     dh.createToDo(todo);
                 }
+
+                mCallback.OnAddedTodo();
             }
         });
-        mCallback.OnAddedTodo();
+
         dialog = builder.create();
         dialog.setTitle("Todo Settings");
 
@@ -139,7 +142,6 @@ public class addTodo extends DialogFragment {
         setOnClickListeners(view);
         setEditTexts(view);
         return dialog;
-
     }
 
     @Override

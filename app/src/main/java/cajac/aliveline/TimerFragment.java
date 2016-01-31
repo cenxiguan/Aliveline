@@ -276,7 +276,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
 
         mgr=(AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         i=new Intent(getActivity(), AlarmReceiver.class);
-        pi=PendingIntent.getBroadcast(getActivity(), 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        pi=PendingIntent.getActivity(getActivity(), 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
         mgr.cancel(pi);
         mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
     }

@@ -3,6 +3,7 @@ package cajac.aliveline;
 //import android.app.ActionBar;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -18,10 +19,8 @@ import java.util.Timer;
 
 /* may be helpful to look into sliding tabs in the future
    because TabListener is deprecated.
-
    SO link on Deprecated ActionBar --> http://stackoverflow.com/questions/24473213/action-bar-navigation-modes-are-deprecated-in-android-l
    Google link on Material Design --> http://www.google.com/design/spec/components/tabs.html
-
  */
 public class MainActivity extends AppCompatActivity implements
         ActionBar.TabListener, addTodo.OnTodoAdditionListener {
@@ -162,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void OnAddedTodo() {
-    //    Fragment homeFragment = (Fragment)getSupportFragmentManager().find
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 }
