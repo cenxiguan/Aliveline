@@ -190,6 +190,8 @@ public class CalendarFragment extends Fragment {
         screenHeight = mActivity.getResources().getDisplayMetrics().heightPixels;
     }
 
+    public FragmentManager getFragManager() {return fragmentManager; }
+
     public Fragment getCurrentCal() {
         return currentCal;
     }
@@ -198,7 +200,7 @@ public class CalendarFragment extends Fragment {
         return selectedDate;
     }
 
-    private class CalendarMonthFragment extends Fragment implements OnMonthChangedListener, CalendarResetter {
+    public class CalendarMonthFragment extends Fragment implements OnMonthChangedListener, CalendarResetter {
         private View childView;
         private MaterialCalendarView calendarView;
         private TextView textView;

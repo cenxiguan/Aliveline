@@ -15,6 +15,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+
+import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 
 /* may be helpful to look into sliding tabs in the future
@@ -151,8 +155,25 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void OnAddedTodo() {
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
+        List<Fragment> allFragments = getSupportFragmentManager().getFragments();
+
+        HomeFragment hfrag = (HomeFragment)allFragments.get(0);
+        hfrag.createChart();
+        hfrag.getTodaysList();
+        hfrag.createRecyclerView();
+        hfrag.showList();
+
+        //calendarfrag update
+        //CalendarFragment cfrag = (CalendarFragment)allFragments.get(1);
+        //List<Fragment> calendarFragments = cfrag.getFragManager().getFragments();
+        //CalendarFragment.CalendarMonthFragment calMonFrag = (CalendarFragment.CalendarMonthFragment) calendarFragments.get(0);
+        //calMonFrag.setSelectedDate(new Date());
+
+        TimerFragment tfrag = (TimerFragment)allFragments.get(2);
+        tfrag.populateListView();
+
+        //Intent intent = getIntent();
+        //finish();
+        //startActivity(intent);
     }
 }

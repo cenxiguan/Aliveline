@@ -223,7 +223,7 @@ public class TimerFragment extends Fragment implements View.OnClickListener {
         return todaysList;
     }
 
-    private void populateListView(){
+    public void populateListView(){
         //get list of todos
         todaysList = new ArrayList<Todo>();
         todaysList = getListTodos();
