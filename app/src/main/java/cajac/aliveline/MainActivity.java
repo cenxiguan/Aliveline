@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements
         // Initialization for tabs
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getSupportActionBar();
-        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+        mAdapter = new TabsPagerAdapter(getSupportFragmentManager(),this);
 
         viewPager.setAdapter(mAdapter);
         viewPager.setOffscreenPageLimit(3);
@@ -62,16 +62,8 @@ public class MainActivity extends AppCompatActivity implements
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
-//        actionBar.setBackgroundDrawable();
         actionBar.setStackedBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
-
-        // Adding Tabs with Icons
-        //for (int i=0; i < tabs.length; i++){
-        //    actionBar.addTab(actionBar.newTab().setText(tabs[i])
-        //            .setIcon(getResources().getDrawable(icons[i]))
-        //            .setTabListener(this));
-        //}
 
         if(isScreenNormal()) {
             //creates custom views for ech tab, with icons on top and text on bottom
@@ -118,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements
 
         SharedPreferences sharedPreferences = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-
     }
 
     //creates custom view tab with image on top, text on bottom
