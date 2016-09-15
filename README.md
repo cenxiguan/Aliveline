@@ -25,14 +25,15 @@ In the Calendar tab there are also two Fragments, one with a calendar view and t
 <p>
 The calendar view actually consists of two Fragments, however, there is always only one showing and one hiding. One Fragment is what can be referred to as the "<b>Month View</b>", which uses the API provided by an open-source project called Material CalendarView. There are a few changes we made to its source code, however, adding features such as different size tiles (allowing for a rectangular calendar) and an OnClickListener on the TextView that contains the month of the calendar. The other Fragment is the "<b>Day View</b>" which is a RecyclerView and a custom EndlessScrollListener class. The Fragment allows for infinite scrolling both to the left and the right. 
 </p>
-![Demo of Aliveline Calendar Tab](http://cdn.makeagif.com/media/9-30-2015/GocbZ-.gif)
+
+<img src="https://github.com/jmaeda/Aliveline/blob/master/Demo_of_Aliveline_Calendar_Tab.gif" height="500" />
 
 <h4>Timer</h4>
 <p>
 The Timer tab is more of an optional feature that helps track the amount of work one does in a day. 
 </p>
 
-![Demo of Aliveline Timer](http://cdn.makeagif.com/media/9-30-2015/ZCDAC7.gif)
+<img src="https://github.com/jmaeda/Aliveline/blob/master/Demo_of_Aliveline_Timer.gif" height="500" />
 
 <h4>Settings</h4>
 <p>
